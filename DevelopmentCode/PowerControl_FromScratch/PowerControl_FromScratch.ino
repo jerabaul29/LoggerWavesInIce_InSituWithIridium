@@ -8,7 +8,7 @@
 volatile int nbr_remaining;
 
 #define DEBUG true
-#define SHOW_LED true
+#define SHOW_LED false
 
 #define PIN_MSR_BAT A0      // measure of battery
 #define PIN_MSR_SOL A1      // measure of solar panel on anode
@@ -25,8 +25,11 @@ volatile int nbr_remaining;
 #define EPS_VOLT 20 // epsilon voltage; 20 is 20 * 5 / 1024.0 approx 0.1V
 #define MIN_MARGIN_PANEL 0.5  // minimum over voltage panel vs battery for it to be worth connecting
 
-#define CYCLES_BEFORE_MEGA_WAKEUP 5 // number of cycles before waking up the Mega; if sleep 8s, typically 37 cycles
-                                    // are 5 minutes
+#define CYCLES_BEFORE_MEGA_WAKEUP 4 // number of loop () cycles before waking up the Mega
+                                    // if deep sleep 80s, 4 loop() is a bit over 5 minutes
+
+// #define CYCLES_DEEP_SLEEP 10 // for production
+#define CYCLES_DEEP_SLEEP 1  // for tests
 
 float meas_battery = 0.0;
 float meas_solar_panel_anode = 0.0;
@@ -82,12 +85,15 @@ void setup() {
 
   // set digital pins (analog pins do not need to be set)
   pinMode(PIN_FBK_MGA, INPUT);
-  pinMode(PIN_CMD_LED, OUTPUT);
+  #if SHOW_LED
+    pinMode(PIN_CMD_LED, OUTPUT);
+  #endif
   pinMode(PIN_MFT_SOL, INPUT);
   pinMode(PIN_MFT_MGA, INPUT);
 
-  digitalWrite(PIN_CMD_LED, LOW);
-
+  #if SHOW_LED
+    digitalWrite(PIN_CMD_LED, LOW);
+  #endif
 }
 
 void loop() {
@@ -164,7 +170,7 @@ void loop() {
   }
 
   else{
-    if (remaining_before_mega_wakeup == 0){
+    if (remaining_before_mega_wakeup <= 0){
       #if DEBUG
         Serial.println(F("Time to wake up the mega"));
         delay(50);
@@ -189,7 +195,7 @@ void loop() {
   // --------------------------------------------------------------
   // Sleep
   // --------------------------------------------------------------
-  sleep(1);
+  sleep(CYCLES_DEEP_SLEEP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -230,10 +236,9 @@ float read_solar_panel_anode(){
   // simply disconnected.
 
   // open the MOSFET commanding solar panel to be sure that +5V on +
-  pinMode(PIN_MFT_SOL, OUTPUT);
-  digitalWrite(PIN_MFT_SOL, LOW);
+  pinMode(PIN_MFT_SOL, INPUT);
 
-  delay(100);
+  delay(200);
 
   // measure on - of solar panel
   int value_measurement_solar_panel_anode;
@@ -328,7 +333,9 @@ void sleep(int ncycles)
   nbr_remaining = ncycles; // defines how many cycles should sleep
 
   // let all pins float instead
-  pinMode(PIN_CMD_LED, INPUT);
+  #if SHOW_LED
+    pinMode(PIN_CMD_LED, INPUT);
+  #endif
 
   // Set sleep to full power down.  Only external interrupts or
   // the watchdog timer can wake the CPU!
@@ -361,8 +368,8 @@ void sleep(int ncycles)
   sbi(ADCSRA,ADEN);
   power_all_enable();
 
-  pinMode(PIN_CMD_LED, OUTPUT);
-  //
-  digitalWrite(PIN_CMD_LED, LOW);
-
+  #if SHOW_LED
+    pinMode(PIN_CMD_LED, OUTPUT);
+    digitalWrite(PIN_CMD_LED, LOW);
+  #endif
 }
