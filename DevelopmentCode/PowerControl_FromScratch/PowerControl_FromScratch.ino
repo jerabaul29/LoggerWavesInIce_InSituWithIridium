@@ -5,7 +5,7 @@
 
 // how many times remain to sleep before wake up
 // volatile to be modified in interrupt function
-volatile int nbr_remaining; 
+volatile int nbr_remaining;
 
 #define DEBUG true
 #define SHOW_LED true
@@ -18,7 +18,6 @@ volatile int nbr_remaining;
 #define PIN_MFT_SOL 2      // command mosfet solar panel / battery
 #define PIN_FBK_MGA 3      // feedback from Mega
 #define PIN_MFT_MGA 4      // command mosfet giving to the Mega
-#define PIN_CMD_MGA 5      // command from the Mega: Mega asking or not for current
 #define PIN_CMD_LED 13      // command of intern LED
 
 #define BAT_THRESHOLD_V 3.7  // thereshold for full battery
@@ -39,6 +38,16 @@ int command_from_mega = 0;
 
 int remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
 bool mega_awake = false;
+
+//clear bit macro
+#ifndef cbi
+#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
+#endif
+
+//set bit macro
+#ifndef sbi
+#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
+#endif
 
 void setup() {
   // --------------------------------------------------------------
@@ -70,23 +79,20 @@ void setup() {
     Serial.println(F("Set pins..."));
     delay(50);
   #endif
-  
+
   // set digital pins (analog pins do not need to be set)
   pinMode(PIN_FBK_MGA, INPUT);
   pinMode(PIN_CMD_LED, OUTPUT);
-  pinMode(PIN_MFT_SOL, OUTPUT);
-  pinMode(PIN_MFT_MGA, OUTPUT);
-  pinMode(PIN_CMD_MGA, INPUT);
+  pinMode(PIN_MFT_SOL, INPUT);
+  pinMode(PIN_MFT_MGA, INPUT);
 
   digitalWrite(PIN_CMD_LED, LOW);
-  digitalWrite(PIN_MFT_SOL, LOW);
-  digitalWrite(PIN_MFT_MGA, LOW);
 
 }
 
 void loop() {
   wdt_reset();
-  
+
   #if DEBUG
     Serial.println();
     Serial.println(F("Start new cycle..."));
@@ -99,8 +105,8 @@ void loop() {
   meas_battery = float(analogRead(PIN_MSR_BAT)) * 5.0 / 1024.0;
   meas_solar_panel_anode = read_solar_panel_anode();
   solar_panel_voltage = meas_battery - meas_solar_panel_anode;
-  command_from_mega = digitalRead(PIN_CMD_MGA);
-  
+  command_from_mega = digitalRead(PIN_FBK_MGA);
+
 
   #if DEBUG
     Serial.print(F("meas_battery: "));
@@ -130,8 +136,7 @@ void loop() {
     #if DEBUG
       Serial.println(F("Disconnect battery panel now"));
     #endif
-    pinMode(PIN_MFT_SOL, OUTPUT);
-    digitalWrite(PIN_MFT_SOL, LOW);
+    pinMode(PIN_MFT_SOL, INPUT);
     delay(50);
   }
 
@@ -151,8 +156,7 @@ void loop() {
         delay(50);
       #endif
 
-    pinMode(PIN_MFT_MGA, OUTPUT);
-    digitalWrite(PIN_MFT_MGA, LOW);
+    pinMode(PIN_MFT_MGA, INPUT);
 
     mega_awake = false;
     remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
@@ -180,8 +184,8 @@ void loop() {
       remaining_before_mega_wakeup--;
     }
   }
-  
-  
+
+
   // --------------------------------------------------------------
   // Sleep
   // --------------------------------------------------------------
@@ -217,20 +221,20 @@ bool should_connect_array(void){
     #endif
     return(true);
   }
-  
+
 }
 
 float read_solar_panel_anode(){
   // return the tension accross the solar panel
   // Should call take_care_battery_solar after this function to not let the solar panel
   // simply disconnected.
-  
+
   // open the MOSFET commanding solar panel to be sure that +5V on +
   pinMode(PIN_MFT_SOL, OUTPUT);
   digitalWrite(PIN_MFT_SOL, LOW);
 
   delay(100);
-  
+
   // measure on - of solar panel
   int value_measurement_solar_panel_anode;
   value_measurement_solar_panel_anode = analogRead(PIN_MSR_SOL);
@@ -284,14 +288,14 @@ ISR(WDT_vect)
         // must be rebooted
         // configure
         MCUSR = 0;                          // reset flags
-       
+
                                             // Put timer in reset-only mode:
         WDTCSR |= 0b00011000;               // Enter config mode.
         WDTCSR =  0b00001000 | 0b000000;    // clr WDIE (interrupt enable...7th from left)
                                             // set WDE (reset enable...4th from left), and set delay interval
                                             // reset system in 16 ms...
                                             // unless wdt_disable() in loop() is reached first
-                                       
+
         // reboot
         while(1);
     }
@@ -303,49 +307,62 @@ ISR(WDT_vect)
 // be determined in the ISR function
 void configure_wdt(void)
 {
- 
+
   cli();                           // disable interrupts for changing the registers
 
   MCUSR = 0;                       // reset status register flags
 
-                                   // Put timer in interrupt-only mode:                                       
+                                   // Put timer in interrupt-only mode:
   WDTCSR |= 0b00011000;            // Set WDCE (5th from left) and WDE (4th from left) to enter config mode,
                                    // using bitwise OR assignment (leaves other bits unchanged).
   WDTCSR =  0b01000000 | 0b100001; // set WDIE: interrupt enabled
                                    // clr WDE: reset disabled
                                    // and set delay interval (right side of bar) to 8 seconds
 
-  sei();                           // re-enable interrupts 
+  sei();                           // re-enable interrupts
 }
 
 // Put the Arduino to deep sleep. Only an interrupt can wake it up.
 void sleep(int ncycles)
-{  
+{
   nbr_remaining = ncycles; // defines how many cycles should sleep
+
+  // let all pins float instead
+  pinMode(PIN_CMD_LED, INPUT);
 
   // Set sleep to full power down.  Only external interrupts or
   // the watchdog timer can wake the CPU!
+  power_all_disable();
+
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
- 
+
   // Turn off the ADC while asleep.
-  power_adc_disable();
- 
+  // power_adc_disable();
+  cbi(ADCSRA,ADEN);
+
+  sleep_enable();
+
   while (nbr_remaining > 0){ // while some cycles left, sleep!
 
-  // Enable sleep and enter sleep mode.
-  sleep_mode();
+    // Enable sleep and enter sleep mode.
+    sleep_mode();
 
-  // CPU is now asleep and program execution completely halts!
-  // Once awake, execution will resume at this point if the
-  // watchdog is configured for resume rather than restart
- 
-  // When awake, disable sleep mode
-  sleep_disable();
- 
+    // CPU is now asleep and program execution completely halts!
+    // Once awake, execution will resume at this point if the
+    // watchdog is configured for resume rather than restart
+
+    // When awake, disable sleep mode
+    sleep_disable();
+
   }
- 
-  // put everything on again
-  power_all_enable();
- 
-}
 
+  // put everything on again
+  // power_all_enable();
+  sbi(ADCSRA,ADEN);
+  power_all_enable();
+
+  pinMode(PIN_CMD_LED, OUTPUT);
+  //
+  digitalWrite(PIN_CMD_LED, LOW);
+
+}
