@@ -7,8 +7,8 @@
 // volatile to be modified in interrupt function
 volatile int nbr_remaining;
 
-#define DEBUG true
-#define SHOW_LED false
+#define DEBUG false
+#define SHOW_LED true
 
 #define PIN_MSR_BAT A0      // measure of battery
 #define PIN_MSR_SOL A1      // measure of solar panel on anode
@@ -99,6 +99,13 @@ void setup() {
 void loop() {
   wdt_reset();
 
+  #if SHOW_LED
+    controlled_blink(50, 20);
+    delay(2000);
+  #endif
+
+  wdt_reset();
+
   #if DEBUG
     Serial.println();
     Serial.println(F("Start new cycle..."));
@@ -126,6 +133,8 @@ void loop() {
     delay(50);
   #endif
 
+  wdt_reset();
+
   // --------------------------------------------------------------
   // Decide what should do with the solar panel
   // --------------------------------------------------------------
@@ -133,6 +142,9 @@ void loop() {
   if (connect_battery_panel){
     #if DEBUG
       Serial.println(F("Connect battery panel now"));
+    #endif
+    #if SHOW_LED
+      controlled_blink(25, 20);
     #endif
     pinMode(PIN_MFT_SOL, OUTPUT);
     digitalWrite(PIN_MFT_SOL, HIGH);
@@ -142,9 +154,18 @@ void loop() {
     #if DEBUG
       Serial.println(F("Disconnect battery panel now"));
     #endif
+    #if SHOW_LED
+      controlled_blink(500, 2);
+    #endif
     pinMode(PIN_MFT_SOL, INPUT);
     delay(50);
   }
+
+  #if SHOW_LED
+    delay(1000);
+  #endif
+
+  wdt_reset();
 
   // --------------------------------------------------------------
   // Decide what to do with the Arduino Mega
@@ -155,11 +176,17 @@ void loop() {
         Serial.println(F("Mega is asking for more current; keep awake"));
         delay(50);
       #endif
+      #if SHOW_LED
+        controlled_blink(25, 20);
+      #endif
     }
     else{
       #if DEBUG
         Serial.println(F("Mega is not asking for more current; shut down"));
         delay(50);
+      #endif
+      #if SHOW_LED
+        controlled_blink(500, 2);
       #endif
 
     pinMode(PIN_MFT_MGA, INPUT);
@@ -174,6 +201,9 @@ void loop() {
       #if DEBUG
         Serial.println(F("Time to wake up the mega"));
         delay(50);
+      #endif
+      #if SHOW_LED
+        controlled_blink(50, 10);
       #endif
 
       pinMode(PIN_MFT_MGA, OUTPUT);
@@ -191,6 +221,7 @@ void loop() {
     }
   }
 
+  wdt_reset();
 
   // --------------------------------------------------------------
   // Sleep
