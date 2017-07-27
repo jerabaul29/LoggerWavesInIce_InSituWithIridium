@@ -1,0 +1,3 @@
+NOTES
+
+- power control system: give access to all Arduino pins in PCB CAD (using headers).

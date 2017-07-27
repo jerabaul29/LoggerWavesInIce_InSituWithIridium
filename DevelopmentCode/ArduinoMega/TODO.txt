@@ -1,0 +1,5 @@
+- documentation pins
+- clean code
+- mega feedback
+- give power raspberry pi
+- iridium (?)
