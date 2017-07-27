@@ -21,24 +21,76 @@
  * SCL to SCL
  * SDA to SDA
  * 
+ * CONVENTIONS:
+ * - S,: message about the Start of the file: booting, or new file timer
+ * - M,: timestamp in Arduino internal clock reference frame
+ * - R,: raw data about battery level
+ * - C,: converted data about battery level
+ * - B,: binary data
+ * - $G: start of GPS data. When parsing, this is turned into a _G and _Gt file. Problematic lines (ie lines for which parsing
+do not work) are stored in a _P (and timestamps in a _Pt) file.
+ * - I;: start IMU data
+ * - D;: debugging data
+ * - P:: commands for the Raspberry Pi
+ * 
  */
 
  /*
   * TODO:
-  * clean
-  * watchodog
+  * First at setup: decide if should sleep more or be active (MGA_FBK)
   * RaspberryPi
   * Iridium
+  * clean
   */
 
+/*
+ * IDEAS:
+ * 
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ * Keep track of configuration
+ * 
+ * Mega:
+ * -- how often to wake up
+ * -- battery limit to not wake up at all
+ * 
+ * RPi:
+ * -- what processing to do
+ * -- what information to send back by iridium
+ * 
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ * Iridium:
+ * 
+ * controls to the logger:
+ * -- to the Mega:
+ * ------ number of cycles to sleep
+ * ------ dump lines number A to B in a SD file F
+ * -- to the RPi:
+ * ------ which processing to do
+ * ------ which processing to send back
+ * ------ send back old processing
+ * 
+ * data from the logger:
+ * -- about the logger
+ * ------ battery voltage
+ * ------ if solar panel is connected
+ * ------ GPS position (if can get a fix)
+ * ------ current file index used (the one when waking up)
+ * 
+ * -- about the files
+ * ------ dump of file F lines A to B
+ * 
+ * -- about the RPi
+ * ------ send the result of the analysis
+ *
+ */
+
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// include the libraries
+// include libraries
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #include <SPI.h>
 #include <SD.h>
 #include <Adafruit_GPS.h>
-// note: we do not use software serial
-// but it seems to be necessary for initializing
+// note: we do not use software serial but it seems to be necessary for initializing
 // Adafruit_GPS library
 #include <SoftwareSerial.h>
 #include <EEPROM.h>
@@ -50,17 +102,15 @@
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // SD card
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// slave select on Arduino Mega
-// this is for the SPI driven SD card
+// slave select on Arduino Mega: this is for the SPI driven SD card use
 const int chipSelect = 53;
 // name of the file on which writting in the SD card library type
 File dataFile;
-
-// for tests
+// for printing information about all files present on SD card
 File root;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// GPS def
+// GPS
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // config GPS chip and instance creation
 #define SERIAL_GPS Serial1
@@ -69,31 +119,30 @@ Adafruit_GPS GPS(&SERIAL_GPS);
 String dataStringGPS = "";
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// filename gestion
+// SD card filename
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // filename, will be modified based on EEPROM data for saving on several files
 char currentFileName[] = "F00000";
-int nbrOfZeros = 5; // number of zeros after the letter in the name convention
-// time in milliseconds after which write to a new file
-//                      900 s is 900 000 milliseconds is 15 minutes
+// number of zeros after the letter in the name convention
+int nbrOfZeros = 5;
+// time in milliseconds after which write to a new file, 900 s is 900 000 milliseconds is 15 minutes
 //#define time_WNF 900000
 #define time_WNF 60000
-//#define time_WNF 10000
-// timer for writting new file
-unsigned long timer_WNF = 1;
+// time tracking variable for writting new file
+unsigned long time_tracking_WNF = 1;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// EEPROM gestion
+// EEPROM
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// address in which stores if the EEPROM has been used to generate file numbers before
-int address_init = 0;
-// address in which stores the current file numbering
-int address_numberReset = 1;
+// EEPROM gestion for filename on SD card ---------------------------------------
+// address in which stores the current file numbering; this will extend from
+// this address to 4 more bytes (use long int)
+int address_numberReset = 1; // ie EEPROM bytes 1, 2, 3, and 4 are used
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// IMU gestion
+// IMU
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// Connection of LSM9DS0 as I2C.
+// Connection of LSM9DS0 as I2C -------------------------------------------------
 
 // Assign a unique base ID for the sensor
 Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0(1000);  // Use I2C, ID #1000
@@ -129,8 +178,9 @@ void configureSensor(void)
 //unsigned long interval_sampling_micro = 50000L; // 20 HZ
 //unsigned long interval_sampling_micro = 100000L; // 10 HZ
 unsigned long interval_sampling_micro = 1000000L; // 1 HZ
-unsigned long time_previous;
-unsigned long time_current;
+
+// variables for timing when should measure again
+unsigned long time_previous_IMU;
 
 // IMU string
 String dataStringIMU = "";
@@ -138,7 +188,16 @@ String dataStringIMU = "";
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Some parameters
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Parameters about serial connections on Serial (USB port) ---------------------
+
+// for debugging: print strings about actions on serial
 #define SERIAL_PRINT true
+// for connection with the Raspberry Pi
+#define SERIAL_RPY false
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// SETUP LOOP
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 void setup(){
   // let the time to open computer serial if needed %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -307,10 +366,9 @@ void loop(){
   // IMU stuff %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   // check if time to do new measurement
-  time_current = micros();
-  if (time_current - time_previous >= interval_sampling_micro) {
+  if (micros() - time_previous_IMU >= interval_sampling_micro) {
 
-    time_previous += interval_sampling_micro;
+    time_previous_IMU += interval_sampling_micro;
 
     // Get a new sensor event
     lsm.getEvent(&accel, &mag, &gyro, &temp);
@@ -409,19 +467,19 @@ void postSD(String dataStringPost){
   // when using it at high frequency
 
   #if SERIAL_PRINT
-  unsigned long startLog = millis();
-  Serial.println();
-  Serial.println("Start post...");
-  Serial.print("Time log beginning: ");
-  Serial.println(startLog);
+    unsigned long startLog = millis();
+    Serial.println();
+    Serial.println("Start post...");
+    Serial.print("Time log beginning: ");
+    Serial.println(startLog);
   #endif
 
   // decide if time to write to a new file
-  if (millis() - timer_WNF > time_WNF){
-    // reset timer
-    timer_WNF = millis();
+  if (millis() - time_tracking_WNF > time_WNF){
+    // update time tracking
+    time_tracking_WNF += time_WNF;
     #if SERIAL_PRINT
-    Serial.println("Update file name because timer");
+      Serial.println("Update file name because timer");
     #endif
     UpdateCurrentFile();
     dataFile.println("S,New file created (timer)\n");
@@ -435,11 +493,11 @@ void postSD(String dataStringPost){
     delay(5);
 
     #if SERIAL_PRINT
-    Serial.println("post success, content:");
-    Serial.print(dataStringPost);
+      Serial.println("post success, content:");
+      Serial.print(dataStringPost);
     #endif
   }
-  // if the file isn't open, pop up an error:
+  // else the file isn't open, pop up an error:
   // and reboot
   else {
     #if SERIAL_PRINT
@@ -451,18 +509,18 @@ void postSD(String dataStringPost){
   }
 
   #if SERIAL_PRINT
-  unsigned long endLog = millis();
-  Serial.print("Time log end: ");
-  Serial.println(endLog);
-  Serial.print("Time log delay: ");
-  Serial.println(endLog-startLog);
+    unsigned long endLog = millis();
+    Serial.print("Time log end: ");
+    Serial.println(endLog);
+    Serial.print("Time log delay: ");
+    Serial.println(endLog-startLog);
   #endif
 
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// reads from EEPROM the name of the next file on which to write and updates the EEPROM
-// open the new current file
+// read from EEPROM the name of the next file on which to write, update the EEPROM
+// and open the new current file
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void UpdateCurrentFile(){
 
@@ -491,10 +549,10 @@ void UpdateCurrentFile(){
   }
 
   #if SERIAL_PRINT
-  Serial.print("str_rank: ");
-  Serial.println(str_index);
-  Serial.print("File name: ");
-  Serial.println(currentFileName);
+    Serial.print("str_rank: ");
+    Serial.println(str_index);
+    Serial.print("File name: ");
+    Serial.println(currentFileName);
   #endif
 
   delay(5);
@@ -524,7 +582,7 @@ void EEPROMWritelong(int address, long value)
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// read 4 bytes of memory from the EEPROM (address up to address + 4)
+// read 4 bytes of memory from the EEPROM (address up to address + 3)
 // assemble the 4 bytes to form a long variable
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 long EEPROMReadlong(long address)
@@ -544,7 +602,7 @@ long EEPROMReadlong(long address)
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void generateDataStringIMU(){
   dataStringIMU = "";
-  dataStringIMU += "IMU;";
+  dataStringIMU += "I;";
   dataStringIMU += String(accel.acceleration.x);
   dataStringIMU += ";";
   dataStringIMU += String(accel.acceleration.y);
