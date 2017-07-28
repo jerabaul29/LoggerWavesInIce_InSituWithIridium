@@ -38,6 +38,9 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
  /*
   * TODO:
   * 
+  * RaspberryPi
+  * Iridium
+  * 
   * open serial port if Raspberry pi alone only later on?
   * 
   * wake up Iridium modem
