@@ -2,7 +2,9 @@
  * Code for power control
  * 
  * TODO:
- * add a power threshold low to not switch on the Mega if too low battery
+ * put the pololu on a MOSFET from the battery side (to disconnect it when not needed, ie when not using
+ * the Mega). Then need to be sure voltage on capacitors do not get too low: re connect pololu when logging with
+ * Mega, and connect at least 8 seconds each 15 minutes [note: check values].
  * 
  */
 

@@ -38,6 +38,8 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
  /*
   * TODO:
   * 
+  * fix possible bug in waiting time (?) so that if 0 waiting time reboot at once, if 1 waiting time start working at next wake up
+  * 
   * open serial port if Raspberry pi alone only later on?
   * 
   * wake up Iridium modem
@@ -362,17 +364,34 @@ void loop(){
   // send update orders to RPi ----------------------------------------------------
 
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  // EVERYTHING IS DONE: SLEEP
+  // EVERYTHING IS DONE: SLEEP OR REBOOT
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  pinMode(PIN_FBK_MGA, INPUT);
+  if (TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP == 0){
+    #if SERIAL_PRINT
+      Serial.println(F("D;Do not sleep; log again at once"));
+    #endif
 
-  wdt_disable();
-
-  while (1){
-    make_sleep();
+    // reboot
+    wdt_enable(WDTO_15MS);     // enable the watchdog, 15 ms
+    while(1){
+    }
   }
-  
+
+  else{
+
+    #if SERIAL_PRINT
+      Serial.println(F("D;Ask no more current and sleep"));
+    #endif
+    
+    pinMode(PIN_FBK_MGA, INPUT);
+
+    wdt_disable();
+
+    while (1){
+      make_sleep();
+    }
+  }
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -809,7 +828,7 @@ void decide_if_wakeup(void){
       delay(5);
     #endif
   
-    EEPROM.write(address_sleeps_left, TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP - 1);
+    EEPROM.write(address_sleeps_left, TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP);
 
     pinMode(PIN_FBK_MGA, INPUT);
 
@@ -818,8 +837,8 @@ void decide_if_wakeup(void){
     }
   }
 
-  // if ok value >0: decrease by one and sleep
-  else if (number_sleeps_left > 0){
+  // if ok value >1: must sleep more; decrease by one and sleep
+  else if (number_sleeps_left > 1){
     
     #if SERIAL_PRINT
       Serial.println(F("D;Sleep more"));
@@ -835,8 +854,8 @@ void decide_if_wakeup(void){
     }
   }
 
-  // if <1: time to wake up
-  else if (number_sleeps_left < 1){
+  // if <2: time to wake up
+  else if (number_sleeps_left < 2){
     #if SERIAL_PRINT
       Serial.println(F("D;Time to wake up!"));
       delay(5);
