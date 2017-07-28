@@ -38,8 +38,6 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
  /*
   * TODO:
   * 
-  * fix possible bug in waiting time (?) so that if 0 waiting time reboot at once, if 1 waiting time start working at next wake up
-  * 
   * open serial port if Raspberry pi alone only later on?
   * 
   * wake up Iridium modem

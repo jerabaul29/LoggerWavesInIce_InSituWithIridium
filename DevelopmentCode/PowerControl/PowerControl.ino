@@ -2,6 +2,9 @@
  * Code for power control
  * 
  * TODO:
+ * 
+ * When seeing if Mega needs power, give it 5 seconds to boot and test if needs power or not
+ * 
  * put the pololu on a MOSFET from the battery side (to disconnect it when not needed, ie when not using
  * the Mega). Then need to be sure voltage on capacitors do not get too low: re connect pololu when logging with
  * Mega, and connect at least 8 seconds each 15 minutes [note: check values].
@@ -225,7 +228,25 @@ void loop() {
       
         pinMode(PIN_MFT_MGA, OUTPUT);
         digitalWrite(PIN_MFT_MGA, HIGH);
-        mega_awake = true;
+
+        // see if the Mega actually wanted to be waken up
+        // give the Mega the time to boot
+        delay(2000);
+
+        // measure again the level of the Mega
+        command_from_mega = digitalRead(PIN_FBK_MGA);
+
+        if (command_from_mega){
+          Serial.println(F("The mega wants to be up"));
+          mega_awake = true;
+        }
+
+        else{
+          Serial.println(F("The mega wants to be down"));
+          mega_awake = false;
+          pinMode(PIN_MFT_MGA, INPUT);
+        }
+
       }
       else{
         #if DEBUG
@@ -233,9 +254,9 @@ void loop() {
           Serial.println(F("Skip this wakeup"));
           delay(50);
         #endif
-
-        remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
       }
+
+      remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
     }
     
     else{
