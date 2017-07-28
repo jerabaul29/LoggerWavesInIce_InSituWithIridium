@@ -38,9 +38,7 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
  /*
   * TODO:
   * 
-  * keep track of what initial file number is after new file has been created
-  * 
-  * perform only logging only for so long should before switching to post logging behavior
+  * open serial port if Raspberry pi alone only later on?
   * 
   * wake up Iridium modem
   * wake up RPi, send last data file, get back processed data
@@ -155,9 +153,9 @@ char currentFileName[] = "F00000";
 // number of zeros after the letter in the name convention
 int nbrOfZeros = 5;
 // time in milliseconds after which write to a new file, 900 s is 900 000 milliseconds is 15 minutes
-//#define time_WNF 900000
-#define time_WNF 960000 // put some margin relatively to duration_logging_ms
-//#define time_WNF 60000
+//#define TIME_WNF 900000
+#define TIME_WNF 960000 // put some margin relatively to duration_logging_ms
+//#define TIME_WNF 60000
 // time tracking variable for writting new file
 unsigned long time_tracking_WNF = 1;
 
@@ -168,6 +166,10 @@ unsigned long time_tracking_WNF = 1;
 // address in which stores the current file numbering; this will extend from
 // this address to 4 more bytes (use long int)
 int address_numberReset = 1; // ie EEPROM bytes 1, 2, 3, and 4 are used
+
+// EEPROM gestion for sleeping --------------------------------------------------
+// address for where number of sleep cycles left stored
+int address_sleeps_left = 5;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // IMU
@@ -206,8 +208,9 @@ void configureSensor(void)
 //unsigned long interval_sampling_micro = 10000L; // 100 HZ
 // unsigned long interval_sampling_micro = 20000L; // 50 HZ
 //unsigned long interval_sampling_micro = 50000L; // 20 HZ
-//unsigned long interval_sampling_micro = 100000L; // 10 HZ
-unsigned long interval_sampling_micro = 1000000L; // 1 HZ
+// unsigned long interval_sampling_micro = 100000L; // 10 HZ
+unsigned long interval_sampling_micro = 200000L; // 5 HZ
+// unsigned long interval_sampling_micro = 1000000L; // 1 HZ
 
 // variables for timing when should measure again
 unsigned long time_previous_IMU;
@@ -227,17 +230,17 @@ String dataStringIMU = "";
 
 // how often should wake up -----------------------------------------------------
 // how many 'wake up cycles' by the power controlleft before really wake up
-// this should be stored in EEPROM
-int address_sleeps_left = 5;
+// this should be stored in EEPROM, see EEPROM section: address_sleeps_left
 int number_sleeps_left;
 // how many 'wake up cycles' should sleep between two real wake ups
 // this can be either hard coded
-#define TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP 10
+#define TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP 1
 // or defined in EEPROM so that possible to update by Iridium
 // TODO
 
 // how long should log ----------------------------------------------------------
-#define duration_logging_ms 900000
+#define DURATION_LOGGING_MS 930000
+unsigned long time_start_logging_ms = 1;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Some parameters for serial
@@ -245,9 +248,9 @@ int number_sleeps_left;
 // Parameters about serial connections on Serial (USB port) ---------------------
 
 // for debugging: print strings about actions on serial
-#define SERIAL_PRINT true
+#define SERIAL_PRINT false
 // for connection with the Raspberry Pi
-#define SERIAL_RPY false
+#define SERIAL_RPI false
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -260,11 +263,15 @@ void setup(){
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // OPEN SERIAL IF NECESSARY
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // #if SERIAL_PRINT || SERIAL_RPI
   #if SERIAL_PRINT
     // let the time to open computer serial if needed
     delay(5000);
     // Open serial communications and wait for port to open:
     Serial.begin(115200);
+  #endif
+  
+  #if SERIAL_PRINT
     while (!Serial) {
       ; // wait for serial port to connect.
     }
@@ -284,6 +291,10 @@ void setup(){
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   setup_logging();
+
+  
+  time_tracking_WNF = millis();
+  time_start_logging_ms = millis();
   
 }
 
@@ -301,7 +312,7 @@ void loop(){
   // LOGGING
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  while (millis() < duration_logging_ms){
+  while (millis() - time_start_logging_ms < DURATION_LOGGING_MS){
     wdt_reset();
     logging_loop();
   }
@@ -313,9 +324,42 @@ void loop(){
   // POST LOGGING
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  // RPI stuff %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // start booting RPi ------------------------------------------------------------
 
-  // IRD stuff %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // set Iridium up; record when set up (note: do it earlier? Wait at least 120s --
+  // before trying to send messages)
+
+  // wait for RPi to be booted and ready ------------------------------------------
+
+  // send last data file to RPi ---------------------------------------------------
+  // this is file currentFileName[]
+
+  // send vital information by Iridium --------------------------------------------
+  // get vital information
+  // battery level
+
+  // GPS position
+  // try to get a fix for at most one minute
+
+  // assemble information
+
+  // try to send for at most five minutes
+  
+
+  // wait for answer from Pi being ready to transmit by Iridium -------------------
+
+  // send all RPi data by Iridium -------------------------------------------------
+
+  // try to send each message at most 5 times; if does not work at some point,
+  // abort all following attempts
+
+  // receive commands from Iridium ------------------------------------------------
+
+  // try at most 5 times
+
+  // update Mega setup with commands ----------------------------------------------
+
+  // send update orders to RPi ----------------------------------------------------
 
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // EVERYTHING IS DONE: SLEEP
@@ -362,7 +406,7 @@ void printDirectory(File dir, int numTabs) {
       break;
     }
     for (uint8_t i = 0; i < numTabs; i++) {
-      Serial.print("D;\t");
+      Serial.print("\t");
     }
     Serial.print(entry.name());
     if (entry.isDirectory()) {
@@ -370,7 +414,7 @@ void printDirectory(File dir, int numTabs) {
       printDirectory(entry, numTabs + 1);
     } else {
       // files have sizes, directories do not
-      Serial.print("D;\t\t");
+      Serial.print("\t\t");
       Serial.println(entry.size(), DEC);
     }
     entry.close();
@@ -394,9 +438,9 @@ void postSD(String dataStringPost){
   #endif
 
   // decide if time to write to a new file
-  if (millis() - time_tracking_WNF > time_WNF){
+  if (millis() - time_tracking_WNF > TIME_WNF){
     // update time tracking
-    time_tracking_WNF += time_WNF;
+    time_tracking_WNF += TIME_WNF;
     #if SERIAL_PRINT
       Serial.println("D;Update file name because timer");
     #endif
@@ -595,6 +639,7 @@ void logging_loop(void){
     // Get a new sensor event
     lsm.getEvent(&accel, &mag, &gyro, &temp);
 
+    /*
     #if SERIAL_PRINT
       Serial.print("D;**********************\n");
       // print out accelleration data
@@ -617,6 +662,7 @@ void logging_loop(void){
 
       Serial.println("D;**********************\n");
     #endif
+    */
 
     // generate the string to post on SD card
     generateDataStringIMU();
@@ -654,7 +700,7 @@ void setup_logging(void){
     blinkLED();
   }
   #if SERIAL_PRINT
-    Serial.println("card initialized.");
+    Serial.println("D;card initialized.");
   #endif
 
   #if SERIAL_PRINT
@@ -740,7 +786,7 @@ void decide_if_wakeup(void){
 
   // pull up FBK_MEGA
   #if SERIAL_PRINT
-    Serial.println(F("Put PIN_FBK_MGA HIGH"));
+    Serial.println(F("D;Put PIN_FBK_MGA HIGH"));
     delay(5);
   #endif
   

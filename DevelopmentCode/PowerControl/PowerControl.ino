@@ -1,3 +1,11 @@
+/*
+ * Code for power control
+ * 
+ * TODO:
+ * add a power threshold low to not switch on the Mega if too low battery
+ * 
+ */
+
 #include <avr/wdt.h>            // library for default watchdog functions
 #include <avr/interrupt.h>      // library for interrupts handling
 #include <avr/sleep.h>          // library for sleep
@@ -20,16 +28,17 @@ volatile int nbr_remaining;
 #define PIN_MFT_MGA 4      // command mosfet giving to the Mega
 #define PIN_CMD_LED 13      // command of intern LED
 
-#define BAT_THRESHOLD_V 3.7  // thereshold for full battery
+#define BAT_THRESHOLD_V 3.6  // threshold for full battery
+#define BAT_EMPTY_V 2.85     // threshold for empty battery
 #define BAT_THRESHOLD_C 758  // threshold for full battery 3.7V: 1024 * 3.7 / 5.0 approx 748
 #define EPS_VOLT 20 // epsilon voltage; 20 is 20 * 5 / 1024.0 approx 0.1V
 #define MIN_MARGIN_PANEL 0.5  // minimum over voltage panel vs battery for it to be worth connecting
 
-#define CYCLES_BEFORE_MEGA_WAKEUP 4 // number of loop () cycles before waking up the Mega
+#define CYCLES_BEFORE_MEGA_WAKEUP 10 // number of loop () cycles before waking up the Mega
                                     // if deep sleep 80s, 4 loop() is a bit over 5 minutes
 
-// #define CYCLES_DEEP_SLEEP 10 // for production
-#define CYCLES_DEEP_SLEEP 1  // for tests
+#define CYCLES_DEEP_SLEEP 10 // for production
+// #define CYCLES_DEEP_SLEEP 1  // for tests
 
 float meas_battery = 0.0;
 float meas_solar_panel_anode = 0.0;
@@ -206,11 +215,27 @@ void loop() {
         controlled_blink(50, 10);
       #endif
 
-      pinMode(PIN_MFT_MGA, OUTPUT);
-      digitalWrite(PIN_MFT_MGA, HIGH);
+      if (BAT_EMPTY_V < meas_battery){
+        #if DEBUG
+          Serial.println(F("Enough battery"));
+          delay(50);
+        #endif
+      
+        pinMode(PIN_MFT_MGA, OUTPUT);
+        digitalWrite(PIN_MFT_MGA, HIGH);
+        mega_awake = true;
+      }
+      else{
+        #if DEBUG
+          Serial.println(F("Not enough battery"));
+          Serial.println(F("Skip this wakeup"));
+          delay(50);
+        #endif
 
-      mega_awake = true;
+        remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
+      }
     }
+    
     else{
       #if DEBUG
         Serial.println(F("Mega should sleep more"));
