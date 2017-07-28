@@ -37,14 +37,35 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
 
  /*
   * TODO:
-  * First at setup: decide if should sleep more or be active (MGA_FBK)
+  * 
+  * keep track of what initial file number is after new file has been created
+  * 
+  * perform only logging only for so long should before switching to post logging behavior
+  * 
+  * wake up Iridium modem
+  * wake up RPi, send last data file, get back processed data
+  * find a (if possible, valid) GPS position string; wait at most N=20 GPS messages to find a valid
+  * if necessary, wait a bit more for Iridium to be ready
+  * send critical information by Iridium: GPS. battery, current file number, other (?)
+  * send data received back from the Pi
+  * update all parameters following instructions by Iridium
+  * 
+  * 
   * RaspberryPi
   * Iridium
   * clean
+  * 
+  * put logging and post logging in loops
+  * 
   */
 
 /*
  * IDEAS:
+ * 
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ * Wake-up
+ * 
+ * Power control should give power each 5 minutes
  * 
  * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  * Keep track of configuration
@@ -85,6 +106,12 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
  */
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// PRELIMINARY
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // include libraries
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #include <SPI.h>
@@ -98,6 +125,8 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LSM9DS0.h>
 #include <avr/wdt.h>
+#include <avr/sleep.h>          // library for sleep
+#include <avr/power.h>          // library for power control
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // SD card
@@ -127,7 +156,8 @@ char currentFileName[] = "F00000";
 int nbrOfZeros = 5;
 // time in milliseconds after which write to a new file, 900 s is 900 000 milliseconds is 15 minutes
 //#define time_WNF 900000
-#define time_WNF 60000
+#define time_WNF 960000 // put some margin relatively to duration_logging_ms
+//#define time_WNF 60000
 // time tracking variable for writting new file
 unsigned long time_tracking_WNF = 1;
 
@@ -186,7 +216,31 @@ unsigned long time_previous_IMU;
 String dataStringIMU = "";
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// Some parameters
+// Feedback Mega
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// feedback mega pin: high as long as the Mega should get power
+#define PIN_FBK_MGA 48
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Timing parameters for the logger behavior
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+// how often should wake up -----------------------------------------------------
+// how many 'wake up cycles' by the power controlleft before really wake up
+// this should be stored in EEPROM
+int address_sleeps_left = 5;
+int number_sleeps_left;
+// how many 'wake up cycles' should sleep between two real wake ups
+// this can be either hard coded
+#define TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP 10
+// or defined in EEPROM so that possible to update by Iridium
+// TODO
+
+// how long should log ----------------------------------------------------------
+#define duration_logging_ms 900000
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Some parameters for serial
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Parameters about serial connections on Serial (USB port) ---------------------
 
@@ -196,20 +250,19 @@ String dataStringIMU = "";
 #define SERIAL_RPY false
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // SETUP LOOP
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 void setup(){
-  // let the time to open computer serial if needed %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  delay(5000);
 
-  // enable watchdog, if 8 seconds hang %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  wdt_enable(WDTO_8S);
-  wdt_reset();
-
-  // open serial %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // OPEN SERIAL IF NECESSARY
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   #if SERIAL_PRINT
+    // let the time to open computer serial if needed
+    delay(5000);
     // Open serial communications and wait for port to open:
     Serial.begin(115200);
     while (!Serial) {
@@ -217,206 +270,72 @@ void setup(){
     }
     Serial.println();
     Serial.println();
-    Serial.println("Booting");
-    // check if everyhting is normal with Mega speed
-    int time1 = millis();
-    Serial.println();
-    Serial.print("Time1: ");
-    Serial.print(time1);
-    time1 = millis();
-    Serial.println();
-    Serial.print("Time2: ");
-    Serial.print(time1);
-    Serial.println();
-  #endif
-  
-  wdt_reset();
-
-  // setup SD card %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  // see if the card is present and can be initialized:
-  if (!SD.begin(chipSelect)) {
-    #if SERIAL_PRINT
-      Serial.println("Card failed, or not present");
-    #endif
-    // blink to indicate failure
-    blinkLED();
-  }
-  #if SERIAL_PRINT
-    Serial.println("card initialized.");
+    Serial.println("D;Booting");
   #endif
 
-  #if SERIAL_PRINT
-    root = SD.open("/");
-    printDirectory(root, 0);
-    Serial.println("done!");
-  #endif
-  
-  wdt_reset();
-  
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // SEE IF SHOULD WAKE UP OR JUST SLEEP MORE
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  // setup GPS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  delay(250);
+  decide_if_wakeup();
 
-  // 9600 NMEA is the default baud rate for Adafruit MTK GPS's- some use 4800
-  GPS.begin(9600);
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // SETUP LOGGING
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  // uncomment this line to turn on RMC (recommended minimum) and GGA (fix data) including altitude
-  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-  // uncomment this line to turn on only the "minimum recommended" data
-  // GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
-
-  // Set the update rate
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
-  GPS.sendCommand(PMTK_API_SET_FIX_CTL_1HZ);
-  // For the parsing code to work nicely and have time to sort thru the data, and
-  // print it out we don't suggest using anything higher than 1 Hz
-
-  // Request updates on antenna status, comment out to keep quiet
-  // GPS.sendCommand(PGCMD_ANTENNA);
-
-  delay(1000);
-
-  // Ask for firmware version
-  // SERIAL_GPS.println(PMTK_Q_RELEASE);
-
-  #if SERIAL_PRINT
-    Serial.println("GPS initialized");
-  #endif
-
-  wdt_reset();
-
-  // update the name of the file to write on %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  // update the EEPROM
-  // name of the current file on which writting on the SD card, print that
-  // booted from beginning, print battery state
-  UpdateCurrentFile();
-  dataFile.println("S,Booting from beginning!\n");
-
-  wdt_reset();
-
-  // Initialize IMU %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  #if SERIAL_PRINT
-    Serial.println(F("IMU initialisation")); Serial.println("");
-  #endif
-
-  /* Initialise the sensor */
-  if (!lsm.begin())
-  {
-    #if SERIAL_PRINT
-      Serial.print(F("No LSM9DS0 detected"));
-    #endif
-    while (1);
-  }
-  #if SERIAL_PRINT
-    Serial.println(F("found LSM9DS0"));
-  #endif
-
-  #if SERIAL_PRINT
-    Serial.println(F("configure sensor"));
-  #endif
-  configureSensor();
-
-  wdt_reset();
+  setup_logging();
   
 }
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// MAIN LOOP
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 void loop(){
 
   wdt_reset();
 
-  // add a small delay to avoid conflicts when reading several
-  // ports at possibly high frequency
-  delayMicroseconds(10);
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // LOGGING
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  // GPS stuff %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  // check at each loop if new information from the GPS
-  while (SERIAL_GPS.available()>0){
-
-    char c_GPS = GPS.read();
-
-    if (c_GPS=='\n'){
-
-      // reached the end of a string: time to log
-
-      // add millis informations
-      dataStringGPS += "\nM,";
-      dataStringGPS += String(millis());
-
-      // SD post
-      postSD(dataStringGPS);
-      #if SERIAL_PRINT
-        Serial.println(dataStringGPS);
-      #endif
-
-      // re initialize the logging string
-      dataStringGPS = "";
-
-    }
-    else{
-      dataStringGPS += c_GPS;
-    }
+  while (millis() < duration_logging_ms){
+    wdt_reset();
+    logging_loop();
   }
 
-  wdt_reset();
-
-  // IMU stuff %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  // check if time to do new measurement
-  if (micros() - time_previous_IMU >= interval_sampling_micro) {
-
-    time_previous_IMU += interval_sampling_micro;
-
-    // Get a new sensor event
-    lsm.getEvent(&accel, &mag, &gyro, &temp);
-
-    #if SERIAL_PRINT
-      Serial.print("**********************\n");
-      // print out accelleration data
-      Serial.print("Accel X: "); Serial.print(accel.acceleration.x); Serial.print(" ");
-      Serial.print("  \tY: "); Serial.print(accel.acceleration.y);       Serial.print(" ");
-      Serial.print("  \tZ: "); Serial.print(accel.acceleration.z);     Serial.println("  \tm/s^2");
-
-      // print out magnetometer data
-      Serial.print("Magn. X: "); Serial.print(mag.magnetic.x); Serial.print(" ");
-      Serial.print("  \tY: "); Serial.print(mag.magnetic.y);       Serial.print(" ");
-      Serial.print("  \tZ: "); Serial.print(mag.magnetic.z);     Serial.println("  \tgauss");
+  // close logging file
+  dataFile.close();
   
-      // print out gyroscopic data
-      Serial.print("Gyro  X: "); Serial.print(gyro.gyro.x); Serial.print(" ");
-      Serial.print("  \tY: "); Serial.print(gyro.gyro.y);       Serial.print(" ");
-      Serial.print("  \tZ: "); Serial.print(gyro.gyro.z);     Serial.println("  \tdps");
-
-      // print out temperature data
-      Serial.print("Temp: "); Serial.print(temp.temperature); Serial.println(" *C");
-
-      Serial.println("**********************\n");
-    #endif
-
-    // generate the string to post on SD card
-    generateDataStringIMU();
-    
-    // post data
-    // SD post
-    postSD(dataStringIMU);
-    #if SERIAL_PRINT
-      Serial.println(dataStringIMU);
-    #endif
-    
-  }
-
-  wdt_reset();
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // POST LOGGING
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   // RPI stuff %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   // IRD stuff %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  // SLEEPING DECISION stuff %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // EVERYTHING IS DONE: SLEEP
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  pinMode(PIN_FBK_MGA, INPUT);
+
+  wdt_disable();
+
+  while (1){
+    make_sleep();
+  }
   
 }
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// FUNCTIONS / OTHER
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // LED 13 blink
@@ -443,7 +362,7 @@ void printDirectory(File dir, int numTabs) {
       break;
     }
     for (uint8_t i = 0; i < numTabs; i++) {
-      Serial.print('\t');
+      Serial.print("D;\t");
     }
     Serial.print(entry.name());
     if (entry.isDirectory()) {
@@ -451,7 +370,7 @@ void printDirectory(File dir, int numTabs) {
       printDirectory(entry, numTabs + 1);
     } else {
       // files have sizes, directories do not
-      Serial.print("\t\t");
+      Serial.print("D;\t\t");
       Serial.println(entry.size(), DEC);
     }
     entry.close();
@@ -469,8 +388,8 @@ void postSD(String dataStringPost){
   #if SERIAL_PRINT
     unsigned long startLog = millis();
     Serial.println();
-    Serial.println("Start post...");
-    Serial.print("Time log beginning: ");
+    Serial.println("D;Start post...");
+    Serial.print("D;Time log beginning: ");
     Serial.println(startLog);
   #endif
 
@@ -479,7 +398,7 @@ void postSD(String dataStringPost){
     // update time tracking
     time_tracking_WNF += time_WNF;
     #if SERIAL_PRINT
-      Serial.println("Update file name because timer");
+      Serial.println("D;Update file name because timer");
     #endif
     UpdateCurrentFile();
     dataFile.println("S,New file created (timer)\n");
@@ -493,7 +412,7 @@ void postSD(String dataStringPost){
     delay(5);
 
     #if SERIAL_PRINT
-      Serial.println("post success, content:");
+      Serial.println("D;post success, content:");
       Serial.print(dataStringPost);
     #endif
   }
@@ -501,7 +420,7 @@ void postSD(String dataStringPost){
   // and reboot
   else {
     #if SERIAL_PRINT
-    Serial.println("post failure");
+    Serial.println("D;post failure");
     #endif
     while(1){
       // do nothing watchdog fires
@@ -510,9 +429,9 @@ void postSD(String dataStringPost){
 
   #if SERIAL_PRINT
     unsigned long endLog = millis();
-    Serial.print("Time log end: ");
+    Serial.print("D;Time log end: ");
     Serial.println(endLog);
-    Serial.print("Time log delay: ");
+    Serial.print("D;Time log delay: ");
     Serial.println(endLog-startLog);
   #endif
 
@@ -549,9 +468,9 @@ void UpdateCurrentFile(){
   }
 
   #if SERIAL_PRINT
-    Serial.print("str_rank: ");
+    Serial.print("D;str_rank: ");
     Serial.println(str_index);
-    Serial.print("File name: ");
+    Serial.print("D;File name: ");
     Serial.println(currentFileName);
   #endif
 
@@ -600,7 +519,7 @@ long EEPROMReadlong(long address)
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // generate the dataStringIMU to be posted on SD card
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void generateDataStringIMU(){
+void generateDataStringIMU(void){
   dataStringIMU = "";
   dataStringIMU += "I;";
   dataStringIMU += String(accel.acceleration.x);
@@ -623,5 +542,293 @@ void generateDataStringIMU(){
   dataStringIMU += ";";
   dataStringIMU += "\nM,";
   dataStringIMU += String(millis());
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// logging loop
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+void logging_loop(void){
+
+  // add a small delay to avoid conflicts when reading several
+  // ports at possibly 'high' frequency
+  delayMicroseconds(10);
+
+  // GPS stuff %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  // check at each loop if new information from the GPS
+  while (SERIAL_GPS.available()>0){
+
+    char c_GPS = GPS.read();
+
+    if (c_GPS=='\n'){
+
+      // reached the end of a string: time to log
+
+      // add millis informations
+      dataStringGPS += "\nM,";
+      dataStringGPS += String(millis());
+
+      // SD post
+      postSD(dataStringGPS);
+      #if SERIAL_PRINT
+        Serial.println(dataStringGPS);
+      #endif
+
+      // re initialize the logging string
+      dataStringGPS = "";
+
+    }
+    else{
+      dataStringGPS += c_GPS;
+    }
+  }
+
+  wdt_reset();
+
+  // IMU stuff %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  // check if time to do new measurement
+  if (micros() - time_previous_IMU >= interval_sampling_micro) {
+
+    time_previous_IMU += interval_sampling_micro;
+
+    // Get a new sensor event
+    lsm.getEvent(&accel, &mag, &gyro, &temp);
+
+    #if SERIAL_PRINT
+      Serial.print("D;**********************\n");
+      // print out accelleration data
+      Serial.print("D;Accel X: "); Serial.print(accel.acceleration.x); Serial.print(" ");
+      Serial.print("D;  \tY: "); Serial.print(accel.acceleration.y);       Serial.print(" ");
+      Serial.print("D;  \tZ: "); Serial.print(accel.acceleration.z);     Serial.println("  \tm/s^2");
+
+      // print out magnetometer data
+      Serial.print("D;Magn. X: "); Serial.print(mag.magnetic.x); Serial.print(" ");
+      Serial.print("D;  \tY: "); Serial.print(mag.magnetic.y);       Serial.print(" ");
+      Serial.print("D;  \tZ: "); Serial.print(mag.magnetic.z);     Serial.println("  \tgauss");
+  
+      // print out gyroscopic data
+      Serial.print("D;Gyro  X: "); Serial.print(gyro.gyro.x); Serial.print(" ");
+      Serial.print("D;  \tY: "); Serial.print(gyro.gyro.y);       Serial.print(" ");
+      Serial.print("D;  \tZ: "); Serial.print(gyro.gyro.z);     Serial.println("  \tdps");
+
+      // print out temperature data
+      Serial.print("D;Temp: "); Serial.print(temp.temperature); Serial.println(" *C");
+
+      Serial.println("D;**********************\n");
+    #endif
+
+    // generate the string to post on SD card
+    generateDataStringIMU();
+    
+    // post data
+    // SD post
+    postSD(dataStringIMU);
+    #if SERIAL_PRINT
+      Serial.println(dataStringIMU);
+    #endif
+  }
+
+  wdt_reset();
+  
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// setup if should log
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+void setup_logging(void){
+
+  // enable watchdog, if 8 seconds hang %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  wdt_enable(WDTO_8S);
+  wdt_reset();
+
+  // setup SD card %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {
+    #if SERIAL_PRINT
+      Serial.println("D;Card failed, or not present");
+    #endif
+    // blink to indicate failure
+    blinkLED();
+  }
+  #if SERIAL_PRINT
+    Serial.println("card initialized.");
+  #endif
+
+  #if SERIAL_PRINT
+    root = SD.open("/");
+    printDirectory(root, 0);
+    Serial.println("D;done!");
+  #endif
+  
+  wdt_reset();
+  
+  // setup GPS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  delay(250);
+
+  // 9600 NMEA is the default baud rate for Adafruit MTK GPS's- some use 4800
+  GPS.begin(9600);
+
+  // uncomment this line to turn on RMC (recommended minimum) and GGA (fix data) including altitude
+  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
+  // uncomment this line to turn on only the "minimum recommended" data
+  // GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
+
+  // Set the update rate
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
+  GPS.sendCommand(PMTK_API_SET_FIX_CTL_1HZ);
+  // For the parsing code to work nicely and have time to sort thru the data, and
+  // print it out we don't suggest using anything higher than 1 Hz
+
+  // Request updates on antenna status, comment out to keep quiet
+  // GPS.sendCommand(PGCMD_ANTENNA);
+
+  delay(1000);
+
+  // Ask for firmware version
+  // SERIAL_GPS.println(PMTK_Q_RELEASE);
+
+  #if SERIAL_PRINT
+    Serial.println("GPS initialized");
+  #endif
+
+  wdt_reset();
+
+  // update the name of the file to write on %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  // update the EEPROM
+  // name of the current file on which writting on the SD card, print that
+  // booted from beginning, print battery state
+  UpdateCurrentFile();
+  dataFile.println("S,Booting from beginning!\n");
+
+  wdt_reset();
+
+  // Initialize IMU %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  #if SERIAL_PRINT
+    Serial.println(F("D;IMU initialisation")); Serial.println("");
+  #endif
+
+  /* Initialise the sensor */
+  if (!lsm.begin())
+  {
+    #if SERIAL_PRINT
+      Serial.print(F("D;No LSM9DS0 detected"));
+    #endif
+    while (1);
+  }
+  #if SERIAL_PRINT
+    Serial.println(F("D;found LSM9DS0"));
+  #endif
+
+  #if SERIAL_PRINT
+    Serial.println(F("D;configure sensor"));
+  #endif
+  configureSensor();
+
+  wdt_reset();
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// decide if should really wake up or just sleep more
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+void decide_if_wakeup(void){
+
+  // pull up FBK_MEGA
+  #if SERIAL_PRINT
+    Serial.println(F("Put PIN_FBK_MGA HIGH"));
+    delay(5);
+  #endif
+  
+  pinMode(PIN_FBK_MGA, OUTPUT);
+  digitalWrite(PIN_FBK_MGA, HIGH);
+  
+  // value of the EEPROM: number of more cycles to sleep
+  number_sleeps_left = int(EEPROM.read(address_sleeps_left));
+
+  #if SERIAL_PRINT
+    Serial.print(F("D;number_sleeps_left: "));
+    Serial.println(number_sleeps_left);
+    delay(5);
+  #endif
+
+  // if too high value: set back to max number of sleep cycles and sleep
+  if (number_sleeps_left > TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP){
+    #if SERIAL_PRINT
+      Serial.println(F("D;Too high number_sleeps_left: reset"));
+      delay(5);
+    #endif
+  
+    EEPROM.write(address_sleeps_left, TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP - 1);
+
+    pinMode(PIN_FBK_MGA, INPUT);
+
+    while(1){
+      make_sleep();
+    }
+  }
+
+  // if ok value >0: decrease by one and sleep
+  else if (number_sleeps_left > 0){
+    
+    #if SERIAL_PRINT
+      Serial.println(F("D;Sleep more"));
+      delay(5);
+    #endif
+    
+    EEPROM.write(address_sleeps_left, number_sleeps_left - 1);
+
+    pinMode(PIN_FBK_MGA, INPUT);
+
+    while(1){
+      make_sleep();
+    }
+  }
+
+  // if <1: time to wake up
+  else if (number_sleeps_left < 1){
+    #if SERIAL_PRINT
+      Serial.println(F("D;Time to wake up!"));
+      delay(5);
+    #endif
+    
+    EEPROM.write(address_sleeps_left, TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP);
+  }
+
+  else{
+    #if SERIAL_PRINT
+      Serial.println(F("D;Something wrong"));
+      delay(5);
+    #endif
+
+    EEPROM.write(address_sleeps_left, TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP - 1);
+
+    pinMode(PIN_FBK_MGA, INPUT);
+
+    while(1){
+      make_sleep();
+    }
+  }
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// make Arduino Mega sleep
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+void make_sleep(void){
+  #if SERIAL_PRINT
+    Serial.println(F("D;Make Mega sleep"));
+    delay(5);
+  #endif
+  
+  power_all_disable();
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  power_adc_disable();
+  sleep_enable();
+  sleep_mode();
 }
 
