@@ -38,8 +38,12 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
  /*
   * TODO:
   * 
+  * measure battery
   * RaspberryPi
   * Iridium
+  * 
+  * Improve the logging by average of oversampling?
+  * Use an extended buffer Arduino Mega core
   * 
   * open serial port if Raspberry pi alone only later on?
   * 
@@ -757,7 +761,7 @@ void setup_logging(void){
   // SERIAL_GPS.println(PMTK_Q_RELEASE);
 
   #if SERIAL_PRINT
-    Serial.println("GPS initialized");
+    Serial.println("D;GPS initialized");
   #endif
 
   wdt_reset();

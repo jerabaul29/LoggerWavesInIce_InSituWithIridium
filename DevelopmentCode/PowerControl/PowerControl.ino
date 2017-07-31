@@ -38,7 +38,7 @@ volatile int nbr_remaining;
 #define MIN_MARGIN_PANEL 0.5  // minimum over voltage panel vs battery for it to be worth connecting
 
 #define CYCLES_BEFORE_MEGA_WAKEUP 10 // number of loop () cycles before waking up the Mega
-                                    // if deep sleep 80s, 4 loop() is a bit over 5 minutes
+                                     // if deep sleep 80s, 4 loop() is a bit over 5 minutes
 
 #define CYCLES_DEEP_SLEEP 10 // for production
 // #define CYCLES_DEEP_SLEEP 1  // for tests
