@@ -45,6 +45,11 @@ int current_n_read_GPS = 0;
 char Iridium_msg[100];
 int Iridium_msg_position = 0;
 
+uint8_t Ird_rx[270];
+size_t Ird_rx_position = sizeof(Ird_rx);
+
+int ird_feedback = -1;
+
 
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
@@ -55,6 +60,7 @@ int Iridium_msg_position = 0;
 // note: we do not use software serial but it seems to be necessary for initializing
 // Adafruit_GPS library
 #include <SoftwareSerial.h>
+#include <avr/wdt.h>
 
 // GPS
 // config GPS chip and instance creation
@@ -154,12 +160,38 @@ void setup() {
 
 
 
-
+  wdt_enable(WDTO_8S);
+  wdt_reset();
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void loop() {
 
+
+
+  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+  // not to add to the Mega part; just to wait for user input /////////////////
+  while (1){
+
+    wdt_reset();
+    
+    if (Serial.available() > 0){
+      char c_read;
+      c_read = Serial.read();
+      if (c_read == 'T'){
+        break;
+      }
+    }
+  }
+  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+
+
+
+  wdt_reset();
+
+  // get the Iridium feedback string ready
   set_battery_value_Iridium_message();
 
   set_file_number_Iridium_message();
@@ -167,7 +199,26 @@ void loop() {
   obtain_GPRMC_Iridium_message();
   set_GPRMC_Iridium_message();
 
-  delay(20000);
+  // try to send the Iridium feedback string
+  // note: retries the operation for up to 300 seconds by default; put watchdog reset in
+  // ISBDCallback.
+  ird_feedback = isbd.sendReceiveSBDBinary((uint8_t *)Iridium_msg, size_t(1 + GPS_rx_buffer_position),
+                                           Ird_rx, Ird_rx_position);
+
+  #if SERIAL_PRINT
+    Serial.println((uint8_t)Iridium_msg);
+  #endif
+
+  #if SERIAL_PRINT
+    if (ird_feedback != 0){
+      Serial.print("D;Problem transmitting: ");
+      Serial.println(ird_feedback);
+    }
+    else{
+      Serial.println("D;Transmitted well");
+    }
+  #endif
+
 
 }
 
@@ -229,6 +280,8 @@ void obtain_GPRMC_Iridium_message(void){
   // try to read at most 10 GPS strings; if no valid GPRMC strings
   // 10 times in a row, just use the last one
   while (current_n_read_GPS < 10) {
+
+    wdt_reset();
 
     // if this is the beginning of a new GPS message, log it,
     // check if GPRMC and check if valid
@@ -325,5 +378,10 @@ void set_GPRMC_Iridium_message(void){
     }
     Serial.println();
   #endif
+}
+
+bool ISBDCallback(void){
+  wdt_reset();
+  return(true);
 }
 

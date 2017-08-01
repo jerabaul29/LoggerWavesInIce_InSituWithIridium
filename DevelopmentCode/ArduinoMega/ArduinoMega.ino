@@ -4,6 +4,9 @@
  * 
  * PINS:
  * 
+ * -- Misc.
+ * A0 to batt + (measure battery)
+ * 
  * -- Adafruit GPS:
  * GND, Vin (5V)
  * TX to RX1
@@ -20,6 +23,12 @@
  * GND, Vin (5V)
  * SCL to SCL
  * SDA to SDA
+ * 
+ * -- RockBlock7
+ * GND, Vin (5V)
+ * Sleep (On Off) to 49 
+ * TXD to Mega TX2
+ * RXD to Mega RX2
  * 
  * CONVENTIONS:
  * - S,: message about the Start of the file: booting, or new file timer
@@ -255,7 +264,7 @@ unsigned long time_start_logging_ms = 1;
 // Parameters about serial connections on Serial (USB port) ---------------------
 
 // for debugging: print strings about actions on serial
-#define SERIAL_PRINT false
+#define SERIAL_PRINT true
 // for connection with the Raspberry Pi
 #define SERIAL_RPI false
 
