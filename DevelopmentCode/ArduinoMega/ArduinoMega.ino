@@ -29,6 +29,7 @@
  * Sleep (On Off) to 49 
  * TXD to Mega TX2
  * RXD to Mega RX2
+ * Interface through the Internet: https://rockblock.rock7.com/Operations
  * 
  * CONVENTIONS:
  * - S,: message about the Start of the file: booting, or new file timer
@@ -42,14 +43,23 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
  * - D;: debugging data
  * - P:: commands for the Raspberry Pi
  * 
+ * CONVERT DECIMAL / HEX / ASCII / BINARY:
+ * https://www.branah.com/ascii-converter
+ * 
+ * 
  */
 
  /*
   * TODO:
   * 
+  * let Iridium charge super capacitor for 40 seconds before switching to sleep
+  * check that Iridium waits enough between transmission tries
+  * set TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP using Iridium in EEPROM
   * receive commands from Iridium
   * RaspberryPi
   * Iridium
+  * put a safety to make sure that wakes up at least once every couple of days
+  * 
   * 
   * Improve the logging by average of oversampling?
   * Use an extended buffer Arduino Mega core
@@ -1147,7 +1157,6 @@ void obtain_GPRMC_Iridium_message(void){
           Serial.println("D;GPRMC");
       #endif
 
-        current_n_read_GPS++;
       }
 
       // check if valid fix; if it is the case, finish here
@@ -1159,13 +1168,14 @@ void obtain_GPRMC_Iridium_message(void){
         break;
       }
 
-    }
+      current_n_read_GPS++;
 
-  // if GPS logging started at the middle of a string,
-  // wait for the end of next message
-  if (SERIAL_GPS.available() > 0) {
-          c_GPS = GPS.read();
-  }
+    }
+    // if GPS logging started at the middle of a string,
+    // wait for the end of next message
+    else if (SERIAL_GPS.available() > 0) {
+            c_GPS = GPS.read();
+    }
 
   }
 }

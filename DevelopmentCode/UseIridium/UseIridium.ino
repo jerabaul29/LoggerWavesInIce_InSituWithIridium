@@ -207,7 +207,7 @@ void loop() {
   //////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////
 
-  // read Iridium commands if available
+  // read Iridium command if available
 
   #if SERIAL_PRINT
     Serial.print("Inbound buffer size is ");
@@ -221,7 +221,44 @@ void loop() {
     Serial.print("Messages left: ");
     Serial.println(isbd.getWaitingMessageCount());
   #endif
+
+  wdt_reset();
+
+  // check if command back
+  if (Ird_rx_position > 0){
+    #if SERIAL_PRINT
+      Serial.println(F("Ird_rx_position > 0"));
+    #endif
+
+    // check if should update number of sleep cycles
+    // this kind of message should be of the form: SLP12 [set the number of sleep cycles
+    // to 12]
+    if (char(Ird_rx[0]) == 'S' && char(Ird_rx[1]) == 'L' && char(Ird_rx[2]) == 'P'){
+       int value_sleep = uint8_t(Ird_rx[3]);
+
+      #if SERIAL_PRINT
+        Serial.print(F("Will sleep for:"));
+        Serial.println(value_sleep);
+      #endif
+    }
+
+    // last hex message: 534c5006
+
+    // check if should send some commands to RPi
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////
 }
+
+/*
+ * GOT ANSWER IN CONSOLE:
+ * 
+D;Transmitted well
+Inbound buffer size is 5
+T(84) e(101) s(115) t(116) 1(49) Messages left: 0
+ *
+ */
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Put the battery value reading in the Iridium message
@@ -344,12 +381,11 @@ void obtain_GPRMC_Iridium_message(void){
       }
 
     }
-
-  // if GPS logging started at the middle of a string,
-  // wait for the end of next message
-  if (SERIAL_GPS.available() > 0) {
-          c_GPS = GPS.read();
-  }
+    // if GPS logging started at the middle of a string,
+    // wait for the end of next message
+    else if (SERIAL_GPS.available() > 0) {
+            c_GPS = GPS.read();
+    }
 
   }
 }
