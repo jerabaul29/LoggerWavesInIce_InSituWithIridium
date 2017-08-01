@@ -292,6 +292,7 @@ int Iridium_msg_position = 0;
 
 uint8_t Ird_rx[270];
 size_t Ird_rx_position = sizeof(Ird_rx);
+//size_t Ird_rx_position = 0;
 
 int ird_feedback = -1;
 
@@ -381,11 +382,10 @@ void loop(){
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   // ------------------------------------------------------------------------------
-  // send the vital information Iridium messages ----------------------------------
+  // send the vital information Iridium messages
+  // and receive a message if available
 
   send_Iridium_vital_information();
-
-  
 
   // ------------------------------------------------------------------------------
   // receive the Iridium instructions and parse -----------------------------------
