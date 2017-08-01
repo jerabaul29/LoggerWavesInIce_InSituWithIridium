@@ -47,7 +47,7 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
  /*
   * TODO:
   * 
-  * measure battery
+  * receive commands from Iridium
   * RaspberryPi
   * Iridium
   * 
@@ -141,6 +141,8 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
 #include <avr/wdt.h>
 #include <avr/sleep.h>          // library for sleep
 #include <avr/power.h>          // library for power control
+#include "IridiumSBD.h"
+#include<stdlib.h>
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // SD card
@@ -269,6 +271,31 @@ unsigned long time_start_logging_ms = 1;
 #define SERIAL_RPI false
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Iridium
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#define PIN_IRD_SLEEP 49
+#define SERIAL_IRIDIUM Serial2
+
+#define PIN_MSR_BATTERY A0
+String string_battery = "";
+
+IridiumSBD isbd(SERIAL_IRIDIUM, PIN_IRD_SLEEP);
+int signalQuality = 255;
+
+char GPS_rx_buffer[128];
+int GPS_rx_buffer_position = 0;
+
+int current_n_read_GPS = 0;
+
+char Iridium_msg[100];
+int Iridium_msg_position = 0;
+
+uint8_t Ird_rx[270];
+size_t Ird_rx_position = sizeof(Ird_rx);
+
+int ird_feedback = -1;
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // SETUP LOOP
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -304,6 +331,7 @@ void setup(){
 
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // SETUP LOGGING
+  // NOTE: watchdog is activated after here
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   setup_logging();
@@ -311,6 +339,16 @@ void setup(){
   
   time_tracking_WNF = millis();
   time_start_logging_ms = millis();
+
+  wdt_reset();
+
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // SETUP IRIDIUM
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  setup_iridium();
+
+  wdt_reset();
   
 }
 
@@ -335,10 +373,22 @@ void loop(){
 
   // close logging file
   dataFile.close();
+
+  wdt_reset();
   
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // POST LOGGING
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  // ------------------------------------------------------------------------------
+  // send the vital information Iridium messages ----------------------------------
+
+  send_Iridium_vital_information();
+
+  
+
+  // ------------------------------------------------------------------------------
+  // receive the Iridium instructions and parse -----------------------------------
 
   // start booting RPi ------------------------------------------------------------
 
@@ -910,4 +960,246 @@ void make_sleep(void){
   sleep_enable();
   sleep_mode();
 }
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// setup iridium
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+void setup_iridium(void){
+
+  #if SERIAL_PRINT
+    Serial.println("D;Starting Iridium SBD object");
+  #endif
+
+  SERIAL_IRIDIUM.begin(19200);
+
+  #if SERIAL_PRINT
+    Serial.println("D;Serial to Iridium SBD");
+    isbd.attachConsole(Serial);
+    isbd.attachDiags(Serial);
+  #endif
+
+  #if SERIAL_PRINT
+    Serial.println("D;Iridium power profile");
+  #endif
+
+  // set power profile
+  // 0 when high power supply
+  // 1 when low power supply
+  isbd.setPowerProfile(0);
+
+  #if SERIAL_PRINT
+    Serial.println("D;Iridium begin method");
+  #endif
+
+  // Wake up and prepare to communicate
+  isbd.begin();
+
+  // go to sleep
+  isbd.sleep();
+  
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// send Iridium vital information
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+void send_Iridium_vital_information(void){
+  wdt_reset();
+
+  // wake up the Iridium
+  isbd.begin();
+
+  // get the Iridium feedback string ready
+  set_battery_value_Iridium_message();
+
+  set_file_number_Iridium_message();
+
+  obtain_GPRMC_Iridium_message();
+  set_GPRMC_Iridium_message();
+
+  // try to send the Iridium feedback string
+  // note: retries the operation for up to 300 seconds by default; put watchdog reset in
+  // ISBDCallback.
+  ird_feedback = isbd.sendReceiveSBDBinary((uint8_t *)Iridium_msg, size_t(1 + GPS_rx_buffer_position),
+                                           Ird_rx, Ird_rx_position);
+
+  #if SERIAL_PRINT
+    Serial.println((uint8_t)Iridium_msg);
+  #endif
+
+  #if SERIAL_PRINT
+    if (ird_feedback != 0){
+      Serial.print("D;Problem transmitting: ");
+      Serial.println(ird_feedback);
+    }
+    else{
+      Serial.println("D;Transmitted well");
+    }
+  #endif
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Put the battery value reading in the Iridium message
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+void set_battery_value_Iridium_message(void){
+  // measure battery
+  string_battery = String(analogRead(PIN_MSR_BATTERY), DEC);
+
+  #if SERIAL_PRINT
+    Serial.println(F("D;Battery reading"));
+    Serial.print("D;");
+    Serial.print(string_battery[0]);
+    Serial.print(string_battery[1]);
+    Serial.println(string_battery[2]);
+  #endif
+
+  Iridium_msg[0] = string_battery[0];
+  Iridium_msg[1] = string_battery[1];
+  Iridium_msg[2] = string_battery[2];
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Put the file number in the Iridium message
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+void set_file_number_Iridium_message(void){
+  // get file number
+
+  #if SERIAL_PRINT
+    Serial.println(F("D;File number"));
+    Serial.print("D;");
+    for (int i = 1; i < nbrOfZeros + 1; i++) {
+      Serial.print(currentFileName[i]);
+    }
+    Serial.println();
+  #endif
+
+  Iridium_msg[3] = currentFileName[1];
+  Iridium_msg[4] = currentFileName[2];
+  Iridium_msg[5] = currentFileName[3];
+  Iridium_msg[6] = currentFileName[4];
+  Iridium_msg[7] = currentFileName[5];
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Obtain a GPS GPRMC string to be used in the Iridium message
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+void obtain_GPRMC_Iridium_message(void){
+  
+  // flush GPS buffer
+  while (SERIAL_GPS.available() > 0) {
+    SERIAL_GPS.read();
+  }
+
+  // variable for holding GPS chars
+  char c_GPS = '0';
+
+  // try to read at most 10 GPS strings; if no valid GPRMC strings
+  // 10 times in a row, just use the last one
+  while (current_n_read_GPS < 10) {
+
+    wdt_reset();
+
+    // if this is the beginning of a new GPS message, log it,
+    // check if GPRMC and check if valid
+    if (c_GPS == '\n') {
+
+      #if SERIAL_PRINT
+        Serial.print(F("D;Attempt reading GPS number: "));
+        Serial.println(current_n_read_GPS);
+      #endif
+
+      // init buffer position
+      GPS_rx_buffer_position = 0;
+
+      bool end_GPS_msg = false;
+
+      // log the whole message
+      while (!end_GPS_msg) {
+        if (SERIAL_GPS.available() > 0) {
+
+          c_GPS = GPS.read();
+
+          if (c_GPS == '\n') {
+            end_GPS_msg = true;
+          }
+
+          else {
+            GPS_rx_buffer[GPS_rx_buffer_position] = c_GPS;
+            GPS_rx_buffer_position++;
+          }
+        }
+      }
+
+      #if SERIAL_PRINT
+        Serial.print(F("D;Read:"));
+        for (int i = 0; i < GPS_rx_buffer_position; i++) {
+          Serial.print(GPS_rx_buffer[i]);
+        }
+        Serial.println();
+      #endif
+
+      // check if the logged message was GPRMC
+      if ((GPS_rx_buffer[0] == '$') && (GPS_rx_buffer[1] == 'G') && (GPS_rx_buffer[2] == 'P') &&
+          (GPS_rx_buffer[3] == 'R') && (GPS_rx_buffer[4] == 'M') && (GPS_rx_buffer[5] == 'C')) {
+
+      #if SERIAL_PRINT
+          Serial.println("D;GPRMC");
+      #endif
+
+        current_n_read_GPS++;
+      }
+
+      // check if valid fix; if it is the case, finish here
+      if (GPS_rx_buffer[18] == 'A') {
+      #if SERIAL_PRINT
+          Serial.println("D;Valid");
+      #endif
+
+        break;
+      }
+
+    }
+
+  // if GPS logging started at the middle of a string,
+  // wait for the end of next message
+  if (SERIAL_GPS.available() > 0) {
+          c_GPS = GPS.read();
+  }
+
+  }
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Set the GPS GPRMC string in the Iridium message
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+void set_GPRMC_Iridium_message(void){
+  #if SERIAL_PRINT
+    Serial.println(F("GPRMC message to use:"));
+    for (int i = 0; i < GPS_rx_buffer_position; i++) {
+      Serial.print(GPS_rx_buffer[i]);
+    }
+    Serial.println();
+  #endif
+
+  // add the GPS information into the message string
+  for (int i = 0; i < GPS_rx_buffer_position - 7; i++) {
+    Iridium_msg[8 + i] = GPS_rx_buffer[i + 7];
+  }
+
+  #if SERIAL_PRINT
+    Serial.print(F("Iridum_msg length:"));
+    Serial.println(GPS_rx_buffer_position + 1);
+    for (int i = 0; i < 1 + GPS_rx_buffer_position; i++) {
+      Serial.print(Iridium_msg[i]);
+    }
+    Serial.println();
+  #endif
+}
+
+bool ISBDCallback(void){
+  wdt_reset();
+  return(true);
+}
+
 
