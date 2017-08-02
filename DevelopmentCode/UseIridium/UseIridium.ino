@@ -182,15 +182,15 @@ void loop() {
   obtain_GPRMC_Iridium_message();
   set_GPRMC_Iridium_message();
 
+  #if SERIAL_PRINT
+    Serial.println((uint8_t)Iridium_msg);
+  #endif
+
   // try to send the Iridium feedback string
   // note: retries the operation for up to 300 seconds by default; put watchdog reset in
   // ISBDCallback.
   ird_feedback = isbd.sendReceiveSBDBinary((uint8_t *)Iridium_msg, size_t(1 + GPS_rx_buffer_position),
                                            Ird_rx, Ird_rx_position);
-
-  #if SERIAL_PRINT
-    Serial.println((uint8_t)Iridium_msg);
-  #endif
 
   #if SERIAL_PRINT
     if (ird_feedback != 0){
@@ -207,46 +207,70 @@ void loop() {
   //////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////
 
-  // read Iridium command if available
-
-  #if SERIAL_PRINT
-    Serial.print("Inbound buffer size is ");
-    Serial.println(Ird_rx_position);
-    for (int i=0; i<Ird_rx_position; ++i){
-      Serial.write(Ird_rx[i]);
-      Serial.print("(");
-      Serial.print(Ird_rx[i]);
-      Serial.print(") ");
-    }
-    Serial.print("Messages left: ");
-    Serial.println(isbd.getWaitingMessageCount());
-  #endif
-
-  wdt_reset();
-
-  // check if command back
-  if (Ird_rx_position > 0){
-    #if SERIAL_PRINT
-      Serial.println(F("Ird_rx_position > 0"));
-    #endif
-
-    // check if should update number of sleep cycles
-    // this kind of message should be of the form: SLP12 [set the number of sleep cycles
-    // to 12]
-    if (char(Ird_rx[0]) == 'S' && char(Ird_rx[1]) == 'L' && char(Ird_rx[2]) == 'P'){
-       int value_sleep = uint8_t(Ird_rx[3]);
-
+  // read Iridium command if available, as many times as incoming messages
+  do{
       #if SERIAL_PRINT
-        Serial.print(F("Will sleep for:"));
-        Serial.println(value_sleep);
+        Serial.print("Inbound buffer size is ");
+        Serial.println(Ird_rx_position);
+        for (int i=0; i<Ird_rx_position; ++i){
+          Serial.write(Ird_rx[i]);
+          Serial.print("(");
+          Serial.print(Ird_rx[i]);
+          Serial.print(") ");
+        }
+        Serial.print("Messages left: ");
+        Serial.println(isbd.getWaitingMessageCount());
       #endif
+  
+    wdt_reset();
+  
+    // use do...while to go through all messages
+    // check also commands to RPi
+  
+    // check if command back
+    if (Ird_rx_position > 0){
+      #if SERIAL_PRINT
+        Serial.print(F("Ird_rx_position > 0: "));
+        Serial.println(Ird_rx_position);
+      #endif
+  
+      // check if should update number of sleep cycles
+      // this kind of message should be of the form: SLP12 [set the number of sleep cycles
+      // to 12]
+      if (char(Ird_rx[0]) == 'S' && char(Ird_rx[1]) == 'L' && char(Ird_rx[2]) == 'P'){
+         int value_sleep = uint8_t(Ird_rx[3]);
+  
+        #if SERIAL_PRINT
+          Serial.print(F("Will sleep for:"));
+          Serial.println(value_sleep);
+        #endif
+      }
+  
+      // check if should send some commands to RPi
     }
 
-    // last hex message: 534c5006
-
-    // check if should send some commands to RPi
-  }
-
+    // if more messages to get, use more sendReceive
+    if (isbd.getWaitingMessageCount() > 0){
+      
+      #if SERIAL_PRINT
+        Serial.println(F("D;Receive one more message"));
+      #endif
+      
+      Ird_rx_position = sizeof(Ird_rx);
+      ird_feedback = isbd.sendReceiveSBDBinary(NULL, 0, Ird_rx, Ird_rx_position);
+      
+    }
+    else{
+      
+      #if SERIAL_PRINT
+        Serial.println(F("D;No more messages"));
+      #endif
+      
+      break;
+      
+    }
+    
+  }while(true);
   //////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////
 }
