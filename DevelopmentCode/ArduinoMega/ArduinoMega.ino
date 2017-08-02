@@ -198,6 +198,8 @@ int address_numberReset = 1; // ie EEPROM bytes 1, 2, 3, and 4 are used
 // EEPROM gestion for sleeping --------------------------------------------------
 // address for where number of sleep cycles left stored
 int address_sleeps_left = 5;
+// address for what is the total number of sleep cycles
+int address_total_sleeps = 6;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // IMU
@@ -259,12 +261,12 @@ String dataStringIMU = "";
 // how often should wake up -----------------------------------------------------
 // how many 'wake up cycles' by the power controlleft before really wake up
 // this should be stored in EEPROM, see EEPROM section: address_sleeps_left
-int number_sleeps_left;
+uint8_t number_sleeps_left;
 // how many 'wake up cycles' should sleep between two real wake ups
-// this can be either hard coded
-#define TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP 1
-// or defined in EEPROM so that possible to update by Iridium
-// TODO
+// initially hard coded (but then not possible to update via Iridium)
+// #define TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP 1
+// now defined in EEPROM so that possible to update by Iridium
+uint8_t total_number_sleeps_before_wakeup = 1;
 
 // how long should log ----------------------------------------------------------
 #define DURATION_LOGGING_MS 930000
@@ -441,7 +443,7 @@ void loop(){
   // EVERYTHING IS DONE: SLEEP OR REBOOT
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  if (TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP == 0){
+  if (total_number_sleeps_before_wakeup == 0){
     #if SERIAL_PRINT
       Serial.println(F("D;Do not sleep; log again at once"));
     #endif
@@ -885,9 +887,18 @@ void decide_if_wakeup(void){
   
   pinMode(PIN_FBK_MGA, OUTPUT);
   digitalWrite(PIN_FBK_MGA, HIGH);
+
+  // read from EEPROM total number of sleeps
+  total_number_sleeps_before_wakeup = EEPROM.read(address_total_sleeps);
+
+  #if SERIAL_PRINT
+    Serial.print(F("D;total number sleeps: "));
+    Serial.println(total_number_sleeps_before_wakeup);
+    delay(5);
+  #endif
   
   // value of the EEPROM: number of more cycles to sleep
-  number_sleeps_left = int(EEPROM.read(address_sleeps_left));
+  number_sleeps_left = EEPROM.read(address_sleeps_left);
 
   #if SERIAL_PRINT
     Serial.print(F("D;number_sleeps_left: "));
@@ -896,13 +907,13 @@ void decide_if_wakeup(void){
   #endif
 
   // if too high value: set back to max number of sleep cycles and sleep
-  if (number_sleeps_left > TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP){
+  if (number_sleeps_left > total_number_sleeps_before_wakeup){
     #if SERIAL_PRINT
       Serial.println(F("D;Too high number_sleeps_left: reset"));
       delay(5);
     #endif
   
-    EEPROM.write(address_sleeps_left, TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP);
+    EEPROM.write(address_sleeps_left, total_number_sleeps_before_wakeup);
 
     pinMode(PIN_FBK_MGA, INPUT);
 
@@ -919,7 +930,7 @@ void decide_if_wakeup(void){
       delay(5);
     #endif
     
-    EEPROM.write(address_sleeps_left, number_sleeps_left - 1);
+    EEPROM.write(address_sleeps_left, uint8_t(number_sleeps_left - 1));
 
     pinMode(PIN_FBK_MGA, INPUT);
 
@@ -935,7 +946,7 @@ void decide_if_wakeup(void){
       delay(5);
     #endif
     
-    EEPROM.write(address_sleeps_left, TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP);
+    EEPROM.write(address_sleeps_left, total_number_sleeps_before_wakeup);
   }
 
   else{
@@ -944,7 +955,7 @@ void decide_if_wakeup(void){
       delay(5);
     #endif
 
-    EEPROM.write(address_sleeps_left, TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP - 1);
+    EEPROM.write(address_sleeps_left, total_number_sleeps_before_wakeup - 1);
 
     pinMode(PIN_FBK_MGA, INPUT);
 
@@ -1079,12 +1090,15 @@ void send_receive_Iridium_vital_information(void){
       // this kind of message should be of the form: SLP12 [set the number of sleep cycles
       // to 12]
       if (char(Ird_rx[0]) == 'S' && char(Ird_rx[1]) == 'L' && char(Ird_rx[2]) == 'P'){
-         int value_sleep = uint8_t(Ird_rx[3]);
+         uint8_t value_sleep = uint8_t(Ird_rx[3]);
   
         #if SERIAL_PRINT
           Serial.print(F("Will sleep for:"));
           Serial.println(value_sleep);
         #endif
+
+        // update the EEPROM
+        EEPROM.write(address_total_sleeps, value_sleep);
       }
   
       // check if should send some commands to RPi
