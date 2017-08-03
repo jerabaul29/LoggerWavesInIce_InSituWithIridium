@@ -52,6 +52,9 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
  /*
   * TODO:
   * 
+  * put a maximum time for execution of the RPi interaction, otherwise reboot / exit
+  * RPi interaction function
+  * 
   * let Iridium charge super capacitor for 40 seconds before switching to sleep
   * check that Iridium waits enough between transmission tries
   * set TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP using Iridium in EEPROM
@@ -59,6 +62,7 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
   * RaspberryPi
   * Iridium
   * put a safety to make sure that wakes up at least once every couple of days
+  * go throuh Iridium wakeup and check how does it look: how long / when / sleep etc
   * 
   * 
   * Improve the logging by average of oversampling?
@@ -82,6 +86,16 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
   * put logging and post logging in loops
   * 
   */
+
+/*
+ * 
+ * NOTES
+ * 
+ * NEED AN EEPROM INITIALIZATION FUNCTION (CAN BE SEPARATE PROGRAM)
+ * Should initialize the EEPROM to avoid 255 sleeps initially
+ * Should initialize EEPROM for file numbering (?)
+ * 
+ */
 
 /*
  * IDEAS:
@@ -319,8 +333,8 @@ void setup(){
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // OPEN SERIAL IF NECESSARY
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  // #if SERIAL_PRINT || SERIAL_RPI
-  #if SERIAL_PRINT
+  #if SERIAL_PRINT || SERIAL_RPI
+  // #if SERIAL_PRINT
     // let the time to open computer serial if needed
     delay(5000);
     // Open serial communications and wait for port to open:
@@ -397,15 +411,13 @@ void loop(){
   // send the vital information Iridium messages
   // and receive a message if available
 
+  // NOTE: we do it here as doing it earlier means less time for the GPS to get a fix
   send_receive_Iridium_vital_information();
 
-  // ------------------------------------------------------------------------------
-  // receive the Iridium instructions and parse -----------------------------------
-
-  // start booting RPi ------------------------------------------------------------
+  // boot RPi ------------------------------------------------------------
 
   // set Iridium up; record when set up (note: do it earlier? Wait at least 120s --
-  // before trying to send messages)
+  // before trying to send messages; or use high power profile)
 
   // wait for RPi to be booted and ready ------------------------------------------
 
@@ -1079,14 +1091,14 @@ void send_receive_Iridium_vital_information(void){
     // use do...while to go through all messages
     // check also commands to RPi
   
-    // check if command back
+    // check if command back ----------------------------------------------------
     if (Ird_rx_position > 0){
       #if SERIAL_PRINT
         Serial.print(F("Ird_rx_position > 0: "));
         Serial.println(Ird_rx_position);
       #endif
   
-      // check if should update number of sleep cycles
+      // check if should update number of sleep cycles --------------------------
       // this kind of message should be of the form: SLP12 [set the number of sleep cycles
       // to 12]
       if (char(Ird_rx[0]) == 'S' && char(Ird_rx[1]) == 'L' && char(Ird_rx[2]) == 'P'){
@@ -1101,7 +1113,7 @@ void send_receive_Iridium_vital_information(void){
         EEPROM.write(address_total_sleeps, value_sleep);
       }
   
-      // check if should send some commands to RPi
+      // check if should send some commands to RPi -----------------------------
     }
 
     // if more messages to get, use more sendReceive

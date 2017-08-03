@@ -23,10 +23,13 @@
 #include <SPI.h>
 #include <SD.h>
 
-#define FILE_TO_DUMP "F00103"
+#define FILE_TO_DUMP "F00113"
 const int chipSelect = 53;
 
 void setup() {
+
+  delay(5000);
+  
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
   while (!Serial) {
@@ -57,7 +60,7 @@ void setup() {
   }
   // if the file isn't open, pop up an error:
   else {
-    Serial.println("error opening datalog.txt");
+    Serial.println("error opening FILE_TO_DUMP");
   }
 }
 
