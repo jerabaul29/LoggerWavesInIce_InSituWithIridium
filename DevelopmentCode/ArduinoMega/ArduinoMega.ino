@@ -313,9 +313,9 @@ unsigned long time_start_logging_ms = 1;
 // Parameters about serial connections on Serial (USB port) ---------------------
 
 // for debugging: print strings about actions on serial
-#define SERIAL_PRINT true
+#define SERIAL_PRINT false
 // for connection with the Raspberry Pi
-#define SERIAL_RPI false
+#define SERIAL_RPI true
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Iridium
@@ -766,6 +766,10 @@ void setup_logging(void){
   // enable watchdog, if 8 seconds hang %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   wdt_enable(WDTO_8S);
   wdt_reset();
+
+  // No power to Raspberry Pi %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  pinMode(PIN_MFT_RPI, OUTPUT);
+  digitalWrite(PIN_MFT_RPI, HIGH);
 
   // setup SD card %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1320,8 +1324,7 @@ void raspberry_pi_interaction(void){
     Serial.println(F("D;Boot RPi"));
   #endif
   
-  pinMode(PIN_MFT_RPI, OUTPUT);
-  digitalWrite(PIN_MFT_RPI, HIGH);
+  digitalWrite(PIN_MFT_RPI, LOW);
 
   wdt_reset();
 
@@ -1432,7 +1435,7 @@ void raspberry_pi_interaction(void){
         delay(5000);
         wdt_reset();
 
-        pinMode(PIN_MFT_RPI, INPUT);
+        digitalWrite(PIN_MFT_RPI, HIGH);
 
         break;
       }
