@@ -1,0 +1,11 @@
+- Electronics CAD:
+Do the electronics drawings
+
+- RPi side:
+processing code
+sending by Iridium
+
+- Arduino side:
+send the RPi data through Iridium
+timeout on RPi processing to avoid complete hanging
+

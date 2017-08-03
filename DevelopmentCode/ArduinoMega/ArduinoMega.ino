@@ -7,6 +7,11 @@
  * -- Misc.
  * A0 to batt + (measure battery)
  * 
+ * -- Power controller
+ * 5V to 5V Mega
+ * GND to GND Mega
+ * Feedback Mega to 48
+ * 
  * -- Adafruit GPS:
  * GND, Vin (5V)
  * TX to RX1
@@ -30,6 +35,12 @@
  * TXD to Mega TX2
  * RXD to Mega RX2
  * Interface through the Internet: https://rockblock.rock7.com/Operations
+ * 
+ * -- Raspberry
+ * 5V to 5V
+ * GND to GND
+ * 46 to RPI MFT
+ * Serial through USB chip to RPI
  * 
  * CONVENTIONS:
  * - S,: message about the Start of the file: booting, or new file timer
@@ -269,6 +280,11 @@ String dataStringIMU = "";
 #define PIN_FBK_MGA 48
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Mosfet power Raspberry Pi
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#define PIN_MFT_RPI 46
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Timing parameters for the logger behavior
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -404,82 +420,23 @@ void loop(){
   wdt_reset();
   
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  // POST LOGGING
+  // VITAL INFORMATION IRIDIUM
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  // ------------------------------------------------------------------------------
-  // send the vital information Iridium messages
-  // and receive a message if available
 
   // NOTE: we do it here as doing it earlier means less time for the GPS to get a fix
   send_receive_Iridium_vital_information();
 
-  // boot RPi ------------------------------------------------------------
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // RASPBERRY PI INTERACTION
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  // set Iridium up; record when set up (note: do it earlier? Wait at least 120s --
-  // before trying to send messages; or use high power profile)
-
-  // wait for RPi to be booted and ready ------------------------------------------
-
-  // send last data file to RPi ---------------------------------------------------
-  // this is file currentFileName[]
-
-  // send vital information by Iridium --------------------------------------------
-  // get vital information
-  // battery level
-
-  // GPS position
-  // try to get a fix for at most one minute
-
-  // assemble information
-
-  // try to send for at most five minutes
-  
-
-  // wait for answer from Pi being ready to transmit by Iridium -------------------
-
-  // send all RPi data by Iridium -------------------------------------------------
-
-  // try to send each message at most 5 times; if does not work at some point,
-  // abort all following attempts
-
-  // receive commands from Iridium ------------------------------------------------
-
-  // try at most 5 times
-
-  // update Mega setup with commands ----------------------------------------------
-
-  // send update orders to RPi ----------------------------------------------------
+  raspberry_pi_interaction();
 
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // EVERYTHING IS DONE: SLEEP OR REBOOT
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  if (total_number_sleeps_before_wakeup == 0){
-    #if SERIAL_PRINT
-      Serial.println(F("D;Do not sleep; log again at once"));
-    #endif
-
-    // reboot
-    wdt_enable(WDTO_15MS);     // enable the watchdog, 15 ms
-    while(1){
-    }
-  }
-
-  else{
-
-    #if SERIAL_PRINT
-      Serial.println(F("D;Ask no more current and sleep"));
-    #endif
-    
-    pinMode(PIN_FBK_MGA, INPUT);
-
-    wdt_disable();
-
-    while (1){
-      make_sleep();
-    }
-  }
+  sleep_or_reboot();
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1301,7 +1258,6 @@ void set_GPRMC_Iridium_message(void){
   #endif
 }
 
-
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Callback to avoid watchdog reset
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1310,4 +1266,168 @@ bool ISBDCallback(void){
   return(true);
 }
 
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Sleep or reboot
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+void sleep_or_reboot(void){
+  if (total_number_sleeps_before_wakeup == 0){
+    #if SERIAL_PRINT
+      Serial.println(F("D;Do not sleep; log again at once"));
+    #endif
+
+    // reboot
+    wdt_enable(WDTO_15MS);     // enable the watchdog, 15 ms
+    while(1){
+    }
+  }
+
+  else{
+
+    #if SERIAL_PRINT
+      Serial.println(F("D;Ask no more current and sleep"));
+    #endif
+    
+    pinMode(PIN_FBK_MGA, INPUT);
+
+    wdt_disable();
+
+    while (1){
+      make_sleep();
+    }
+  }
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Interaction with Raspberry Pi
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+void raspberry_pi_interaction(void){
+  // power up the RaspberryPi -----------------------------------
+  #if SERIAL_PRINT
+    Serial.println(F("D;Boot RPi"));
+  #endif
+  
+  pinMode(PIN_MFT_RPI, OUTPUT);
+  digitalWrite(PIN_MFT_RPI, HIGH);
+
+  wdt_reset();
+
+  // give the time to boot --------------------------------------
+  #if SERIAL_PRINT
+    Serial.println(F("D;Let RPi boot"));
+  #endif
+  
+  delay(5000);
+  wdt_reset();
+  delay(5000);
+  wdt_reset();
+  delay(5000);
+  wdt_reset();
+  
+  // check if the RPi has booted --------------------------------
+  Serial.print('B');
+  
+  while(true){
+
+    if (Serial.available() > 0){
+      char answer = Serial.read();
+
+      if (answer == 'R'){
+        break;
+      }
+    }
+  }
+
+  wdt_reset();
+
+  // send commmand updates to the RPi --------------------------
+  // TODO
+
+  // send the file name to the RPi -----------------------------
+  Serial.print('N');
+  Serial.print(currentFileName[0]);
+  Serial.print(currentFileName[1]);
+  Serial.print(currentFileName[2]);
+  Serial.print(currentFileName[3]);
+  Serial.print(currentFileName[4]);
+  Serial.print(currentFileName[5]);
+
+  delay(500);
+
+  wdt_reset();
+
+  // send the file content to the RPi ---------------------------
+  File dataFile = SD.open(currentFileName);
+
+  // if the file is available, read it to the Arduino:
+  Serial.print('N');
+
+  if (dataFile) {
+    while (dataFile.available()) {
+      Serial.write(dataFile.read());
+      delayMicroseconds(5);
+      wdt_reset();
+    }
+    dataFile.close();
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    #if SERIAL_PRINT
+      Serial.println("D;error opening FILE_TO_DUMP");
+    #endif
+
+    while(1){
+      // reboot
+    }
+  }
+
+  #if SERIAL_PRINT
+    Serial.println();
+    Serial.println(F("D;All data transmitted"));
+  #endif
+
+  Serial.print("FINISHED");
+
+  wdt_reset();
+
+  // get back the data to send by Iridium, or shut off if RPi is done --------------
+  while(true){
+
+    if (Serial.available() > 0){
+      wdt_reset();
+
+      char command_Mega = Serial.read();
+
+      // RPi wants to send some Iridium data
+      if (command_Mega == 'I'){
+        #if SERIAL_PRINT
+            Serial.println(F("D;Pi to Iridium"));
+        #endif
+        
+        // TODO
+      }
+
+      // RPi is finished
+      if (command_Mega == 'F'){
+        #if SERIAL_PRINT
+            Serial.println(F("D;Shut down RPi"));
+        #endif
+
+        // give the time to shut down gracefully
+        delay(5000);
+        wdt_reset();
+        delay(5000);
+        wdt_reset();
+
+        pinMode(PIN_MFT_RPI, INPUT);
+
+        break;
+      }
+    }
+  }
+
+  #if SERIAL_PRINT
+    Serial.println(F("D; Done with RPi"));
+  #endif
+
+}
 
