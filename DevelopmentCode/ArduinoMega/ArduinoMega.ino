@@ -42,6 +42,11 @@
  * 46 to RPI MFT
  * Serial through USB chip to RPI
  * 
+ * CHECKLIST:
+ * -- SERIAL_PRINT
+ * -- SERIAL_RPI
+ * -- USE_IRIDIUM
+ * 
  * CONVENTIONS:
  * - S,: message about the Start of the file: booting, or new file timer
  * - M,: timestamp in Arduino internal clock reference frame
@@ -308,13 +313,15 @@ unsigned long time_start_logging_ms = 1;
 // Parameters about serial connections on Serial (USB port) ---------------------
 
 // for debugging: print strings about actions on serial
-#define SERIAL_PRINT true
+#define SERIAL_PRINT false
 // for connection with the Raspberry Pi
-#define SERIAL_RPI false
+#define SERIAL_RPI true
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Iridium
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#define USE_IRIDIUM false
+
 #define PIN_IRD_SLEEP 49
 #define SERIAL_IRIDIUM Serial2
 
@@ -389,8 +396,10 @@ void setup(){
   // SETUP IRIDIUM
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  setup_iridium();
-
+  #if USE_IRIDIUM
+    setup_iridium();
+  #endif
+  
   wdt_reset();
   
 }
@@ -424,7 +433,9 @@ void loop(){
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   // NOTE: we do it here as doing it earlier means less time for the GPS to get a fix
-  send_receive_Iridium_vital_information();
+  #if USE_IRIDIUM
+    send_receive_Iridium_vital_information();
+  #endif
 
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // RASPBERRY PI INTERACTION

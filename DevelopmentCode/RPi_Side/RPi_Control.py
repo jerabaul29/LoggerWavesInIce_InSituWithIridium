@@ -182,6 +182,7 @@ class RPi_control(object):
 
         with open(self.main_path + 'filename_list.txt', "a") as myfile:
             myfile.write(self.filename)
+            myfile.write('\n')
 
         if self.verbose > 0:
             printi("Add entry in Commands")
@@ -189,6 +190,7 @@ class RPi_control(object):
         with open(self.main_path + 'Commands/' + self.filename, "w") as myfile:
             for current_command in self.list_of_commands:
                 myfile.write(current_command)
+                myfile.write('\n')
 
         if self.verbose > 0:
             printi("Add entry in Data")
