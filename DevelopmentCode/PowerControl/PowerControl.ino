@@ -9,6 +9,17 @@
  * 
  */
 
+ /*
+  * 
+  * CHECKLIST
+  * 
+  * DEBUG
+  * SHOW_LED
+  * CYCLES_BEFORE_MEGA_WAKEUP
+  * CYCLES_DEEP_SLEEP
+  * 
+  */
+
 #include <avr/wdt.h>            // library for default watchdog functions
 #include <avr/interrupt.h>      // library for interrupts handling
 #include <avr/sleep.h>          // library for sleep
@@ -37,11 +48,12 @@ volatile int nbr_remaining;
 #define EPS_VOLT 20 // epsilon voltage; 20 is 20 * 5 / 1024.0 approx 0.1V
 #define MIN_MARGIN_PANEL 0.5  // minimum over voltage panel vs battery for it to be worth connecting
 
-#define CYCLES_BEFORE_MEGA_WAKEUP 10 // number of loop () cycles before waking up the Mega
+#define CYCLES_BEFORE_MEGA_WAKEUP 2 // for tests
+//#define CYCLES_BEFORE_MEGA_WAKEUP 10 // number of loop () cycles before waking up the Mega
                                      // if deep sleep 80s, 4 loop() is a bit over 5 minutes
 
-#define CYCLES_DEEP_SLEEP 10 // for production
-// #define CYCLES_DEEP_SLEEP 1  // for tests
+// #define CYCLES_DEEP_SLEEP 10 // for production
+ #define CYCLES_DEEP_SLEEP 1  // for tests
 
 float meas_battery = 0.0;
 float meas_solar_panel_anode = 0.0;
@@ -182,6 +194,16 @@ void loop() {
   // --------------------------------------------------------------
   // Decide what to do with the Arduino Mega
   // --------------------------------------------------------------
+
+  // check that no problem with the number of remaining sleeps
+  if (remaining_before_mega_wakeup > CYCLES_BEFORE_MEGA_WAKEUP){
+    #if DEBUG
+      Serial.println(F("Error; reset number of cycles before Mega up"));
+    #endif
+
+    remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
+  }
+  
   if (mega_awake){
     if (command_from_mega){
       #if DEBUG
@@ -229,7 +251,11 @@ void loop() {
 
         // see if the Mega actually wanted to be waken up
         // give the Mega the time to boot
-        delay(2000);
+        wdt_reset();
+        
+        delay(4000);
+
+        wdt_reset();
 
         // measure again the level of the Mega
         command_from_mega = digitalRead(PIN_FBK_MGA);

@@ -203,6 +203,14 @@ class RPi_control(object):
 
         self.serial_port.write('F')
 
+    def processing(self):
+        """Launch the processing of data"""
+
+        pass
+
+    def send_over_Iridium(self):
+        """Send the processed data over Iridium"""
+
     def launch_RPi_command(self):
         """Launch all RPi processing."""
 
@@ -213,10 +221,8 @@ class RPi_control(object):
         self.connect_to_Arduino()
         self.receive_from_Arduino()
         self.save_all()
-
-        # TODO: processing
-
-        # TODO: send over Iridium
+        self.processing() # TODO: processing
+        self.send_over_Iridium() # TODO: send over Iridium
 
         if self.verbose > 0:
             printi("Done with everything!")

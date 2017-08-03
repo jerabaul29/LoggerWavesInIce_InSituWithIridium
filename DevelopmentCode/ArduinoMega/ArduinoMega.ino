@@ -313,9 +313,9 @@ unsigned long time_start_logging_ms = 1;
 // Parameters about serial connections on Serial (USB port) ---------------------
 
 // for debugging: print strings about actions on serial
-#define SERIAL_PRINT false
+#define SERIAL_PRINT true
 // for connection with the Raspberry Pi
-#define SERIAL_RPI true
+#define SERIAL_RPI false
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Iridium
@@ -356,10 +356,13 @@ void setup(){
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // OPEN SERIAL IF NECESSARY
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  #if SERIAL_PRINT || SERIAL_RPI
+  #if SERIAL_PRINT
   // #if SERIAL_PRINT
-    // let the time to open computer serial if needed
-    delay(5000);
+    // Open serial communications and wait for port to open:
+    Serial.begin(115200);
+  #endif
+
+  #if SERIAL_RPI
     // Open serial communications and wait for port to open:
     Serial.begin(115200);
   #endif
