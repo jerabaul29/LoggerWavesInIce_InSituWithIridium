@@ -920,7 +920,7 @@ void decide_if_wakeup(void){
   }
 
   // if ok value >1: must sleep more; decrease by one and sleep
-  else if (number_sleeps_left > 1){
+  else if (number_sleeps_left > 0){
     
     #if SERIAL_PRINT
       Serial.println(F("D;Sleep more"));
@@ -937,7 +937,7 @@ void decide_if_wakeup(void){
   }
 
   // if <2: time to wake up
-  else if (number_sleeps_left < 2){
+  else if (number_sleeps_left < 1){
     #if SERIAL_PRINT
       Serial.println(F("D;Time to wake up!"));
       delay(5);
