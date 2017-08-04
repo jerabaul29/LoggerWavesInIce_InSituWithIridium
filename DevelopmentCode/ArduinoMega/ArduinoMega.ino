@@ -301,7 +301,7 @@ uint8_t number_sleeps_left;
 // initially hard coded (but then not possible to update via Iridium)
 // #define TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP 1
 // now defined in EEPROM so that possible to update by Iridium
-uint8_t total_number_sleeps_before_wakeup = 1;
+uint8_t total_number_sleeps_before_wakeup = 2;
 
 // how long should log ----------------------------------------------------------
 #define DURATION_LOGGING_MS 930000

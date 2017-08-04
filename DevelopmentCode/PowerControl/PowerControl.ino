@@ -30,7 +30,7 @@
 volatile int nbr_remaining;
 
 #define DEBUG false
-#define SHOW_LED true
+#define SHOW_LED false
 
 #define PIN_MSR_BAT A0      // measure of battery
 #define PIN_MSR_SOL A1      // measure of solar panel on anode
@@ -44,16 +44,14 @@ volatile int nbr_remaining;
 
 #define BAT_THRESHOLD_V 3.6  // threshold for full battery
 #define BAT_EMPTY_V 2.85     // threshold for empty battery
-#define BAT_THRESHOLD_C 758  // threshold for full battery 3.7V: 1024 * 3.7 / 5.0 approx 748
-#define EPS_VOLT 20 // epsilon voltage; 20 is 20 * 5 / 1024.0 approx 0.1V
 #define MIN_MARGIN_PANEL 0.5  // minimum over voltage panel vs battery for it to be worth connecting
 
-#define CYCLES_BEFORE_MEGA_WAKEUP 2 // for tests
-//#define CYCLES_BEFORE_MEGA_WAKEUP 10 // number of loop () cycles before waking up the Mega
+//#define CYCLES_BEFORE_MEGA_WAKEUP 2 // for tests
+#define CYCLES_BEFORE_MEGA_WAKEUP 10 // number of loop () cycles before waking up the Mega
                                      // if deep sleep 80s, 4 loop() is a bit over 5 minutes
 
-// #define CYCLES_DEEP_SLEEP 10 // for production
- #define CYCLES_DEEP_SLEEP 1  // for tests
+// #define CYCLES_DEEP_SLEEP 1  // for tests
+#define CYCLES_DEEP_SLEEP 10 // for production
 
 float meas_battery = 0.0;
 float meas_solar_panel_anode = 0.0;
