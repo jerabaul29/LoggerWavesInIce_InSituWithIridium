@@ -46,12 +46,14 @@ volatile int nbr_remaining;
 #define BAT_EMPTY_V 2.85     // threshold for empty battery
 #define MIN_MARGIN_PANEL 0.5  // minimum over voltage panel vs battery for it to be worth connecting
 
-#define CYCLES_BEFORE_MEGA_WAKEUP 10 // for production: 10
+// for production: 10
+#define CYCLES_BEFORE_MEGA_WAKEUP 10
                                      // number of loop () cycles before waking up the Mega
                                      // if deep sleep 80s, 4 loop() is a bit over 5 minutes
 
 
-#define CYCLES_DEEP_SLEEP 10 // for production: 10
+// for production: 10
+#define CYCLES_DEEP_SLEEP 10
 
 float meas_battery = 0.0;
 float meas_solar_panel_anode = 0.0;
