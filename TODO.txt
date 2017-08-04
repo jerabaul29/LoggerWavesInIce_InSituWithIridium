@@ -1,0 +1,4 @@
+- add a 'finished gracefully' stamp in the RaspberryPi folder structure
+- try with the other Pi models (less power consumption)
+- processing on the Pi
+- sending back information from the Pi

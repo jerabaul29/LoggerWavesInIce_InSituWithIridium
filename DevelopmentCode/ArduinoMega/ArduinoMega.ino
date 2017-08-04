@@ -46,6 +46,7 @@
  * -- SERIAL_PRINT
  * -- SERIAL_RPI
  * -- USE_IRIDIUM
+ * -- EEPROM initialized with right value at address_total_sleeps, otherwise never sleeps
  * 
  * CONVENTIONS:
  * - S,: message about the Start of the file: booting, or new file timer
@@ -81,8 +82,8 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
   * go throuh Iridium wakeup and check how does it look: how long / when / sleep etc
   * 
   * 
-  * Improve the logging by average of oversampling?
-  * Use an extended buffer Arduino Mega core
+  * Improve the logging by average of oversampling on LSM9DS0?
+  * Use an extended buffer Arduino Mega core (?)
   * 
   * open serial port if Raspberry pi alone only later on?
   * 
@@ -290,6 +291,11 @@ String dataStringIMU = "";
 #define PIN_MFT_RPI 46
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// LED
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#define PIN_MGA_LED 13
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Timing parameters for the logger behavior
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -301,7 +307,7 @@ uint8_t number_sleeps_left;
 // initially hard coded (but then not possible to update via Iridium)
 // #define TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP 1
 // now defined in EEPROM so that possible to update by Iridium
-uint8_t total_number_sleeps_before_wakeup = 2;
+uint8_t total_number_sleeps_before_wakeup;
 
 // how long should log ----------------------------------------------------------
 #define DURATION_LOGGING_MS 930000
@@ -460,14 +466,14 @@ void loop(){
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// LED 13 blink
+// LED PIN_MGA_LED blink
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // make led 13 on the board blink continuously to report fault
 void blinkLED(){
   while (1){
-    digitalWrite(13, HIGH);   // turn the LED on
+    digitalWrite(PIN_MGA_LED, HIGH);   // turn the LED on
     delay(100);              // wait for a second
-    digitalWrite(13, LOW);    // turn the LED
+    digitalWrite(PIN_MGA_LED, LOW);    // turn the LED
     delay(100);              // wait for a second
   }
 }
@@ -792,6 +798,10 @@ void setup_logging(void){
   #endif
   
   wdt_reset();
+
+  // take care of LED PIN_MGA_LED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  pinMode(PIN_MGA_LED, OUTPUT);
+  digitalWrite(PIN_MGA_LED, LOW);
   
   // setup GPS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   delay(250);
