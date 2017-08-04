@@ -46,12 +46,12 @@ volatile int nbr_remaining;
 #define BAT_EMPTY_V 2.85     // threshold for empty battery
 #define MIN_MARGIN_PANEL 0.5  // minimum over voltage panel vs battery for it to be worth connecting
 
-//#define CYCLES_BEFORE_MEGA_WAKEUP 2 // for tests
-#define CYCLES_BEFORE_MEGA_WAKEUP 10 // number of loop () cycles before waking up the Mega
+#define CYCLES_BEFORE_MEGA_WAKEUP 10 // for production: 10
+                                     // number of loop () cycles before waking up the Mega
                                      // if deep sleep 80s, 4 loop() is a bit over 5 minutes
 
-// #define CYCLES_DEEP_SLEEP 1  // for tests
-#define CYCLES_DEEP_SLEEP 10 // for production
+
+#define CYCLES_DEEP_SLEEP 10 // for production: 10
 
 float meas_battery = 0.0;
 float meas_solar_panel_anode = 0.0;
@@ -116,14 +116,19 @@ void setup() {
   #if SHOW_LED
     digitalWrite(PIN_CMD_LED, LOW);
   #endif
+
 }
 
 void loop() {
   wdt_reset();
 
+  delay(500);
+
   #if SHOW_LED
     controlled_blink(50, 20);
     delay(2000);
+  #else
+    // delay(500);
   #endif
 
   wdt_reset();
@@ -167,6 +172,8 @@ void loop() {
     #endif
     #if SHOW_LED
       controlled_blink(25, 20);
+    #else
+      // delay(500);
     #endif
     pinMode(PIN_MFT_SOL, OUTPUT);
     digitalWrite(PIN_MFT_SOL, HIGH);
@@ -178,6 +185,8 @@ void loop() {
     #endif
     #if SHOW_LED
       controlled_blink(500, 2);
+    #else
+      // delay(500);
     #endif
     pinMode(PIN_MFT_SOL, INPUT);
     delay(50);
@@ -185,6 +194,8 @@ void loop() {
 
   #if SHOW_LED
     delay(1000);
+  #else
+    // delay(500);
   #endif
 
   wdt_reset();
@@ -210,6 +221,8 @@ void loop() {
       #endif
       #if SHOW_LED
         controlled_blink(25, 20);
+      #else
+        // delay(500);
       #endif
     }
     else{
@@ -219,6 +232,8 @@ void loop() {
       #endif
       #if SHOW_LED
         controlled_blink(500, 2);
+      #else
+        // delay(500);
       #endif
 
     pinMode(PIN_MFT_MGA, INPUT);
@@ -236,6 +251,8 @@ void loop() {
       #endif
       #if SHOW_LED
         controlled_blink(50, 10);
+      #else
+        // delay(500);
       #endif
 
       if (BAT_EMPTY_V < meas_battery){
