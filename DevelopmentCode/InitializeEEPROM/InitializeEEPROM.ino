@@ -21,9 +21,9 @@ int address_sleeps_left = 5;
 int address_total_sleeps = 6;
 
 void setup(){
-  EEPROMWritelong(address_numberReset, 0);
-  EEPROM.write(address_sleeps_left, 0);
-  EEPROM.write(address_total_sleeps, 2);
+  EEPROMWritelong(address_numberReset, 200);
+  EEPROM.write(address_sleeps_left, 1);
+  EEPROM.write(address_total_sleeps, 1);
   
 }
 

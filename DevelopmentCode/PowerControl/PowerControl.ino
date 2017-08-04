@@ -47,13 +47,13 @@ volatile int nbr_remaining;
 #define MIN_MARGIN_PANEL 0.5  // minimum over voltage panel vs battery for it to be worth connecting
 
 // for production: 10
-#define CYCLES_BEFORE_MEGA_WAKEUP 10
+#define CYCLES_BEFORE_MEGA_WAKEUP 2
                                      // number of loop () cycles before waking up the Mega
                                      // if deep sleep 80s, 4 loop() is a bit over 5 minutes
 
 
 // for production: 10
-#define CYCLES_DEEP_SLEEP 10
+#define CYCLES_DEEP_SLEEP 3
 
 float meas_battery = 0.0;
 float meas_solar_panel_anode = 0.0;
@@ -295,6 +295,9 @@ void loop() {
           Serial.println(F("Skip this wakeup"));
           delay(50);
         #endif
+
+        mega_awake = false;
+        pinMode(PIN_MFT_MGA, INPUT);
       }
 
       remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;

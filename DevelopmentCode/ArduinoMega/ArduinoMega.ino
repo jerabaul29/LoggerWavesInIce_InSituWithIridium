@@ -43,6 +43,8 @@
  * Serial through USB chip to RPI
  * 
  * CHECKLIST:
+ * -- DURATION_LOGGING_MS
+ * -- TIME_WNF
  * -- SERIAL_PRINT
  * -- SERIAL_RPI
  * -- USE_IRIDIUM
@@ -212,9 +214,9 @@ char currentFileName[] = "F00000";
 // number of zeros after the letter in the name convention
 int nbrOfZeros = 5;
 // time in milliseconds after which write to a new file, 900 s is 900 000 milliseconds is 15 minutes
-//#define TIME_WNF 900000
-#define TIME_WNF 960000 // put some margin relatively to duration_logging_ms
-//#define TIME_WNF 60000
+// for production: 960000
+#define TIME_WNF 24000 // put some margin relatively to duration_logging_ms
+
 // time tracking variable for writting new file
 unsigned long time_tracking_WNF = 1;
 
@@ -310,7 +312,8 @@ uint8_t number_sleeps_left;
 uint8_t total_number_sleeps_before_wakeup;
 
 // how long should log ----------------------------------------------------------
-#define DURATION_LOGGING_MS 930000
+// for production: 930000
+#define DURATION_LOGGING_MS 20000
 unsigned long time_start_logging_ms = 1;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -936,7 +939,7 @@ void decide_if_wakeup(void){
     }
   }
 
-  // if <2: time to wake up
+  // time to wake up
   else if (number_sleeps_left < 1){
     #if SERIAL_PRINT
       Serial.println(F("D;Time to wake up!"));
@@ -1329,6 +1332,9 @@ void sleep_or_reboot(void){
 // Interaction with Raspberry Pi
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void raspberry_pi_interaction(void){
+
+  wdt_reset();
+  
   // power up the RaspberryPi -----------------------------------
   #if SERIAL_PRINT
     Serial.println(F("D;Boot RPi"));
@@ -1342,12 +1348,25 @@ void raspberry_pi_interaction(void){
   #if SERIAL_PRINT
     Serial.println(F("D;Let RPi boot"));
   #endif
+
+  Serial.flush();
+
+  wdt_reset();
   
-  delay(5000);
+  delay(4000);
   wdt_reset();
-  delay(5000);
+  delay(4000);
   wdt_reset();
-  delay(5000);
+  delay(4000);
+  wdt_reset();
+  delay(4000);
+  wdt_reset();
+
+  // flush the buffer -------------------------------------------
+  while (Serial.available() > 0){
+    Serial.read();
+  }
+
   wdt_reset();
   
   // check if the RPi has booted --------------------------------
@@ -1418,9 +1437,9 @@ void raspberry_pi_interaction(void){
 
   // get back the data to send by Iridium, or shut off if RPi is done --------------
   while(true){
+    wdt_reset();
 
     if (Serial.available() > 0){
-      wdt_reset();
 
       char command_Mega = Serial.read();
 

@@ -226,3 +226,5 @@ class RPi_control(object):
 
         if self.verbose > 0:
             printi("Done with everything!")
+
+        self.confirm_finished()
