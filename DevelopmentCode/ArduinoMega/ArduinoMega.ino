@@ -97,6 +97,8 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
   * send data received back from the Pi
   * update all parameters following instructions by Iridium
   * 
+  * use DTR instead of capacitory to avoid reset on opening of USB port? can be done in pyserial
+  * 
   * 
   * RaspberryPi
   * Iridium

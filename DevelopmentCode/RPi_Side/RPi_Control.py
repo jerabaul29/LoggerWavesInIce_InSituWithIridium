@@ -211,6 +211,8 @@ class RPi_control(object):
     def send_over_Iridium(self):
         """Send the processed data over Iridium"""
 
+        pass
+
     def launch_RPi_command(self):
         """Launch all RPi processing."""
 
@@ -221,8 +223,8 @@ class RPi_control(object):
         self.connect_to_Arduino()
         self.receive_from_Arduino()
         self.save_all()
-        self.processing() # TODO: processing
-        self.send_over_Iridium() # TODO: send over Iridium
+        self.processing()  # TODO: processing
+        self.send_over_Iridium()  # TODO: send over Iridium
 
         if self.verbose > 0:
             printi("Done with everything!")
