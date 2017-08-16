@@ -61,7 +61,6 @@ class Parser_logger():
         self.path_out = path_out
         self.filename = filename
         self.verbose = verbose
-        self.process_file()
 
     def process_file(self):
         self.load_file(self.path_in + self.filename, verbose=self.verbose)

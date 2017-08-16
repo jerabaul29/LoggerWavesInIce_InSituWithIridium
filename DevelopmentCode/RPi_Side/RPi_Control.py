@@ -2,6 +2,7 @@ from __future__ import print_function
 import serial
 import glob
 from printind.printind_function import printi
+from parser import Parser_logger
 
 
 class RPi_control(object):
@@ -206,7 +207,14 @@ class RPi_control(object):
     def processing(self):
         """Launch the processing of data"""
 
-        pass
+        # do the parsing of the file from the Mega
+        path_in = self.main_path + 'Data/'
+        path_out = self.main_path + 'ResultAnalyzis/'
+        parser_instance = Parser_logger(path_in, path_out, self.filename, self.verbose)
+        parser_instance.process_file()
+
+        # do the analysis of the data
+        # TODO
 
     def send_over_Iridium(self):
         """Send the processed data over Iridium"""
