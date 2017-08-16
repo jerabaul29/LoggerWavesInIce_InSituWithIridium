@@ -7,6 +7,8 @@ from scipy import signal
 """
 NOTES / TODO
 - rather transmit the 'locally integrated' spectrum than the under sampled spectrum!!
+- averaging of the IMU reading (to do on the Mega side)
+- save all to send as bytes
 """
 
 ################################################################################
@@ -224,20 +226,23 @@ class WaveStatistics(object):
             printi("array_discretized_spectrum = " + str(self.array_discretized_spectrum))
 
     def save_all_results(self):
-        # save as text files
+        # save as text files ---------------------------------------------------
         np.savetxt(self.path_in + '/' + self.filename + '_SWH.csv', np.array([self.SWH]))
-        # with open(self.path_in + '/' + self.filename + '_SWH.csv', "w") as text_file:
-        #     text_file.write(self.SWH)
 
-        spectral_properties = np.array([self.Hs, self.T_z, self.T_c])
+        spectral_properties = np.array([self.Hs, self.T_z, self.T_c], dtype=np.float16)
         np.savetxt(self.path_in + '/' + self.filename + '_spectral_properties.csv', spectral_properties)
-        # with open(self.path_in + '/' + self.filename + '_spectral_properties.csv', "w") as text_file:
-        #     text_file.write(spectral_properties)
 
         np.savetxt(self.path_in + '/' + self.filename + '_limited_frequencies_frequencies.csv', self.limited_frequencies_frequencies)
-        # with open(self.path_in + '/' + self.filename + '_limited_frequencies_frequencies.csv', "w") as text_file:
-        #     text_file.write(self.limited_frequencies_frequencies)
 
-        # save as byte string for what should be sent by iridium
+        # save as byte string for what should be sent by iridium ---------------
+        with open(self.path_in + '/' + self.filename + '_SWH.bdat', 'wb') as f:
+            f.write(np.array([self.SWH], dtype=np.float16).tostring())
+
         with open(self.path_in + '/' + self.filename + '_binary_red_spectrum.bdat', 'wb') as f:
             f.write(self.array_discretized_spectrum.tostring())
+
+        with open(self.path_in + '/' + self.filename + '_spectral_properties.bdat', 'wb') as f:
+            f.write(spectral_properties.tostring())
+
+        with open(self.path_in + '/' + self.filename + '_max_value_limited_spectrum.bdat', 'wb') as f:
+            f.write(np.array(self.max_value_limited_spectrum, dtype=np.float16).tostring())
