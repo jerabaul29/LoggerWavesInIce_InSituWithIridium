@@ -71,6 +71,8 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
  /*
   * TODO:
   * 
+  * Test that work sending RaspberryPi information by Iridium
+  * 
   * put a maximum time for execution of the RPi interaction, otherwise reboot / exit
   * RPi interaction function
   * 
@@ -347,7 +349,7 @@ int GPS_rx_buffer_position = 0;
 
 int current_n_read_GPS = 0;
 
-char Iridium_msg[100];
+char Iridium_msg[340];
 int Iridium_msg_position = 0;
 
 uint8_t Ird_rx[270];
@@ -1445,16 +1447,39 @@ void raspberry_pi_interaction(void){
 
       char command_Mega = Serial.read();
 
-      // RPi wants to send some Iridium data
+      // check if RPi wants to send some Iridium data
       if (command_Mega == 'I'){
         #if SERIAL_PRINT
             Serial.println(F("D;Pi to Iridium"));
         #endif
         
-        // TODO
+        // get the number of bytes to transmit
+        int number_of_bytes = Serial.parseInt();
+
+        // store the whole message in the transmitt buffer
+        int byte_number = 0;
+        while (byte_number < number_of_bytes){
+          if (Serial.available() > 0){
+            Iridium_msg[byte_number] = Serial.read();
+            byte_number++;
+          }
+        }
+        Iridium_msg_position = number_of_bytes - 1;
+
+        // try to send the Iridium feedback string ----------------------------------
+        // note: retries the operation for up to 300 seconds by default; put watchdog reset in
+        // ISBDCallback.
+        ird_feedback = isbd.sendReceiveSBDBinary((uint8_t *)Iridium_msg, size_t(Iridium_msg_position),
+                                           Ird_rx, Ird_rx_position);
+
+        // NOTE: MAYBE SHOULD CONSIDER PUT CHECK FOR COMMANDS FROM IRIDIUM HERE
+        
+        // confirm to Raspberry Pi that well transmitted
+        Serial.print("R");
+        
       }
 
-      // RPi is finished
+      // check RPi is finished
       if (command_Mega == 'F'){
         #if SERIAL_PRINT
             Serial.println(F("D;Shut down RPi"));

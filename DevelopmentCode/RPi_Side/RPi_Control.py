@@ -3,6 +3,15 @@ import serial
 import glob
 from printind.printind_function import printi
 from parser import Parser_logger
+from compute_statistics import WaveStatistics
+from time import sleep
+import os
+
+"""
+TODO: do not tranmit reduced spectrum if no signal
+TODO: test processing and sending back through Iridium together with the Mega
+TODO: command for sending back whole parts of a file (TRT command)
+"""
 
 
 class RPi_control(object):
@@ -214,12 +223,118 @@ class RPi_control(object):
         parser_instance.process_file()
 
         # do the analysis of the data
-        # TODO
+        path_in_processing = self.main_path + 'ResultAnalyzis/'
+        instance_compute_statistics = WaveStatistics(path_in=path_in_processing, filename=self.filename)
+        instance_compute_statistics.perform_all_processing()
+        instance_compute_statistics.save_all_results()
+
+    def wait_for_arduino_acknowledgement(self):
+        while True:
+            if self.serial_port.in_waiting > 0:
+                crrt_char = self.serial_port.read()
+                if crrt_char == 'R':
+                    break
 
     def send_over_Iridium(self):
         """Send the processed data over Iridium"""
 
-        pass
+        # when should send through Iridium, ask it to the Mega as:
+        # I [#numberOfBytes] S
+
+        path_in_processing = self.main_path + 'ResultAnalyzis/'
+
+        # go through commands received by Iridium
+        for current_command in self.list_of_commands:
+
+            # default
+            if current_command == 'DEFAULT':
+                # send back SWH ------------------------------------------------
+                self.serial_port.write('I')
+
+                self.serial_port.write(3 + 2)
+
+                self.serial_port.write('S')
+
+                # identifier for the receiving side of the Iridium message
+                self.serial_port.write('S')
+                self.serial_port.write('W')
+                self.serial_port.write('H')
+
+                self.send_content_binary_file(path_in_processing + '_SWH.bdat')
+
+                # wait for transmission by Iridium done
+                self.wait_for_arduino_acknowledgement()
+
+                # send back spectral_properties --------------------------------
+                self.serial_port.write('I')
+
+                self.serial_port.write(3 + 6)
+
+                self.serial_port.write('S')
+
+                # identifier for the receiving side of the Iridium message
+                self.serial_port.write('S')
+                self.serial_port.write('P')
+                self.serial_port.write('P')
+
+                self.send_content_binary_file(path_in_processing + '_spectral_properties.bdat')
+
+                # wait for transmission by Iridium done
+                self.wait_for_arduino_acknowledgement()
+
+                # send back max_value_limited_spectrum -------------------------
+                self.serial_port.write('I')
+
+                self.serial_port.write(3 + 2)
+
+                self.serial_port.write('S')
+
+                # identifier for the receiving side of the Iridium message
+                self.serial_port.write('M')
+                self.serial_port.write('V')
+                self.serial_port.write('L')
+
+                self.send_content_binary_file(path_in_processing + '_max_value_limited_spectrum.bdat')
+
+                # wait for transmission by Iridium done
+                self.wait_for_arduino_acknowledgement()
+
+                # send back binary_red_spectrum --------------------------------
+                self.serial_port.write('I')
+
+                path_to_BRS = path_in_processing + '_spectral_properties.bdat'
+                size_in_bytes = int(os.path.getsize(path_to_BRS))
+                self.serial_port.write(3 + size_in_bytes)
+
+                self.serial_port.write('S')
+
+                # identifier for the receiving side of the Iridium message
+                self.serial_port.write('B')
+                self.serial_port.write('R')
+                self.serial_port.write('S')
+
+                self.send_content_binary_file(path_to_BRS)
+
+                # wait for transmission by Iridium done
+                self.wait_for_arduino_acknowledgement()
+
+            # transmit all data in a file (at least part of it)
+            if current_command[0:3] == 'TRT':
+                filename_to_transmit = current_command[3:]
+                # TODO
+
+    def send_content_binary_file(self, path_to_file):
+        """Send by serial the content of a binary file to the Arduino Mega."""
+
+        with open(path_to_file, "rb") as f:
+            byte = f.read(1)
+            while byte != "":
+                # send the byte to the Mega
+                self.serial_port.write(byte)
+                sleep(5.0 / 1000.0)  # sleep 5 ms
+
+                # read next byte
+                byte = f.read(1)
 
     def launch_RPi_command(self):
         """Launch all RPi processing."""
@@ -231,8 +346,8 @@ class RPi_control(object):
         self.connect_to_Arduino()
         self.receive_from_Arduino()
         self.save_all()
-        self.processing()  # TODO: processing
-        self.send_over_Iridium()  # TODO: send over Iridium
+        self.processing()
+        self.send_over_Iridium()
 
         if self.verbose > 0:
             printi("Done with everything!")

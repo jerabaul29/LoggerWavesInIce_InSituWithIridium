@@ -1,5 +1,6 @@
 import numpy as np
-from compute_statistics import *
+from compute_statistics import WaveStatistics
+from compute_statistics import global_fs
 
 ################################################################################
 # parameters to generate the synthetic signal
