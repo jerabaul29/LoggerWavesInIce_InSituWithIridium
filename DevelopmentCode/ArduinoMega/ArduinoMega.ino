@@ -1,55 +1,56 @@
 /*
  * A logger using Arduino Mega, Adafruit GPS, Adafruit SD, Adafruit LSM9DS0, RockBlock7
  * and connecting to RaspberryPi for processing
- * 
+ *
  * PINS:
- * 
+ *
  * -- Misc.
  * A0 to batt + (measure battery)
- * 
+ *
  * -- Power controller
  * 5V to 5V Mega
  * GND to GND Mega
  * Feedback Mega to 48
- * 
+ *
  * -- Adafruit GPS:
  * GND, Vin (5V)
  * TX to RX1
  * RX to TX1
- * 
+ *
  * -- Adafruit SD:
  * 5V, GND
  * CLK to 52
  * DO to 50
  * DI to 51
  * CS to 53
- * 
+ *
  * -- Adafruit LSM9DS0:
  * GND, Vin (5V)
  * SCL to SCL
  * SDA to SDA
- * 
+ *
  * -- RockBlock7
  * GND, Vin (5V)
- * Sleep (On Off) to 49 
+ * Sleep (On Off) to 49
  * TXD to Mega TX2
  * RXD to Mega RX2
  * Interface through the Internet: https://rockblock.rock7.com/Operations
- * 
+ *
  * -- Raspberry
  * 5V to 5V
  * GND to GND
  * 46 to RPI MFT
  * Serial through USB chip to RPI
- * 
+ *
  * CHECKLIST:
  * -- DURATION_LOGGING_MS
- * -- TIME_WNF
- * -- SERIAL_PRINT
- * -- SERIAL_RPI
+ * -- TIME_WNF  NOTE: to avoid losing the early data, with this simple logging, should have TIME_WNF > DURATION_LOGGING_MS + margin
+ *                       where margin should be at least several tens of seconds
+ * -- SERIAL_PRINT  NOTE: it should probably be either SERIAL_PRINT or SERIAL_RPI
+ * -- SERIAL_RPI  NOTE: it should probably be either SERIAL_PRINT or SERIAL_RPI
  * -- USE_IRIDIUM
  * -- EEPROM initialized with right value at address_total_sleeps, otherwise never sleeps
- * 
+ *
  * CONVENTIONS:
  * - S,: message about the Start of the file: booting, or new file timer
  * - M,: timestamp in Arduino internal clock reference frame
@@ -61,21 +62,23 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
  * - I;: start IMU data
  * - D;: debugging data
  * - P:: commands for the Raspberry Pi
- * 
+ *
  * CONVERT DECIMAL / HEX / ASCII / BINARY:
  * https://www.branah.com/ascii-converter
- * 
- * 
+ *
+ *
  */
 
  /*
   * TODO:
-  * 
+  *
+  * Check that enough battery at the end of the logging; if not, do not reboot but sleep
+  *
   * Test that work sending RaspberryPi information by Iridium
-  * 
+  *
   * put a maximum time for execution of the RPi interaction, otherwise reboot / exit
   * RPi interaction function
-  * 
+  *
   * let Iridium charge super capacitor for 40 seconds before switching to sleep
   * check that Iridium waits enough between transmission tries
   * set TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP using Iridium in EEPROM
@@ -84,13 +87,13 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
   * Iridium
   * put a safety to make sure that wakes up at least once every couple of days
   * go throuh Iridium wakeup and check how does it look: how long / when / sleep etc
-  * 
-  * 
+  *
+  *
   * Improve the logging by average of oversampling on LSM9DS0?
   * Use an extended buffer Arduino Mega core (?)
-  * 
+  *
   * open serial port if Raspberry pi alone only later on?
-  * 
+  *
   * wake up Iridium modem
   * wake up RPi, send last data file, get back processed data
   * find a (if possible, valid) GPS position string; wait at most N=20 GPS messages to find a valid
@@ -98,50 +101,50 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
   * send critical information by Iridium: GPS. battery, current file number, other (?)
   * send data received back from the Pi
   * update all parameters following instructions by Iridium
-  * 
+  *
   * use DTR instead of capacitory to avoid reset on opening of USB port? can be done in pyserial
-  * 
-  * 
+  *
+  *
   * RaspberryPi
   * Iridium
   * clean
-  * 
+  *
   * put logging and post logging in loops
-  * 
+  *
   */
 
 /*
- * 
+ *
  * NOTES
- * 
+ *
  * NEED AN EEPROM INITIALIZATION FUNCTION (CAN BE SEPARATE PROGRAM)
  * Should initialize the EEPROM to avoid 255 sleeps initially
  * Should initialize EEPROM for file numbering (?)
- * 
+ *
  */
 
 /*
  * IDEAS:
- * 
+ *
  * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  * Wake-up
- * 
+ *
  * Power control should give power each 5 minutes
- * 
+ *
  * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  * Keep track of configuration
- * 
+ *
  * Mega:
  * -- how often to wake up
  * -- battery limit to not wake up at all
- * 
+ *
  * RPi:
  * -- what processing to do
  * -- what information to send back by iridium
- * 
+ *
  * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  * Iridium:
- * 
+ *
  * controls to the logger:
  * -- to the Mega:
  * ------ number of cycles to sleep
@@ -150,17 +153,17 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
  * ------ which processing to do
  * ------ which processing to send back
  * ------ send back old processing
- * 
+ *
  * data from the logger:
  * -- about the logger
  * ------ battery voltage
  * ------ if solar panel is connected
  * ------ GPS position (if can get a fix)
  * ------ current file index used (the one when waking up)
- * 
+ *
  * -- about the files
  * ------ dump of file F lines A to B
- * 
+ *
  * -- about the RPi
  * ------ send the result of the analysis
  *
@@ -326,9 +329,9 @@ unsigned long time_start_logging_ms = 1;
 // Parameters about serial connections on Serial (USB port) ---------------------
 
 // for debugging: print strings about actions on serial
-#define SERIAL_PRINT false
+#define SERIAL_PRINT true
 // for connection with the Raspberry Pi
-#define SERIAL_RPI true
+#define SERIAL_RPI false
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Iridium
@@ -369,17 +372,19 @@ void setup(){
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // OPEN SERIAL IF NECESSARY
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  #if SERIAL_PRINT
+  #if SERIAL_PRINT || SERIAL_RPI
   // #if SERIAL_PRINT
     // Open serial communications and wait for port to open:
     Serial.begin(115200);
   #endif
 
+  /*
   #if SERIAL_RPI
     // Open serial communications and wait for port to open:
     Serial.begin(115200);
   #endif
-  
+  */
+
   #if SERIAL_PRINT
     while (!Serial) {
       ; // wait for serial port to connect.
@@ -402,7 +407,7 @@ void setup(){
 
   setup_logging();
 
-  
+
   time_tracking_WNF = millis();
   time_start_logging_ms = millis();
 
@@ -415,9 +420,9 @@ void setup(){
   #if USE_IRIDIUM
     setup_iridium();
   #endif
-  
+
   wdt_reset();
-  
+
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -434,16 +439,17 @@ void loop(){
   // LOGGING
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+  // log for all the required time
   while (millis() - time_start_logging_ms < DURATION_LOGGING_MS){
     wdt_reset();
     logging_loop();
   }
 
-  // close logging file
+  // when done logging: close logging file
   dataFile.close();
 
   wdt_reset();
-  
+
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // VITAL INFORMATION IRIDIUM
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -742,7 +748,7 @@ void logging_loop(void){
       Serial.print("D;Magn. X: "); Serial.print(mag.magnetic.x); Serial.print(" ");
       Serial.print("D;  \tY: "); Serial.print(mag.magnetic.y);       Serial.print(" ");
       Serial.print("D;  \tZ: "); Serial.print(mag.magnetic.z);     Serial.println("  \tgauss");
-  
+
       // print out gyroscopic data
       Serial.print("D;Gyro  X: "); Serial.print(gyro.gyro.x); Serial.print(" ");
       Serial.print("D;  \tY: "); Serial.print(gyro.gyro.y);       Serial.print(" ");
@@ -757,7 +763,7 @@ void logging_loop(void){
 
     // generate the string to post on SD card
     generateDataStringIMU();
-    
+
     // post data
     // SD post
     postSD(dataStringIMU);
@@ -767,7 +773,7 @@ void logging_loop(void){
   }
 
   wdt_reset();
-  
+
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -793,23 +799,26 @@ void setup_logging(void){
     #endif
     // blink to indicate failure
     blinkLED();
+
+    // NOTE: do something here to try to remedy?
   }
   #if SERIAL_PRINT
     Serial.println("D;card initialized.");
   #endif
 
   #if SERIAL_PRINT
+    // show the content of all files
     root = SD.open("/");
     printDirectory(root, 0);
     Serial.println("D;done!");
   #endif
-  
+
   wdt_reset();
 
   // take care of LED PIN_MGA_LED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   pinMode(PIN_MGA_LED, OUTPUT);
   digitalWrite(PIN_MGA_LED, LOW);
-  
+
   // setup GPS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   delay(250);
 
@@ -888,7 +897,7 @@ void decide_if_wakeup(void){
     Serial.println(F("D;Put PIN_FBK_MGA HIGH"));
     delay(5);
   #endif
-  
+
   pinMode(PIN_FBK_MGA, OUTPUT);
   digitalWrite(PIN_FBK_MGA, HIGH);
 
@@ -900,7 +909,7 @@ void decide_if_wakeup(void){
     Serial.println(total_number_sleeps_before_wakeup);
     delay(5);
   #endif
-  
+
   // value of the EEPROM: number of more cycles to sleep
   number_sleeps_left = EEPROM.read(address_sleeps_left);
 
@@ -916,7 +925,7 @@ void decide_if_wakeup(void){
       Serial.println(F("D;Too high number_sleeps_left: reset"));
       delay(5);
     #endif
-  
+
     EEPROM.write(address_sleeps_left, total_number_sleeps_before_wakeup);
 
     pinMode(PIN_FBK_MGA, INPUT);
@@ -928,12 +937,12 @@ void decide_if_wakeup(void){
 
   // if ok value >1: must sleep more; decrease by one and sleep
   else if (number_sleeps_left > 0){
-    
+
     #if SERIAL_PRINT
       Serial.println(F("D;Sleep more"));
       delay(5);
     #endif
-    
+
     EEPROM.write(address_sleeps_left, uint8_t(number_sleeps_left - 1));
 
     pinMode(PIN_FBK_MGA, INPUT);
@@ -944,12 +953,12 @@ void decide_if_wakeup(void){
   }
 
   // time to wake up
-  else if (number_sleeps_left < 1){
+  else if (number_sleeps_left <= 0){
     #if SERIAL_PRINT
       Serial.println(F("D;Time to wake up!"));
       delay(5);
     #endif
-    
+
     EEPROM.write(address_sleeps_left, total_number_sleeps_before_wakeup);
   }
 
@@ -959,7 +968,7 @@ void decide_if_wakeup(void){
       delay(5);
     #endif
 
-    EEPROM.write(address_sleeps_left, total_number_sleeps_before_wakeup - 1);
+    EEPROM.write(address_sleeps_left, 0);
 
     pinMode(PIN_FBK_MGA, INPUT);
 
@@ -978,7 +987,7 @@ void make_sleep(void){
     Serial.println(F("D;Make Mega sleep"));
     delay(5);
   #endif
-  
+
   power_all_disable();
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   power_adc_disable();
@@ -1022,7 +1031,7 @@ void setup_iridium(void){
 
   // go to sleep
   isbd.sleep();
-  
+
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1051,7 +1060,8 @@ void send_receive_Iridium_vital_information(void){
   // note: retries the operation for up to 300 seconds by default; put watchdog reset in
   // ISBDCallback.
   ird_feedback = isbd.sendReceiveSBDBinary((uint8_t *)Iridium_msg, size_t(1 + GPS_rx_buffer_position),
-                                           Ird_rx, Ird_rx_position);
+                                           Ird_rx, Ird_rx_position);  // NOTE: strange that Ird_rx_position; should it be a pointer?
+                                                                      // check all occurences
 
   #if SERIAL_PRINT
     if (ird_feedback != 0){
@@ -1065,6 +1075,8 @@ void send_receive_Iridium_vital_information(void){
 
   // read Iridium command if available, as many times as incoming messages ------
   do{
+
+      // NOTE: this will display the content, but double check not interacting with it because of the isbd call
       #if SERIAL_PRINT
         Serial.print("Inbound buffer size is ");
         Serial.println(Ird_rx_position);
@@ -1077,25 +1089,25 @@ void send_receive_Iridium_vital_information(void){
         Serial.print("Messages left: ");
         Serial.println(isbd.getWaitingMessageCount());
       #endif
-  
+
     wdt_reset();
-  
+
     // use do...while to go through all messages
     // check also commands to RPi
-  
+
     // check if command back ----------------------------------------------------
     if (Ird_rx_position > 0){
       #if SERIAL_PRINT
         Serial.print(F("Ird_rx_position > 0: "));
         Serial.println(Ird_rx_position);
       #endif
-  
+
       // check if should update number of sleep cycles --------------------------
-      // this kind of message should be of the form: SLP12 [set the number of sleep cycles
-      // to 12]
+      // this kind of message should be of the form: SLP(12) [set the number of sleep cycles
+      // to 12, where (12) is in binary value]
       if (char(Ird_rx[0]) == 'S' && char(Ird_rx[1]) == 'L' && char(Ird_rx[2]) == 'P'){
          uint8_t value_sleep = uint8_t(Ird_rx[3]);
-  
+
         #if SERIAL_PRINT
           Serial.print(F("Will sleep for:"));
           Serial.println(value_sleep);
@@ -1104,35 +1116,37 @@ void send_receive_Iridium_vital_information(void){
         // update the EEPROM
         EEPROM.write(address_total_sleeps, value_sleep);
       }
-  
+
       // check if should send some commands to RPi -----------------------------
+      // NOTE: could add functionalities, ie commands from Iridium, here
+      // such as: send a whole file, send an analysis, send another analysis etc
     }
 
     // if more messages to get, use more sendReceive
     if (isbd.getWaitingMessageCount() > 0){
-      
+
       #if SERIAL_PRINT
         Serial.println(F("D;Receive one more message"));
       #endif
-      
+
       Ird_rx_position = sizeof(Ird_rx);
       ird_feedback = isbd.sendReceiveSBDBinary(NULL, 0, Ird_rx, Ird_rx_position);
-      
+
     }
     // otherwise, get out of the reading loop
     else{
-      
+
       #if SERIAL_PRINT
         Serial.println(F("D;No more messages"));
       #endif
-      
+
       break;
-      
+
     }
-    
+
   }while(true);
-  
-  
+
+
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1181,7 +1195,7 @@ void set_file_number_Iridium_message(void){
 // Obtain a GPS GPRMC string to be used in the Iridium message
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void obtain_GPRMC_Iridium_message(void){
-  
+
   // flush GPS buffer
   while (SERIAL_GPS.available() > 0) {
     SERIAL_GPS.read();
@@ -1321,7 +1335,7 @@ void sleep_or_reboot(void){
     #if SERIAL_PRINT
       Serial.println(F("D;Ask no more current and sleep"));
     #endif
-    
+
     pinMode(PIN_FBK_MGA, INPUT);
 
     wdt_disable();
@@ -1338,12 +1352,12 @@ void sleep_or_reboot(void){
 void raspberry_pi_interaction(void){
 
   wdt_reset();
-  
+
   // power up the RaspberryPi -----------------------------------
   #if SERIAL_PRINT
     Serial.println(F("D;Boot RPi"));
   #endif
-  
+
   digitalWrite(PIN_MFT_RPI, LOW);
 
   wdt_reset();
@@ -1356,7 +1370,7 @@ void raspberry_pi_interaction(void){
   Serial.flush();
 
   wdt_reset();
-  
+
   delay(4000);
   wdt_reset();
   delay(4000);
@@ -1372,10 +1386,10 @@ void raspberry_pi_interaction(void){
   }
 
   wdt_reset();
-  
+
   // check if the RPi has booted --------------------------------
   Serial.print('B');
-  
+
   while(true){
 
     if (Serial.available() > 0){
@@ -1390,7 +1404,7 @@ void raspberry_pi_interaction(void){
   wdt_reset();
 
   // send commmand updates to the RPi --------------------------
-  // TODO
+  // TODO: ask for example to do another form for processing
 
   // send the file name to the RPi -----------------------------
   Serial.print('N');
@@ -1452,7 +1466,7 @@ void raspberry_pi_interaction(void){
         #if SERIAL_PRINT
             Serial.println(F("D;Pi to Iridium"));
         #endif
-        
+
         // get the number of bytes to transmit
         int number_of_bytes = Serial.parseInt();
 
@@ -1470,13 +1484,14 @@ void raspberry_pi_interaction(void){
         // note: retries the operation for up to 300 seconds by default; put watchdog reset in
         // ISBDCallback.
         ird_feedback = isbd.sendReceiveSBDBinary((uint8_t *)Iridium_msg, size_t(Iridium_msg_position),
-                                           Ird_rx, Ird_rx_position);
+                                           Ird_rx, Ird_rx_position);  // NOTE: strange that Ird_rx_position; check if should not be
+                                                                      // a pointer
 
         // NOTE: MAYBE SHOULD CONSIDER PUT CHECK FOR COMMANDS FROM IRIDIUM HERE
-        
+
         // confirm to Raspberry Pi that well transmitted
         Serial.print("R");
-        
+
       }
 
       // check RPi is finished
@@ -1503,4 +1518,3 @@ void raspberry_pi_interaction(void){
   #endif
 
 }
-

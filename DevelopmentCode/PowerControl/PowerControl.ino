@@ -1,23 +1,49 @@
 /*
  * Code for power control
- * 
+ *
+ * NOTE:
+ *
+ * This code takes care of the power management, and should be uploaded on the barebone ATMega328P
+ * Its functions are to:
+ * - Take care of the battery and solar panel. Each time it wakes up, check if the battery and solar panel should be connected
+ * - Take care of the power to the Arduino Mega. Each time it wakes up, check what should be the next state of the Arduino Mega.
+ *       The logics is the following:
+ *           - if the Mega is already awake, do as the Mega asks: give it current if asks for current. If the Mega is awake,
+ *               it is the Mega responsibility to check the battery level and to not deplete the battery
+ *           - if the Mega is not awake, chek how many more cycles it should sleep. If time to wake up, check if enough battery,
+ *                and if enough battery, give current to the Mega
+ * - Regarding the number of sleep cycles, there are two different pre-processor values:
+ *     - CYCLES_DEEP_SLEEP is how many 8 seconds watchdog deep sleep cycles this ATMega328P sleeps between taking action. I.e., how
+ *         often the battery vs solar pannel will be checked, the Mega will be checked and if needed its sleep counter decreased.
+ *         Typically, this could be 10 cycles, i.e. this ATMega328P waking up each 80 seconds.
+ *     - CYCLES_BEFORE_MEGA_WAKEUP is the number of deep sleep cycles before the Mega is given the chance to wake up again, when it
+ *          has just gone to sleep. Note that the Mega can always decide to sleep more if he wants, i.e. to really wake up only
+ *          each 2, 3, 4, or N CYCLES_BEFORE_MEGA_WAKEUP.
+ *          Typically, this could be 15 cycles: 15 * 80 = 1200s, i.e. 20 minutes, i.e. the Mega will be given the change to wake
+ *          up if it wants every 20 minutes.
+ *
  * TODO:
- * 
+ *
+ * Possible minor timing bug:
+ * check rigorously the number of wake and sleep cycles and the conditions (< vs <= 0 etc)
+ *
+ * Possible optimization:
  * put the pololu on a MOSFET from the battery side (to disconnect it when not needed, ie when not using
  * the Mega). Then need to be sure voltage on capacitors do not get too low: re connect pololu when logging with
  * Mega, and connect at least 8 seconds each 15 minutes [note: check values].
- * 
+ *
  */
 
  /*
-  * 
-  * CHECKLIST
-  * 
+  *
+  * CHECKLIST BEFORE UPLOADING
+  * CHECK THAT ALL THOSE PREPROCESSOR INSTRUCTIONS ARE SET TO RIGHT VALUE!!
+  *
   * DEBUG
   * SHOW_LED
   * CYCLES_BEFORE_MEGA_WAKEUP
   * CYCLES_DEEP_SLEEP
-  * 
+  *
   */
 
 #include <avr/wdt.h>            // library for default watchdog functions
@@ -29,8 +55,8 @@
 // volatile to be modified in interrupt function
 volatile int nbr_remaining;
 
-#define DEBUG false
-#define SHOW_LED false
+#define DEBUG false  // if DEBUG is true, Serial will be activated and used for logging information strings
+#define SHOW_LED false  // if SHOW_LED is true, the LED will be used for helping debugging
 
 #define PIN_MSR_BAT A0      // measure of battery
 #define PIN_MSR_SOL A1      // measure of solar panel on anode
@@ -40,19 +66,20 @@ volatile int nbr_remaining;
 #define PIN_MFT_SOL 2      // command mosfet solar panel / battery
 #define PIN_FBK_MGA 3      // feedback from Mega
 #define PIN_MFT_MGA 4      // command mosfet giving to the Mega
-#define PIN_CMD_LED 13      // command of intern LED
+#define PIN_CMD_LED 13     // command of intern LED
 
 #define BAT_THRESHOLD_V 3.6  // threshold for full battery
 #define BAT_EMPTY_V 2.85     // threshold for empty battery
 #define MIN_MARGIN_PANEL 0.5  // minimum over voltage panel vs battery for it to be worth connecting
 
-// for production: 10
+// number of loop () cycles before waking up the Mega
+// if deep sleep 80s (ie production value for CYCLES_DEEP_SLEEP), 3 loop() is 4 minutes
+// for production: 15; 15 ' 80s is 1200s, which is 20 minutes betw
 #define CYCLES_BEFORE_MEGA_WAKEUP 2
-                                     // number of loop () cycles before waking up the Mega
-                                     // if deep sleep 80s, 4 loop() is a bit over 5 minutes
 
-
-// for production: 10
+// number of cycles for which the microcontroller taking care of power sleeps
+// each cleep cyclet is 8s
+// for production: 10 cycles is 80 seconds
 #define CYCLES_DEEP_SLEEP 3
 
 float meas_battery = 0.0;
@@ -145,7 +172,7 @@ void loop() {
   // All measurements
   // --------------------------------------------------------------
   meas_battery = float(analogRead(PIN_MSR_BAT)) * 5.0 / 1024.0;
-  meas_solar_panel_anode = read_solar_panel_anode();
+  meas_solar_panel_anode = read_solar_panel_anode();  // the call to take_care_battery_solar comes in next block (decide what to do)
   solar_panel_voltage = meas_battery - meas_solar_panel_anode;
   command_from_mega = digitalRead(PIN_FBK_MGA);
 
@@ -168,37 +195,8 @@ void loop() {
   // Decide what should do with the solar panel
   // --------------------------------------------------------------
   connect_battery_panel = should_connect_array();
-  if (connect_battery_panel){
-    #if DEBUG
-      Serial.println(F("Connect battery panel now"));
-    #endif
-    #if SHOW_LED
-      controlled_blink(25, 20);
-    #else
-      // delay(500);
-    #endif
-    pinMode(PIN_MFT_SOL, OUTPUT);
-    digitalWrite(PIN_MFT_SOL, HIGH);
-    delay(50);
-  }
-  else{
-    #if DEBUG
-      Serial.println(F("Disconnect battery panel now"));
-    #endif
-    #if SHOW_LED
-      controlled_blink(500, 2);
-    #else
-      // delay(500);
-    #endif
-    pinMode(PIN_MFT_SOL, INPUT);
-    delay(50);
-  }
 
-  #if SHOW_LED
-    delay(1000);
-  #else
-    // delay(500);
-  #endif
+  take_care_battery_solar();
 
   wdt_reset();
 
@@ -214,7 +212,8 @@ void loop() {
 
     remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
   }
-  
+
+  // what to do if the Mega already is awake: check if asks for more current
   if (mega_awake){
     if (command_from_mega){
       #if DEBUG
@@ -238,14 +237,19 @@ void loop() {
         // delay(500);
       #endif
 
+    // disconnect the Mega
     pinMode(PIN_MFT_MGA, INPUT);
 
+    // Mega is not awake any longer
     mega_awake = false;
+    // how many cycles left before should wake up Mega
     remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
     }
   }
 
+  // otherwise, if the Mega is not awake, see if time to wake it up
   else{
+    // it should be time to wake up
     if (remaining_before_mega_wakeup <= 0){
       #if DEBUG
         Serial.println(F("Time to wake up the mega"));
@@ -257,19 +261,22 @@ void loop() {
         // delay(500);
       #endif
 
+      // battery is enough to power the Mega
       if (BAT_EMPTY_V < meas_battery){
         #if DEBUG
           Serial.println(F("Enough battery"));
           delay(50);
         #endif
-      
+
+        // power the Mega
         pinMode(PIN_MFT_MGA, OUTPUT);
         digitalWrite(PIN_MFT_MGA, HIGH);
 
         // see if the Mega actually wanted to be waken up
+        // this is because we could decide to change the sampling frequency
         // give the Mega the time to boot
         wdt_reset();
-        
+
         delay(4000);
 
         wdt_reset();
@@ -277,18 +284,25 @@ void loop() {
         // measure again the level of the Mega
         command_from_mega = digitalRead(PIN_FBK_MGA);
 
+        // if the Mega wants to be up, it is now really awake
         if (command_from_mega){
           Serial.println(F("The mega wants to be up"));
           mega_awake = true;
         }
 
+        // if the Mega does not want to be up, put it down again
         else{
           Serial.println(F("The mega wants to be down"));
+          // mega not awake
           mega_awake = false;
+          // take current away from Mega
           pinMode(PIN_MFT_MGA, INPUT);
         }
 
       }
+
+      // else, battery is not enough to power the Mega; save the logger, do not
+      // wake up the Mega
       else{
         #if DEBUG
           Serial.println(F("Not enough battery"));
@@ -296,13 +310,15 @@ void loop() {
           delay(50);
         #endif
 
+        // mega sleeps and gets no current
         mega_awake = false;
         pinMode(PIN_MFT_MGA, INPUT);
       }
 
       remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
     }
-    
+
+    // else, it is not yet time to wake up the Mega
     else{
       #if DEBUG
         Serial.println(F("Mega should sleep more"));
@@ -358,7 +374,7 @@ float read_solar_panel_anode(){
   // Should call take_care_battery_solar after this function to not let the solar panel
   // simply disconnected.
 
-  // open the MOSFET commanding solar panel to be sure that +5V on +
+  // disconnect array from battery, otherwise measure battery voltage
   pinMode(PIN_MFT_SOL, INPUT);
 
   delay(200);
@@ -376,6 +392,40 @@ float read_solar_panel_anode(){
   value_solar_panel_anode_f = (value_measurement_solar_panel_anode_f - 5.0 * alpha) / (1.0 - alpha);
 
   return(value_solar_panel_anode_f);
+}
+
+void take_care_battery_solar(){
+  if (connect_battery_panel){
+    #if DEBUG
+      Serial.println(F("Connect battery panel now"));
+    #endif
+    #if SHOW_LED
+      controlled_blink(25, 20);
+    #else
+      // delay(500);
+    #endif
+    pinMode(PIN_MFT_SOL, OUTPUT);
+    digitalWrite(PIN_MFT_SOL, HIGH);
+    delay(50);
+  }
+  else{
+    #if DEBUG
+      Serial.println(F("Disconnect battery panel now"));
+    #endif
+    #if SHOW_LED
+      controlled_blink(500, 2);
+    #else
+      // delay(500);
+    #endif
+    pinMode(PIN_MFT_SOL, INPUT);
+    delay(50);
+  }
+
+  #if SHOW_LED
+    delay(1000);
+  #else
+    // delay(500);
+  #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

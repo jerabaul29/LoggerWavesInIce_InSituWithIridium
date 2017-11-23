@@ -11,6 +11,8 @@ import os
 TODO: do not tranmit reduced spectrum if no signal
 TODO: test processing and sending back through Iridium together with the Mega
 TODO: command for sending back whole parts of a file (TRT command)
+NOTE: may need to help the Arduino for transmitting through the Iridium by cutting the file in different parts to accomodate
+Iridium buffer size.
 """
 
 
