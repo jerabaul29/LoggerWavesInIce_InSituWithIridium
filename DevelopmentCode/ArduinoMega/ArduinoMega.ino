@@ -1388,6 +1388,8 @@ void raspberry_pi_interaction(void){
   wdt_reset();
 
   // check if the RPi has booted --------------------------------
+  // TODO: make the double checking of booting more robust: need to
+  // TODO: send again 'B' if no answer after some given time
   Serial.print('B');
 
   while(true){
@@ -1404,7 +1406,7 @@ void raspberry_pi_interaction(void){
   wdt_reset();
 
   // send commmand updates to the RPi --------------------------
-  // TODO: ask for example to do another form for processing
+  // TODO: ask to do another form for processing
 
   // send the file name to the RPi -----------------------------
   Serial.print('N');
@@ -1479,6 +1481,11 @@ void raspberry_pi_interaction(void){
           }
         }
         Iridium_msg_position = number_of_bytes - 1;
+
+        // TODO: add a delimiter in the communication from the RPi to make sure
+        // TODO: that right number of bytes even if first byte evaluates as a number?
+        // TODO: other possibility: ask the RPi to always give a chunk of max number (340? check value)
+        // TODO: bytes; this is anyway the minimum size of a message
 
         // try to send the Iridium feedback string ----------------------------------
         // note: retries the operation for up to 300 seconds by default; put watchdog reset in

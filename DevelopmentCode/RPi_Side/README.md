@@ -32,3 +32,11 @@ To be able to talk to the RPi by ssh make sure that:
 - The Pi does not shutoff immediately; for this, may be necessary to plug a dummy
 Arduino
 - In order to upload code to the RPi, from this folder do: ```scp * pi@10.42.0.214:/home/pi/Logger/Code/.```
+- If necessary, see the webpage on my website: https://folk.uio.no/jeanra/Informatics/GettingStartedRaspberryPi.html
+
+## TODO
+
+- Decide and write down the protocol for communications with the Mega
+- Write clean(er) code for communication with the Mega
+- Write code for processing
+- Write code for asking to send through Iridium
