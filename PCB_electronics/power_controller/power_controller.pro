@@ -1,4 +1,4 @@
-update=ti. 28. nov. 2017 kl. 18.47 +0100
+update=on. 29. nov. 2017 kl. 14.01 +0100
 version=1
 last_client=kicad
 [pcbnew]
@@ -61,3 +61,4 @@ LibName29=valves
 LibName30=/home/jrlab/Desktop/Git/kicad-library/libs/MOSFET-P
 LibName31=/home/jrlab/Desktop/Git/kicad-library/libs/MOSFET-N
 LibName32=/home/jrlab/Downloads/net-tie
+LibName33=/home/jrlab/Desktop/Git/MyKiCADLibraries/my_mosfet-n
