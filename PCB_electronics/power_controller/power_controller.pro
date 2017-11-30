@@ -1,4 +1,4 @@
-update=on. 29. nov. 2017 kl. 14.01 +0100
+update=to. 30. nov. 2017 kl. 10.24 +0100
 version=1
 last_client=kicad
 [pcbnew]
@@ -62,3 +62,13 @@ LibName30=/home/jrlab/Desktop/Git/kicad-library/libs/MOSFET-P
 LibName31=/home/jrlab/Desktop/Git/kicad-library/libs/MOSFET-N
 LibName32=/home/jrlab/Downloads/net-tie
 LibName33=/home/jrlab/Desktop/Git/MyKiCADLibraries/my_mosfet-n
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=Pcbnew
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
