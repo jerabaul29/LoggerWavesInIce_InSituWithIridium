@@ -1,0 +1,3 @@
+- see if can change to 3.3V everywhere to save power; in worst case, 3.3V / 5V mix
+- add capacitors to the board (at least, solder points)
+- add the Mega to the board (barebone Mega; include USB FTDI chip)
