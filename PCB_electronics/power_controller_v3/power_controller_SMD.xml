@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="D">
+  <design>
+    <source>/home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/PCB_electronics/power_controller_v3/power_controller_SMD.sch</source>
+    <date>ti. 12. des. 2017 kl. 13.29 +0100</date>
+    <tool>Eeschema 4.0.2+dfsg1-stable</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title>Power Manager SMD</title>
+        <company>UiO</company>
+        <rev>0.1</rev>
+        <date>2017-12-12</date>
+        <source>power_controller_SMD.sch</source>
+        <comment number="1" value="Jean Rabault"/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="R4">
+      <value>SMD-RES-47K-5%-1_10W_0603_</value>
+      <footprint>SeeedOPL-Resistor-2016:R0603</footprint>
+      <fields>
+        <field name="MPN">RC0603JR-0747KL</field>
+        <field name="SKU">301010084</field>
+      </fields>
+      <libsource lib="SeeedOPL-Resistor-2016" part="SMD-RES-47K-5%-1_10W_0603_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2F9616</tstamp>
+    </comp>
+    <comp ref="Y1">
+      <value>DIP-CRYSTAL-16MHZ-18PF-30PPM-40R_HC49US_</value>
+      <footprint>SeeedOPL-Crystal Oscillator-2016:HC49US</footprint>
+      <fields>
+        <field name="MPN">HC-49US    16.000MHz</field>
+        <field name="SKU">306010014</field>
+      </fields>
+      <libsource lib="SeeedOPL-Crystal Oscillator-2016" part="DIP-CRYSTAL-16MHZ-18PF-30PPM-40R_HC49US_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2F9C2D</tstamp>
+    </comp>
+    <comp ref="C2">
+      <value>CERAMIC-18PF-50V-5%-NPO_0402_</value>
+      <footprint>SeeedOPL-Capacitor-2016:C0402</footprint>
+      <fields>
+        <field name="MPN">CC0402JRNPO9BN180</field>
+        <field name="SKU">302010016</field>
+      </fields>
+      <libsource lib="SeeedOPL-Capacitor-2016" part="CERAMIC-18PF-50V-5%-NPO_0402_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2F9CA9</tstamp>
+    </comp>
+    <comp ref="C1">
+      <value>CERAMIC-18PF-50V-5%-NPO_0402_</value>
+      <footprint>SeeedOPL-Capacitor-2016:C0402</footprint>
+      <fields>
+        <field name="MPN">CC0402JRNPO9BN180</field>
+        <field name="SKU">302010016</field>
+      </fields>
+      <libsource lib="SeeedOPL-Capacitor-2016" part="CERAMIC-18PF-50V-5%-NPO_0402_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2F9D78</tstamp>
+    </comp>
+    <comp ref="J2">
+      <value>SCREW-TERMINAL-GREEN_2P-5.0_</value>
+      <footprint>SeeedOPL-Connector-2016:H2-5.0-10.5X8.0MM</footprint>
+      <fields>
+        <field name="SKU">320110031</field>
+      </fields>
+      <libsource lib="SeeedOPL-Connector-2016" part="SCREW-TERMINAL-GREEN_2P-5.0_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2F9FBA</tstamp>
+    </comp>
+    <comp ref="J3">
+      <value>SCREW-TERMINAL-GREEN_2P-5.0_</value>
+      <footprint>SeeedOPL-Connector-2016:H2-5.0-10.5X8.0MM</footprint>
+      <fields>
+        <field name="SKU">320110031</field>
+      </fields>
+      <libsource lib="SeeedOPL-Connector-2016" part="SCREW-TERMINAL-GREEN_2P-5.0_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FA031</tstamp>
+    </comp>
+    <comp ref="J4">
+      <value>SCREW-TERMINAL-GREEN_2P-5.0_</value>
+      <footprint>SeeedOPL-Connector-2016:H2-5.0-10.5X8.0MM</footprint>
+      <fields>
+        <field name="SKU">320110031</field>
+      </fields>
+      <libsource lib="SeeedOPL-Connector-2016" part="SCREW-TERMINAL-GREEN_2P-5.0_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FA076</tstamp>
+    </comp>
+    <comp ref="J5">
+      <value>SCREW-TERMINAL-GREEN_2P-5.0_</value>
+      <footprint>SeeedOPL-Connector-2016:H2-5.0-10.5X8.0MM</footprint>
+      <fields>
+        <field name="SKU">320110031</field>
+      </fields>
+      <libsource lib="SeeedOPL-Connector-2016" part="SCREW-TERMINAL-GREEN_2P-5.0_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FA152</tstamp>
+    </comp>
+    <comp ref="J6">
+      <value>SCREW-TERMINAL-GREEN_3P-5.0_</value>
+      <footprint>SeeedOPL-Connector-2016:H3-5.0-15.5X8.0MM</footprint>
+      <fields>
+        <field name="SKU">320110029</field>
+      </fields>
+      <libsource lib="SeeedOPL-Connector-2016" part="SCREW-TERMINAL-GREEN_3P-5.0_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FA1AD</tstamp>
+    </comp>
+    <comp ref="Q2">
+      <value>SMD-MOSFET-N-CH-20V-2.1A-CJ2302_SOT-23_</value>
+      <footprint>SeeedOPL-Transistor-2016:SOT-23</footprint>
+      <fields>
+        <field name="MPN">CJ2302</field>
+        <field name="SKU">305030015</field>
+      </fields>
+      <libsource lib="SeeedOPL-Transistor-2016" part="SMD-MOSFET-N-CH-20V-2.1A-CJ2302_SOT-23_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FAB41</tstamp>
+    </comp>
+    <comp ref="Q1">
+      <value>SMD-MOSFET-N-CH-20V-2.1A-CJ2302_SOT-23_</value>
+      <footprint>SeeedOPL-Transistor-2016:SOT-23</footprint>
+      <fields>
+        <field name="MPN">CJ2302</field>
+        <field name="SKU">305030015</field>
+      </fields>
+      <libsource lib="SeeedOPL-Transistor-2016" part="SMD-MOSFET-N-CH-20V-2.1A-CJ2302_SOT-23_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FABA2</tstamp>
+    </comp>
+    <comp ref="R3">
+      <value>SMD-RES-47K-5%-1_10W_0603_</value>
+      <footprint>SeeedOPL-Resistor-2016:R0603</footprint>
+      <fields>
+        <field name="MPN">RC0603JR-0747KL</field>
+        <field name="SKU">301010084</field>
+      </fields>
+      <libsource lib="SeeedOPL-Resistor-2016" part="SMD-RES-47K-5%-1_10W_0603_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FB718</tstamp>
+    </comp>
+    <comp ref="R6">
+      <value>SMD-RES-47K-5%-1_10W_0603_</value>
+      <footprint>SeeedOPL-Resistor-2016:R0603</footprint>
+      <fields>
+        <field name="MPN">RC0603JR-0747KL</field>
+        <field name="SKU">301010084</field>
+      </fields>
+      <libsource lib="SeeedOPL-Resistor-2016" part="SMD-RES-47K-5%-1_10W_0603_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FB7F9</tstamp>
+    </comp>
+    <comp ref="R1">
+      <value>SMD-RES-10K-1%-1_10W_0603_</value>
+      <footprint>SeeedOPL-Resistor-2016:R0603</footprint>
+      <fields>
+        <field name="MPN">RC0603FR-0710KL</field>
+        <field name="SKU">301010299</field>
+      </fields>
+      <libsource lib="SeeedOPL-Resistor-2016" part="SMD-RES-10K-1%-1_10W_0603_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FD788</tstamp>
+    </comp>
+    <comp ref="R2">
+      <value>SMD-RES-6.8K-1%-1_10W_0603_</value>
+      <footprint>SeeedOPL-Resistor-2016:R0603</footprint>
+      <fields>
+        <field name="MPN">RC0805JR-07220KL</field>
+        <field name="SKU">301010198</field>
+      </fields>
+      <libsource lib="SeeedOPL-Resistor-2016" part="SMD-RES-6.8K-1%-1_10W_0603_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FD826</tstamp>
+    </comp>
+    <comp ref="R5">
+      <value>SMD-RES-47K-5%-1_10W_0603_</value>
+      <footprint>SeeedOPL-Resistor-2016:R0603</footprint>
+      <fields>
+        <field name="MPN">RC0603JR-0747KL</field>
+        <field name="SKU">301010084</field>
+      </fields>
+      <libsource lib="SeeedOPL-Resistor-2016" part="SMD-RES-47K-5%-1_10W_0603_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FDB77</tstamp>
+    </comp>
+    <comp ref="J1">
+      <value>DIP-BLACK-MALE-HEADER_2X3P-2.54)</value>
+      <footprint>SeeedOPL-Connector-2016:H2X3-2.54</footprint>
+      <fields>
+        <field name="MPN">P125-12A1BS116A1</field>
+        <field name="SKU">320020077</field>
+      </fields>
+      <libsource lib="SeeedOPL-Connector-2016" part="DIP-BLACK-MALE-HEADER_2X3P-2.54)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FE208</tstamp>
+    </comp>
+    <comp ref="P2">
+      <value>CONN_01X02</value>
+      <footprint>Pin_Headers:Pin_Header_Straight_1x02</footprint>
+      <libsource lib="conn" part="CONN_01X02"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FF381</tstamp>
+    </comp>
+    <comp ref="P3">
+      <value>CONN_01X06</value>
+      <footprint>Pin_Headers:Pin_Header_Straight_1x06</footprint>
+      <libsource lib="conn" part="CONN_01X06"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FF8E0</tstamp>
+    </comp>
+    <comp ref="U1">
+      <value>MCU-ATMEGA328P-AU_TQFP32_</value>
+      <footprint>SeeedOPL-IC-2016:TQFP32-0.8-7X7MM</footprint>
+      <fields>
+        <field name="MPN">ATMEGA328P-AU</field>
+        <field name="SKU">310010049</field>
+      </fields>
+      <libsource lib="SeeedOPL-IC-2016" part="MCU-ATMEGA328P-AU_TQFP32_"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FC455</tstamp>
+    </comp>
+    <comp ref="P1">
+      <value>CONN_01X06</value>
+      <footprint>Pin_Headers:Pin_Header_Straight_1x06</footprint>
+      <libsource lib="conn" part="CONN_01X06"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A2FDF7B</tstamp>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="SeeedOPL-Capacitor-2016" part="CERAMIC-18PF-50V-5%-NPO_0402_">
+      <footprints>
+        <fp>*C0402*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">CERAMIC-18PF-50V-5%-NPO_0402_</field>
+        <field name="MPN">CC0402JRNPO9BN180</field>
+        <field name="SKU">302010016</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="conn" part="CONN_01X02">
+      <description>Connector 01x02</description>
+      <footprints>
+        <fp>Pin_Header_Straight_1X02</fp>
+        <fp>Pin_Header_Angled_1X02</fp>
+        <fp>Socket_Strip_Straight_1X02</fp>
+        <fp>Socket_Strip_Angled_1X02</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">P</field>
+        <field name="Value">CONN_01X02</field>
+      </fields>
+      <pins>
+        <pin num="1" name="P1" type="passive"/>
+        <pin num="2" name="P2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="conn" part="CONN_01X06">
+      <description>Connector 01x06</description>
+      <footprints>
+        <fp>Pin_Header_Straight_1X06</fp>
+        <fp>Pin_Header_Angled_1X06</fp>
+        <fp>Socket_Strip_Straight_1X06</fp>
+        <fp>Socket_Strip_Angled_1X06</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">P</field>
+        <field name="Value">CONN_01X06</field>
+      </fields>
+      <pins>
+        <pin num="1" name="P1" type="passive"/>
+        <pin num="2" name="P2" type="passive"/>
+        <pin num="3" name="P3" type="passive"/>
+        <pin num="4" name="P4" type="passive"/>
+        <pin num="5" name="P5" type="passive"/>
+        <pin num="6" name="P6" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="SeeedOPL-Connector-2016" part="DIP-BLACK-MALE-HEADER_2X3P-2.54)">
+      <footprints>
+        <fp>*H2X3-2.54*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">DIP-BLACK-MALE-HEADER_2X3P-2.54)</field>
+        <field name="MPN">P125-12A1BS116A1</field>
+        <field name="SKU">320020077</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="BiDi"/>
+        <pin num="2" name="2" type="BiDi"/>
+        <pin num="3" name="3" type="BiDi"/>
+        <pin num="4" name="4" type="BiDi"/>
+        <pin num="5" name="5" type="BiDi"/>
+        <pin num="6" name="6" type="BiDi"/>
+      </pins>
+    </libpart>
+    <libpart lib="SeeedOPL-Crystal Oscillator-2016" part="DIP-CRYSTAL-16MHZ-18PF-30PPM-40R_HC49US_">
+      <footprints>
+        <fp>*HC49US*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">Y</field>
+        <field name="Value">DIP-CRYSTAL-16MHZ-18PF-30PPM-40R_HC49US_</field>
+        <field name="MPN">HC-49US    16.000MHz</field>
+        <field name="SKU">306010014</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="SeeedOPL-IC-2016" part="MCU-ATMEGA328P-AU_TQFP32_">
+      <footprints>
+        <fp>*TQFP32-0.8-7X7MM*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">MCU-ATMEGA328P-AU_TQFP32_</field>
+        <field name="MPN">ATMEGA328P-AU</field>
+        <field name="SKU">310010049</field>
+      </fields>
+      <pins>
+        <pin num="1" name="PD3(INT1)" type="BiDi"/>
+        <pin num="2" name="PD4(XCK/T0)" type="BiDi"/>
+        <pin num="3" name="GND" type="BiDi"/>
+        <pin num="4" name="VCC" type="BiDi"/>
+        <pin num="5" name="GND" type="BiDi"/>
+        <pin num="6" name="VCC" type="BiDi"/>
+        <pin num="7" name="PB6(XTAL1/TOSC1)" type="BiDi"/>
+        <pin num="8" name="PB7(XTAL2/TOSC2)" type="BiDi"/>
+        <pin num="9" name="PD5(T1)" type="BiDi"/>
+        <pin num="10" name="PD6(AIN0)" type="BiDi"/>
+        <pin num="11" name="PD7(AIN1)" type="BiDi"/>
+        <pin num="12" name="PB0(ICP)" type="BiDi"/>
+        <pin num="13" name="PB1(OC1A)" type="BiDi"/>
+        <pin num="14" name="PB2(SS/OC1B)" type="BiDi"/>
+        <pin num="15" name="PB3(MOSI/OC2)" type="BiDi"/>
+        <pin num="16" name="PB4(MISO)" type="BiDi"/>
+        <pin num="17" name="PB5(SCK)" type="BiDi"/>
+        <pin num="18" name="AVCC" type="BiDi"/>
+        <pin num="19" name="ADC6" type="BiDi"/>
+        <pin num="20" name="AREF" type="BiDi"/>
+        <pin num="21" name="GND" type="BiDi"/>
+        <pin num="22" name="ADC7" type="BiDi"/>
+        <pin num="23" name="PC0(ADC0)" type="BiDi"/>
+        <pin num="24" name="PC1(ADC1)" type="BiDi"/>
+        <pin num="25" name="PC2(ADC2)" type="BiDi"/>
+        <pin num="26" name="PC3(ADC3)" type="BiDi"/>
+        <pin num="27" name="PC4(ADC4/SDA)" type="BiDi"/>
+        <pin num="28" name="PC5(ADC5/SCL)" type="BiDi"/>
+        <pin num="29" name="PC6(/RESET)" type="BiDi"/>
+        <pin num="30" name="PD0(RXD)" type="BiDi"/>
+        <pin num="31" name="PD1(TXD)" type="BiDi"/>
+        <pin num="32" name="PD2(INT0)" type="BiDi"/>
+      </pins>
+    </libpart>
+    <libpart lib="SeeedOPL-Connector-2016" part="SCREW-TERMINAL-GREEN_2P-5.0_">
+      <footprints>
+        <fp>*H2-5.0-10.5X8.0MM*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">SCREW-TERMINAL-GREEN_2P-5.0_</field>
+        <field name="SKU">320110031</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="BiDi"/>
+        <pin num="2" name="2" type="BiDi"/>
+      </pins>
+    </libpart>
+    <libpart lib="SeeedOPL-Connector-2016" part="SCREW-TERMINAL-GREEN_3P-5.0_">
+      <footprints>
+        <fp>*H3-5.0-15.5X8.0MM*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">SCREW-TERMINAL-GREEN_3P-5.0_</field>
+        <field name="SKU">320110029</field>
+      </fields>
+      <pins>
+        <pin num="1" name="P$1" type="BiDi"/>
+        <pin num="2" name="P$2" type="BiDi"/>
+        <pin num="3" name="P$3" type="BiDi"/>
+      </pins>
+    </libpart>
+    <libpart lib="SeeedOPL-Transistor-2016" part="SMD-MOSFET-N-CH-20V-2.1A-CJ2302_SOT-23_">
+      <footprints>
+        <fp>*SOT-23*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">Q</field>
+        <field name="Value">SMD-MOSFET-N-CH-20V-2.1A-CJ2302_SOT-23_</field>
+        <field name="MPN">CJ2302</field>
+        <field name="SKU">305030015</field>
+      </fields>
+      <pins>
+        <pin num="1" name="G" type="passive"/>
+        <pin num="2" name="S" type="passive"/>
+        <pin num="3" name="D" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="SeeedOPL-Resistor-2016" part="SMD-RES-10K-1%-1_10W_0603_">
+      <footprints>
+        <fp>*R0603*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">SMD-RES-10K-1%-1_10W_0603_</field>
+        <field name="MPN">RC0603FR-0710KL</field>
+        <field name="SKU">301010299</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="SeeedOPL-Resistor-2016" part="SMD-RES-47K-5%-1_10W_0603_">
+      <footprints>
+        <fp>*R0603*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">SMD-RES-47K-5%-1_10W_0603_</field>
+        <field name="MPN">RC0603JR-0747KL</field>
+        <field name="SKU">301010084</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="SeeedOPL-Resistor-2016" part="SMD-RES-6.8K-1%-1_10W_0603_">
+      <footprints>
+        <fp>*R0603*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">SMD-RES-6.8K-1%-1_10W_0603_</field>
+        <field name="MPN">RC0805JR-07220KL</field>
+        <field name="SKU">301010198</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="SeeedOPL-Connector-2016">
+      <uri>/home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/SeeedOPL for Kicad-alpha-2017-01-02/SeeedOPL-Connector-2016.lib</uri>
+    </library>
+    <library logical="SeeedOPL-Capacitor-2016">
+      <uri>/home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/SeeedOPL for Kicad-alpha-2017-01-02/SeeedOPL-Capacitor-2016.lib</uri>
+    </library>
+    <library logical="SeeedOPL-Crystal Oscillator-2016">
+      <uri>/home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/SeeedOPL for Kicad-alpha-2017-01-02/SeeedOPL-Crystal Oscillator-2016.lib</uri>
+    </library>
+    <library logical="SeeedOPL-IC-2016">
+      <uri>/home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/SeeedOPL for Kicad-alpha-2017-01-02/SeeedOPL-IC-2016.lib</uri>
+    </library>
+    <library logical="SeeedOPL-Resistor-2016">
+      <uri>/home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/SeeedOPL for Kicad-alpha-2017-01-02/SeeedOPL-Resistor-2016.lib</uri>
+    </library>
+    <library logical="SeeedOPL-Transistor-2016">
+      <uri>/home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/SeeedOPL for Kicad-alpha-2017-01-02/SeeedOPL-Transistor-2016.lib</uri>
+    </library>
+    <library logical="conn">
+      <uri>/usr/share/kicad/library/conn.lib</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="Net-(J1-Pad3)">
+      <node ref="J1" pin="3"/>
+      <node ref="R4" pin="2"/>
+      <node ref="U1" pin="29"/>
+    </net>
+    <net code="2" name="+5V">
+      <node ref="R4" pin="1"/>
+      <node ref="U1" pin="18"/>
+      <node ref="J1" pin="6"/>
+      <node ref="R1" pin="2"/>
+      <node ref="J3" pin="1"/>
+      <node ref="J5" pin="1"/>
+      <node ref="U1" pin="6"/>
+      <node ref="U1" pin="4"/>
+      <node ref="J6" pin="1"/>
+    </net>
+    <net code="3" name="/SOL_-">
+      <node ref="R6" pin="2"/>
+      <node ref="Q2" pin="2"/>
+      <node ref="J2" pin="2"/>
+      <node ref="R2" pin="2"/>
+    </net>
+    <net code="4" name="/SCK">
+      <node ref="U1" pin="17"/>
+      <node ref="J1" pin="2"/>
+    </net>
+    <net code="5" name="Net-(P1-Pad2)">
+      <node ref="U1" pin="26"/>
+      <node ref="P1" pin="2"/>
+    </net>
+    <net code="6" name="Net-(P1-Pad1)">
+      <node ref="U1" pin="25"/>
+      <node ref="P1" pin="1"/>
+    </net>
+    <net code="7" name="Net-(P2-Pad1)">
+      <node ref="P2" pin="1"/>
+      <node ref="U1" pin="30"/>
+    </net>
+    <net code="8" name="Net-(P2-Pad2)">
+      <node ref="P2" pin="2"/>
+      <node ref="U1" pin="31"/>
+    </net>
+    <net code="9" name="/CMD_SOLAR">
+      <node ref="Q2" pin="1"/>
+      <node ref="R6" pin="1"/>
+      <node ref="U1" pin="32"/>
+    </net>
+    <net code="10" name="Net-(P1-Pad3)">
+      <node ref="U1" pin="27"/>
+      <node ref="P1" pin="3"/>
+    </net>
+    <net code="11" name="Net-(P1-Pad6)">
+      <node ref="P1" pin="6"/>
+      <node ref="U1" pin="22"/>
+    </net>
+    <net code="12" name="Net-(P1-Pad5)">
+      <node ref="P1" pin="5"/>
+      <node ref="U1" pin="19"/>
+    </net>
+    <net code="13" name="Net-(P1-Pad4)">
+      <node ref="U1" pin="28"/>
+      <node ref="P1" pin="4"/>
+    </net>
+    <net code="14" name="Net-(R5-Pad1)">
+      <node ref="R5" pin="1"/>
+      <node ref="U1" pin="23"/>
+    </net>
+    <net code="15" name="/MEAS_SOL">
+      <node ref="R1" pin="1"/>
+      <node ref="R2" pin="1"/>
+      <node ref="U1" pin="24"/>
+    </net>
+    <net code="16" name="/MISO">
+      <node ref="U1" pin="16"/>
+      <node ref="J1" pin="1"/>
+    </net>
+    <net code="17" name="/MOSI">
+      <node ref="U1" pin="15"/>
+      <node ref="J1" pin="5"/>
+    </net>
+    <net code="18" name="Net-(P3-Pad1)">
+      <node ref="U1" pin="9"/>
+      <node ref="P3" pin="1"/>
+    </net>
+    <net code="19" name="Net-(P3-Pad6)">
+      <node ref="U1" pin="14"/>
+      <node ref="P3" pin="6"/>
+    </net>
+    <net code="20" name="Net-(P3-Pad5)">
+      <node ref="P3" pin="5"/>
+      <node ref="U1" pin="13"/>
+    </net>
+    <net code="21" name="Net-(P3-Pad4)">
+      <node ref="U1" pin="12"/>
+      <node ref="P3" pin="4"/>
+    </net>
+    <net code="22" name="Net-(P3-Pad3)">
+      <node ref="P3" pin="3"/>
+      <node ref="U1" pin="11"/>
+    </net>
+    <net code="23" name="Net-(P3-Pad2)">
+      <node ref="U1" pin="10"/>
+      <node ref="P3" pin="2"/>
+    </net>
+    <net code="24" name="/feedback_MEGA">
+      <node ref="U1" pin="1"/>
+      <node ref="J6" pin="3"/>
+    </net>
+    <net code="25" name="/MEGA_-">
+      <node ref="J6" pin="2"/>
+      <node ref="Q1" pin="3"/>
+    </net>
+    <net code="26" name="/BAT_+">
+      <node ref="J4" pin="1"/>
+      <node ref="J2" pin="1"/>
+      <node ref="R5" pin="2"/>
+    </net>
+    <net code="27" name="GND">
+      <node ref="U1" pin="3"/>
+      <node ref="J1" pin="4"/>
+      <node ref="U1" pin="5"/>
+      <node ref="U1" pin="21"/>
+      <node ref="Q2" pin="3"/>
+      <node ref="C2" pin="2"/>
+      <node ref="J5" pin="2"/>
+      <node ref="C1" pin="2"/>
+      <node ref="J3" pin="2"/>
+      <node ref="J4" pin="2"/>
+      <node ref="Q1" pin="2"/>
+      <node ref="R3" pin="2"/>
+    </net>
+    <net code="28" name="/CMD_MEGA">
+      <node ref="U1" pin="2"/>
+      <node ref="Q1" pin="1"/>
+      <node ref="R3" pin="1"/>
+    </net>
+    <net code="29" name="Net-(C2-Pad1)">
+      <node ref="Y1" pin="2"/>
+      <node ref="C2" pin="1"/>
+      <node ref="U1" pin="8"/>
+    </net>
+    <net code="30" name="Net-(C1-Pad1)">
+      <node ref="C1" pin="1"/>
+      <node ref="Y1" pin="1"/>
+      <node ref="U1" pin="7"/>
+    </net>
+    <net code="31" name="Net-(U1-Pad20)">
+      <node ref="U1" pin="20"/>
+    </net>
+  </nets>
+</export>
