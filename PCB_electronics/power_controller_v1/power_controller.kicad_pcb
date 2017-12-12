@@ -3,7 +3,7 @@
   (general
     (links 39)
     (no_connects 0)
-    (area 76 37 147.000001 123.000001)
+    (area 63.000001 37 147.000001 129.200001)
     (thickness 1.6)
     (drawings 20)
     (tracks 134)
@@ -78,7 +78,7 @@
     (visible_elements FFFFEFFF)
     (pcbplotparams
       (layerselection 0x3d0f0_80000001)
-      (usegerberextensions true)
+      (usegerberextensions false)
       (excludeedgelayer true)
       (linewidth 0.100000)
       (plotframeref false)
@@ -96,11 +96,11 @@
       (plotinvisibletext false)
       (padsonsilk true)
       (subtractmaskfromsilk false)
-      (outputformat 1)
+      (outputformat 4)
       (mirror false)
       (drillshape 0)
       (scaleselection 1)
-      (outputdirectory Gerbers/))
+      (outputdirectory power_controller_v1_1.pdf/))
   )
 
   (net 0 "")

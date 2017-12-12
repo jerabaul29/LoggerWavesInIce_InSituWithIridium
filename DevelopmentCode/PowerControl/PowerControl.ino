@@ -56,7 +56,7 @@
 volatile int nbr_remaining;
 
 #define DEBUG false  // if DEBUG is true, Serial will be activated and used for logging information strings
-#define SHOW_LED false  // if SHOW_LED is true, the LED will be used for helping debugging
+#define SHOW_LED true  // if SHOW_LED is true, the LED will be used for helping debugging
 
 #define PIN_MSR_BAT A0      // measure of battery
 #define PIN_MSR_SOL A1      // measure of solar panel on anode
@@ -69,12 +69,12 @@ volatile int nbr_remaining;
 #define PIN_CMD_LED 13     // command of intern LED
 
 #define BAT_THRESHOLD_V 3.6  // threshold for full battery
-#define BAT_EMPTY_V 2.85     // threshold for empty battery
+#define BAT_EMPTY_V 2.9     // threshold for empty battery
 #define MIN_MARGIN_PANEL 0.5  // minimum over voltage panel vs battery for it to be worth connecting
 
 // number of loop () cycles before waking up the Mega
 // if deep sleep 80s (ie production value for CYCLES_DEEP_SLEEP), 3 loop() is 4 minutes
-// for production: 15; 15 ' 80s is 1200s, which is 20 minutes betw
+// for production: 15; 15 * 80s is 1200s, which is 20 minutes betw
 #define CYCLES_BEFORE_MEGA_WAKEUP 2
 
 // number of cycles for which the microcontroller taking care of power sleeps
