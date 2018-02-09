@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <export version="D">
   <design>
-    <source>/home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/PCB_electronics/power_controller/power_controller.sch</source>
-    <date>fr. 08. des. 2017 kl. 17.15 +0100</date>
+    <source>/home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/PCB_electronics/power_controller_v1/power_controller.sch</source>
+    <date>fr. 09. feb. 2018 kl. 10.08 +0100</date>
     <tool>Eeschema 4.0.2+dfsg1-stable</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -148,7 +148,7 @@
     <comp ref="W1">
       <value>NET-TIE</value>
       <footprint>conn-test:NET-TIE</footprint>
-      <libsource lib="net-tie" part="NET-TIE"/>
+      <libsource lib="power_controller-cache" part="NET-TIE"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A1DD135</tstamp>
     </comp>
@@ -321,7 +321,7 @@
         <pin num="3" name="~" type="passive"/>
       </pins>
     </libpart>
-    <libpart lib="net-tie" part="NET-TIE">
+    <libpart lib="power_controller-cache" part="NET-TIE">
       <footprints>
         <fp>NET-TIE*</fp>
       </footprints>
@@ -361,11 +361,11 @@
     <library logical="atmel">
       <uri>/usr/share/kicad/library/atmel.lib</uri>
     </library>
-    <library logical="net-tie">
-      <uri>/home/jrlab/Downloads/net-tie.lib</uri>
-    </library>
     <library logical="MOSFET-N">
       <uri>/home/jrlab/Desktop/Git/kicad-library/libs/MOSFET-N.lib</uri>
+    </library>
+    <library logical="power_controller-cache">
+      <uri>/home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/PCB_electronics/power_controller_v1/power_controller-cache.lib</uri>
     </library>
   </libraries>
   <nets>

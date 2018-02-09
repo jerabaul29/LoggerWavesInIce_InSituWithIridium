@@ -1,7 +1,7 @@
 (export (version D)
   (design
-    (source /home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/PCB_electronics/power_controller/power_controller.sch)
-    (date "on. 29. nov. 2017 kl. 15.28 +0100")
+    (source /home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/PCB_electronics/power_controller_v1/power_controller.sch)
+    (date "fr. 09. feb. 2018 kl. 10.08 +0100")
     (tool "Eeschema 4.0.2+dfsg1-stable")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -126,7 +126,7 @@
     (comp (ref W1)
       (value NET-TIE)
       (footprint conn-test:NET-TIE)
-      (libsource (lib net-tie) (part NET-TIE))
+      (libsource (lib power_controller-cache) (part NET-TIE))
       (sheetpath (names /) (tstamps /))
       (tstamp 5A1DD135))
     (comp (ref U1)
@@ -265,7 +265,7 @@
         (pin (num 1) (name ~) (type passive))
         (pin (num 2) (name ~) (type passive))
         (pin (num 3) (name ~) (type passive))))
-    (libpart (lib net-tie) (part NET-TIE)
+    (libpart (lib power_controller-cache) (part NET-TIE)
       (footprints
         (fp NET-TIE*))
       (fields
@@ -287,16 +287,16 @@
         (pin (num 1) (name ~) (type passive))
         (pin (num 2) (name ~) (type passive)))))
   (libraries
-    (library (logical MOSFET-N)
-      (uri /home/jrlab/Desktop/Git/kicad-library/libs/MOSFET-N.lib))
-    (library (logical net-tie)
-      (uri /home/jrlab/Downloads/net-tie.lib))
-    (library (logical atmel)
-      (uri /usr/share/kicad/library/atmel.lib))
+    (library (logical device)
+      (uri /usr/share/kicad/library/device.lib))
     (library (logical conn)
       (uri /usr/share/kicad/library/conn.lib))
-    (library (logical device)
-      (uri /usr/share/kicad/library/device.lib)))
+    (library (logical atmel)
+      (uri /usr/share/kicad/library/atmel.lib))
+    (library (logical MOSFET-N)
+      (uri /home/jrlab/Desktop/Git/kicad-library/libs/MOSFET-N.lib))
+    (library (logical power_controller-cache)
+      (uri /home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/PCB_electronics/power_controller_v1/power_controller-cache.lib)))
   (nets
     (net (code 1) (name /A0)
       (node (ref P3) (pin 1))
