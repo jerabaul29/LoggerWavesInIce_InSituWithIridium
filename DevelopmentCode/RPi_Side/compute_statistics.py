@@ -15,18 +15,33 @@ NOTES / TODO
 # some global parameters #######################################################
 global_debug = False
 
+plot_diag = True
+
+if plot_diag:
+    import matplotlib.pyplot as plt
+
 # parameters for the band pass filtering
-global_lowcut = 0.04
+global_fs = 10.0
+global_lowcut = 0.05
 global_highcut = 0.5
-global_fs = 5.0
 
 # parameters for the part of the acceleration signal to use
 # avoid beginning and end of signal, fixed length in FFTs and Welch so
 # that no need to transmit the frequence points by Iridium
-number_of_points_to_use = int(global_fs * 60 * 20)  # 20 minutes
+# lets use 1024 s ~ 17 minutes
+IMU_nfft = 2**11
+IMU_window = "hanning"
+IMU_nperseg = IMU_nfft/4.0
+IMU_noverlap = IMU_nperseg/2.0
+IMU_detrend = "constant"
+
+# parameters for time
+IMU_buffer = int(120*global_fs) # buffer for beginning to end
+number_of_points_to_use = int(global_fs * 20 * 60)  # 17 minutes
 first_IMU_point_to_use = int(global_fs * 1)
-last_IMU_point_to_use = int(first_IMU_point_to_use + number_of_points_to_use)
+last_IMU_point_to_use = int(first_IMU_point_to_use + number_of_points_to_use + 2*IMU_buffer)
 # so the points to use are [first_IMU_point_to_use:last_IMU_point_to_use]
+
 
 # under sampling of the Fourier spectra
 global_under_sampling = 2
@@ -36,7 +51,7 @@ global_under_sampling = 2
 class ButterFiltering(object):
     """A class to perform bandpass filtering using Butter filter."""
 
-    def __init__(self, lowcut=global_lowcut, highcut=global_highcut, fs=global_fs, order=5):
+    def __init__(self, lowcut=global_lowcut, highcut=global_highcut, fs=global_fs, order=4):
         """lowcut, highcut and fs are in Hz."""
         nyq = 0.5 * fs
         low = lowcut / nyq
@@ -62,109 +77,185 @@ class WaveStatistics(object):
         self.debug = debug
 
     def perform_all_processing(self):
-        self.load_LSM9DS0_data()
-        self.extract_vertical_acceleration()
+        self.load_VN100_data()
+#filename = fileDir + inFile
+#np.savetxt(filename, acceleration, delimiter=',')
+        self.compute_detrend()
         self.compute_vertical_elevation()
+        self.compute_subsample()
         self.compute_SWH()
-        self.compute_elevation_spectrum()
+        self.compute_directional_spectrum()
         self.find_valid_index_PSD_WS()
         self.compute_wave_spectrum_moments()
         self.compute_spectral_properties()
         self.reduce_wave_spectrum()
 
-    def load_LSM9DS0_data(self):
-        """Load LSM9DS0 IMU data.
-        Data is ordered in each line as:
-        ACCX, ACCY, ACCZ, GYRX, GYRY, GYRZ, MAGX, MAGY, MAGZ"""
+    def load_test_data(self):
+        """ load in synthetic data"""
 
-        self.data_I = np.genfromtxt(self.path_in + '/' + self.filename, delimiter=';')
+        self.data_I = np.genfromtxt(self.path_in + '/' + self.filename, delimiter=',')
 
-        if self.verbose > 3:
-            printi(str(self.data_I))
-
-        self.ACCX = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 0]
-        self.ACCY = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 1]
+        self.PITCH = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 0]
+        self.ROLL = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 1]
         self.ACCZ = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 2]
 
-    def extract_vertical_acceleration(self):
-        """Extract vertical acceleration."""
 
-        # find direction of mean acceleration: this is the vertical
-        mean_acc_x = np.mean(self.ACCX)
-        mean_acc_y = np.mean(self.ACCY)
-        mean_acc_z = np.mean(self.ACCZ)
+    def load_VN100_data(self):
+        """Load in VN100 IMU data.
+        Data is ordered in each line as"
+        MagX, MagY, MagZ, AccX, AccY, AccZ, GyroX, GyroY, GyroZ, 
+        Temp, Pres, Yaw, Pitch, Roll, 
+        DCM1, DCM2, DCM3, DCM4, DCM5, DCM6, DCM7, DCM8, DCM9, 
+        MagNED1, MagNED2, MagNED3, AccNED1, AccNED2, ACCNED3"""
 
-        mean_acc_norm = np.sqrt(mean_acc_x**2 + mean_acc_y**2 + mean_acc_z**2)
-
-        if self.verbose > 0:
-            printi("mean_acc_norm = " + str(mean_acc_norm))
-            printi("mean_acc_x = " + str(mean_acc_x))
-            printi("mean_acc_y = " + str(mean_acc_y))
-            printi("mean_acc_z = " + str(mean_acc_z))
-
-        # project acceleration on vertical
-        self.acc_vertical = (mean_acc_x * self.ACCX + mean_acc_y * self.ACCY + mean_acc_z * self.ACCZ) / mean_acc_norm
-        self.acc_vertical = self.acc_vertical - np.mean(self.acc_vertical)
-
-    def compute_vertical_elevation(self):
-        """integrate twice vertical acceleration to get vertical elevation"""
-
-        # band pass filter to use
-        bandpass_instance = ButterFiltering(fs=self.fs)
-
-        # filter and integrate, 1
-        acc_z_filtered = bandpass_instance.filter_data(self.acc_vertical)
-        vel_z = integrate.cumtrapz(acc_z_filtered, dx=1.0 / self.fs)
-
-        # filter and integrate, 2
-        vel_z_filtered = bandpass_instance.filter_data(vel_z)
-        pos_z = integrate.cumtrapz(vel_z_filtered, dx=1.0 / self.fs)
-
-        # filter
-        self.pos_z_filtered = bandpass_instance.filter_data(pos_z)
+        self.data_I = np.genfromtxt(self.path_in + '/' + self.filename, skip_header=1, delimiter=',')
 
         if self.verbose > 3:
-            printi("self.pos_z_filtered = " + str(self.pos_z_filtered))
-            printi("max pos_z_filtered: " + str(np.max(self.pos_z_filtered)))
-            printi("min pos_z_filtered: " + str(np.min(self.pos_z_filtered)))
+            printi('Shape of input data is {}'.format(self.data_I.shape))
+            printi(str(self.data_I))
+
+        self.PITCH = np.deg2rad(self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 12])
+        self.ROLL = np.deg2rad(self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 13])
+        self.ACCZ = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 28]
+
+    def compute_detrend(self):
+        """ program to run a detrend program on signals"""
+
+        pm = signal.detrend(self.PITCH, type=IMU_detrend)
+        rm = signal.detrend(self.ROLL, type=IMU_detrend)
+        azf = signal.detrend(self.ACCZ, type=IMU_detrend)
+        
+        # save detrended signals
+        self.pitch_det = pm
+        self.roll_det = rm
+        self.accz_det = azf
+
+
+    def compute_vertical_elevation(self):
+        '''integrate twice using fft and ifft'''
+
+	# calculate fft, filter, and then ifft to get heights
+        
+        Y = np.fft.fft(self.accz_det)
+
+	# calculate weights before applying ifft
+        freq = np.fft.fftfreq(self.accz_det.size, d=1/global_fs)
+        weights = -1.0/( (2*np.pi*freq)**2 )
+    # need to do some filtering for low frequency (from Kohout)
+        f1 = 0.02
+        f2 = 0.03
+        Yf = np.zeros_like(Y)
+        ind = np.where(np.logical_and(freq>=f1,freq<=f2))
+        Yf[ind] = Y[ind] * 0.5*(1 - np.cos(np.pi*(freq[ind]-f1)/(f2-f1)))*weights[ind]
+        Yf[freq>f2] = Y[freq>f2]*weights[freq>f2]
+	
+	# apply ifft to get height
+        self.elev = np.real(np.fft.ifft(2*Yf))
+
+
+    def compute_subsample(self):
+        """delete first and last IMU_buffer lengths"""
+
+        print self.pitch_det.shape
+        print IMU_buffer
+
+        self.pitch_proc = self.pitch_det[IMU_buffer:-IMU_buffer]
+        self.roll_proc = self.roll_det[IMU_buffer:-IMU_buffer]
+        self.elev_proc = self.elev[IMU_buffer:-IMU_buffer]
+        self.accz_proc = self.accz_det[IMU_buffer:-IMU_buffer]
+
+        if self.verbose > 3:
+            printi("self.elev = " + str(self.elev_proc))
+            printi("max elev: " + str(np.max(self.elev_proc)))
+            printi("min elev: " + str(np.min(self.elev_proc)))
+
+        if plot_diag:
+            plt.figure()
+            plt.plot(self.elev_proc)
+            plt.ylabel('elev')
+            plt.figure()
+            plt.plot(self.accz_proc)
+            plt.figure()
+            plt.plot(np.rad2deg(self.pitch_proc), label='pitch')
+            plt.plot(np.rad2deg(self.roll_proc), label='roll')
+            plt.legend()
 
     def compute_SWH(self):
         """Compute SWH using double integration of vertical acceleration."""
 
         # SWH
-        self.SWH = 4.0 * np.std(self.pos_z_filtered)
+        self.SWH = 4.0 * np.std(self.elev_proc)
 
         if self.verbose > 1:
             printi("SWH = " + str(self.SWH))
+
+    def compute_directional_spectrum(self):
+        """Calculate directional spectrum moments for direction and spread"""
+
+        f11, p11 = signal.csd(self.elev_proc, self.elev_proc, fs=self.fs, nperseg=IMU_nperseg, \
+                noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
+        _, p22 = signal.csd(self.pitch_proc, self.pitch_proc, fs=self.fs, nperseg=IMU_nperseg, \
+                noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
+        _, p33 = signal.csd(self.roll_proc, self.roll_proc, fs=self.fs, nperseg=IMU_nperseg, \
+                noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
+        _, p12 = signal.csd(self.elev_proc, self.pitch_proc, fs=self.fs, nperseg=IMU_nperseg, \
+                noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
+        _, p13 = signal.csd(self.elev_proc, self.roll_proc, fs=self.fs, nperseg=IMU_nperseg, \
+                noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
+        _, p23 = signal.csd(self.pitch_proc, self.roll_proc, fs=self.fs, nperseg=IMU_nperseg, \
+                noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
+
+        # calculate omega, k, and k0
+        omega = 2*np.pi*f11
+        g = 9.81
+        k0 = omega**2 / g
+        k = np.sqrt( (p22 + p33) / p11 )
+
+        # now calculate circular moments
+        a0 = p11 / np.pi
+        a1 = np.imag(p12) / (k * np.pi)
+        b1 = np.imag(p13) / (k * np.pi)
+        a2 = (p22 - p33) / (k**2 * np.pi)
+        b2 = 2*np.real(p23) / (k**2 * np.pi)
+        m1 = np.sqrt ( (a1/a0)**2 + (b1/a0)**2 )
+        spread = np.sqrt( 2*(1-m1) )
+        theta = np.arctan(b1/a1)
+        R = k/k0
+
+        # set values in object
+        self.f_PSD_WS = f11
+        self.S_PSD_WS = p11
+        self.spread = spread
+        self.theta = theta
+        self.R = R
+
 
     def compute_elevation_spectrum(self):
         """Compute elevation spectrum from the double integrated vertical acceleration."""
 
         # Fourier spectrum using FFT
-        self.S_FFT = np.fft.fft(self.pos_z_filtered)
-        self.f_FFT = np.fft.fftfreq(self.pos_z_filtered.shape[-1])
-
-        # power spectrum using the Welch method
-        # duration of a segment for the Welch method in minutes
-        time_duration_segment = 5
-        self.f_PSD_WS, self.S_PSD_WS = signal.welch(self.pos_z_filtered, fs=self.fs, nperseg=self.fs * 60 * time_duration_segment)
+        self.S_FFT = np.fft.fft(self.elev_proc)
+        self.f_FFT = np.fft.fftfreq(self.elev_proc.size, d=1/self.fs)
 
     def find_valid_index_PSD_WS(self):
         """Find the limiting index that are within global_lowcut global_highcut."""
+        
+        ind1 = np.argmin(np.abs(self.f_PSD_WS - global_lowcut))
+        ind2 = np.argmin(np.abs(self.f_PSD_WS - global_highcut))
 
-        self.index_min_PSD_WS = -1
-        self.index_max_PSD_WS = -1
+        # apply limits to values
+        self.f_PSD_WS = self.f_PSD_WS[ind1:ind2]
+        self.S_PSD_WS = self.S_PSD_WS[ind1:ind2]
+        self.spread = self.spread[ind1:ind2]
+        self.theta = self.theta[ind1:ind2]
+        self.R = self.R[ind1:ind2]
 
-        for current_index in range(self.f_PSD_WS.shape[0]):
-            crrt_value = self.f_PSD_WS[current_index]
+        if self.verbose > 2:
+            printi("Smax = " + str(np.max(self.S_PSD_WS)))
+            printi("R(Smax) = " + str(self.R[np.argmax(self.S_PSD_WS)]))
+            printi("theta(Smax) = " + str(np.rad2deg(self.theta[np.argmax(self.S_PSD_WS)])))
+            printi("spread(Smax) = " + str(self.spread[np.argmax(self.S_PSD_WS)]))
 
-            if self.index_min_PSD_WS == -1:
-                if crrt_value > global_lowcut:
-                    self.index_min_PSD_WS = current_index
-
-            if self.index_max_PSD_WS == -1:
-                if crrt_value > global_highcut:
-                    self.index_max_PSD_WS = current_index
 
     def compute_wave_spectrum_moments(self):
         """Compute the moments of the wave spectrum."""
@@ -172,11 +263,13 @@ class WaveStatistics(object):
         omega = 2 * np.pi * self.f_PSD_WS
 
         # note: integrate only on the 'valid' part of the spectrum
-        self.M0 = integrate.trapz(self.S_PSD_WS[self.index_min_PSD_WS: self.index_max_PSD_WS], omega[self.index_min_PSD_WS: self.index_max_PSD_WS])
-        self.M1 = integrate.trapz(self.S_PSD_WS[self.index_min_PSD_WS: self.index_max_PSD_WS] * (omega[self.index_min_PSD_WS: self.index_max_PSD_WS]), omega[self.index_min_PSD_WS: self.index_max_PSD_WS])
-        self.M2 = integrate.trapz(self.S_PSD_WS[self.index_min_PSD_WS: self.index_max_PSD_WS] * (omega[self.index_min_PSD_WS: self.index_max_PSD_WS]**2), omega[self.index_min_PSD_WS: self.index_max_PSD_WS])
-        self.M3 = integrate.trapz(self.S_PSD_WS[self.index_min_PSD_WS: self.index_max_PSD_WS] * (omega[self.index_min_PSD_WS: self.index_max_PSD_WS]**3), omega[self.index_min_PSD_WS: self.index_max_PSD_WS])
-        self.M4 = integrate.trapz(self.S_PSD_WS[self.index_min_PSD_WS: self.index_max_PSD_WS] * (omega[self.index_min_PSD_WS: self.index_max_PSD_WS]**4), omega[self.index_min_PSD_WS: self.index_max_PSD_WS])
+        self.M0 = integrate.trapz(self.S_PSD_WS, omega)
+        self.M1 = integrate.trapz(self.S_PSD_WS * (omega), omega)
+        self.M2 = integrate.trapz(self.S_PSD_WS * (omega**2), omega)
+        self.M3 = integrate.trapz(self.S_PSD_WS * (omega**3), omega)
+        self.M4 = integrate.trapz(self.S_PSD_WS * (omega**4), omega)
+        self.MM1 = integrate.trapz(self.S_PSD_WS * (omega**(-1)), omega)
+        self.MM2 = integrate.trapz(self.S_PSD_WS * (omega**(-2)), omega)
 
         if self.verbose > 2:
             printi("M0 = " + str(self.M0))
@@ -184,6 +277,8 @@ class WaveStatistics(object):
             printi("M2 = " + str(self.M2))
             printi("M3 = " + str(self.M3))
             printi("M4 = " + str(self.M4))
+            printi("MM1 = " + str(self.MM1))
+            printi("MM2 = " + str(self.MM2))
 
     def compute_spectral_properties(self):
         """Compute SWH and the peak period, both zero up-crossing and peak-to-peak,
@@ -192,47 +287,66 @@ class WaveStatistics(object):
         self.Hs = np.sqrt(self.M0) * 4.0 / np.sqrt(2 * np.pi)
         self.T_z = 2.0 * np.pi * np.sqrt(self.M0 / self.M2)
         self.T_c = 2.0 * np.pi * np.sqrt(self.M2 / self.M4)
+        self.T_p = 1.0 / self.f_PSD_WS[np.argmax(self.S_PSD_WS)]
 
         if self.verbose > 1:
             printi("Hs = " + str(self.Hs))
             printi("T_z = " + str(self.T_z))
             printi("T_c = " + str(self.T_c))
+            printi("T_p = " + str(self.T_p))
 
     def reduce_wave_spectrum(self):
         """A rediced wave spectrum, so that easier to transmit (less information).
         Reduction in information is obtained by restraining the frequency domain,
         reducing to 8 bits per frequency"""
 
-        # spectrum between the cutoff frequencies, under sample
-        limited_frequencies_spectrum = self.S_PSD_WS[self.index_min_PSD_WS: self.index_max_PSD_WS: global_under_sampling]
-        self.limited_frequencies_frequencies = self.f_PSD_WS[self.index_min_PSD_WS: self.index_max_PSD_WS: global_under_sampling]
+        num = len(self.f_PSD_WS) / global_under_sampling
 
-        # max value in the limited spectrum
-        self.max_value_limited_spectrum = np.max(limited_frequencies_spectrum)
+        self.array_discretized_spectrum, self.limited_frequencies_frequencies = \
+                signal.resample(self.S_PSD_WS, num, self.f_PSD_WS)
+        self.max_value_limited_spectrum = np.max(self.array_discretized_spectrum)
 
-        # total number of points in the limited spectrum
-        n_points_limited_spectrum = limited_frequencies_spectrum.shape[0]
-
-        # discretize as uint8
-        # build array
-        self.array_discretized_spectrum = np.zeros((n_points_limited_spectrum, ), dtype=np.uint8)
-        # add all points
-        for current_index in range(n_points_limited_spectrum):
-            current_value = limited_frequencies_spectrum[current_index]
-            current_value_as_uint8 = np.uint8(current_value * 255 / self.max_value_limited_spectrum)
-            self.array_discretized_spectrum[current_index] = current_value_as_uint8
+        # normalize by max value and change to uint8
+        # first set all negative values to 0
+        self.array_discretized_spectrum[self.array_discretized_spectrum < 0] = 0.0
+        self.array_discretized_spectrum = self.array_discretized_spectrum / self.max_value_limited_spectrum
+        self.array_discretized_spectrum = np.uint8(255 * self.array_discretized_spectrum)
 
         if self.verbose > 3:
+            printi("limited_frequencies_frequencies = " + str(self.limited_frequencies_frequencies))
             printi("array_discretized_spectrum = " + str(self.array_discretized_spectrum))
+            printi("max reduced = " + str(self.max_value_limited_spectrum))
 
     def save_all_results(self):
+
+        if plot_diag:
+            # first plot spec
+            plt.figure()
+            plt.plot(self.f_PSD_WS,self.S_PSD_WS,'k-')
+            plt.plot(self.limited_frequencies_frequencies, self.max_value_limited_spectrum*self.array_discretized_spectrum/255.0, 'r--')
+
+            plt.figure()
+            plt.plot(self.f_PSD_WS, np.rad2deg(self.spread))
+            plt.ylabel('spread')
+
+            plt.figure()
+            plt.plot(self.f_PSD_WS, self.R)
+            plt.ylabel('R')
+            plt.ylim([0,2])
+
+            plt.figure()
+            plt.plot(self.f_PSD_WS, np.rad2deg(self.theta))
+            plt.ylabel('theta')
+            plt.show()
+
         # save as text files ---------------------------------------------------
         np.savetxt(self.path_in + '/' + self.filename + '_SWH.csv', np.array([self.SWH]))
 
-        spectral_properties = np.array([self.Hs, self.T_z, self.T_c], dtype=np.float16)
+        spectral_properties = np.array([self.Hs, self.T_z, self.T_c, self.T_p], dtype=np.float16)
         np.savetxt(self.path_in + '/' + self.filename + '_spectral_properties.csv', spectral_properties)
 
-        np.savetxt(self.path_in + '/' + self.filename + '_limited_frequencies_frequencies.csv', self.limited_frequencies_frequencies)
+        np.savetxt(self.path_in + '/' + self.filename + '_limited_frequencies_frequencies.csv', \
+                self.limited_frequencies_frequencies)
 
         # save as byte string for what should be sent by iridium ---------------
         with open(self.path_in + '/' + self.filename + '_SWH.bdat', 'wb') as f:
