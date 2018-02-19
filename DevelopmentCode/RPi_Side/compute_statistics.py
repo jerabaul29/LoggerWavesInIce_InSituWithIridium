@@ -22,8 +22,8 @@ if plot_diag:
 
 # parameters for the band pass filtering
 global_fs = 10.0
-global_lowcut = 0.05
-global_highcut = 0.5
+global_lowcut = 0.04
+global_highcut = 0.3
 
 # parameters for the part of the acceleration signal to use
 # avoid beginning and end of signal, fixed length in FFTs and Welch so
@@ -38,13 +38,13 @@ IMU_detrend = "constant"
 # parameters for time
 IMU_buffer = int(120*global_fs) # buffer for beginning to end
 number_of_points_to_use = int(global_fs * 20 * 60)  # 17 minutes
-first_IMU_point_to_use = int(global_fs * 1)
+first_IMU_point_to_use = int(0)
 last_IMU_point_to_use = int(first_IMU_point_to_use + number_of_points_to_use + 2*IMU_buffer)
 # so the points to use are [first_IMU_point_to_use:last_IMU_point_to_use]
 
 
 # under sampling of the Fourier spectra
-global_under_sampling = 2
+global_under_sampling = 4
 ################################################################################
 
 
@@ -77,14 +77,14 @@ class WaveStatistics(object):
         self.debug = debug
 
     def perform_all_processing(self):
-        self.load_VN100_data()
-#filename = fileDir + inFile
-#np.savetxt(filename, acceleration, delimiter=',')
+        #self.load_VN100_data()
+	self.load_test_data()
         self.compute_detrend()
         self.compute_vertical_elevation()
         self.compute_subsample()
         self.compute_SWH()
         self.compute_directional_spectrum()
+	self.compute_elevation_spectrum()
         self.find_valid_index_PSD_WS()
         self.compute_wave_spectrum_moments()
         self.compute_spectral_properties()
@@ -95,8 +95,8 @@ class WaveStatistics(object):
 
         self.data_I = np.genfromtxt(self.path_in + '/' + self.filename, delimiter=',')
 
-        self.PITCH = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 0]
-        self.ROLL = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 1]
+        self.PITCH = np.rad2deg(self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 0])
+        self.ROLL = np.rad2deg(self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 1])
         self.ACCZ = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 2]
 
 
@@ -171,13 +171,13 @@ class WaveStatistics(object):
 
         if plot_diag:
             plt.figure()
-            plt.plot(self.elev_proc)
+            plt.plot(np.arange(len(self.elev_proc))/self.fs,self.elev_proc)
             plt.ylabel('elev')
             plt.figure()
-            plt.plot(self.accz_proc)
+            plt.plot(np.arange(len(self.accz_proc))/self.fs,self.accz_proc)
             plt.figure()
-            plt.plot(np.rad2deg(self.pitch_proc), label='pitch')
-            plt.plot(np.rad2deg(self.roll_proc), label='roll')
+            plt.plot(np.arange(len(self.pitch_proc))/self.fs,np.rad2deg(self.pitch_proc), label='pitch')
+            plt.plot(np.arange(len(self.roll_proc))/self.fs,np.rad2deg(self.roll_proc), label='roll')
             plt.legend()
 
     def compute_SWH(self):
@@ -192,15 +192,15 @@ class WaveStatistics(object):
     def compute_directional_spectrum(self):
         """Calculate directional spectrum moments for direction and spread"""
 
-        f11, p11 = signal.csd(self.elev_proc, self.elev_proc, fs=self.fs, nperseg=IMU_nperseg, \
+        f11, p11 = signal.csd(self.accz_proc, self.accz_proc, fs=self.fs, nperseg=IMU_nperseg, \
                 noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
         _, p22 = signal.csd(self.pitch_proc, self.pitch_proc, fs=self.fs, nperseg=IMU_nperseg, \
                 noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
         _, p33 = signal.csd(self.roll_proc, self.roll_proc, fs=self.fs, nperseg=IMU_nperseg, \
                 noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
-        _, p12 = signal.csd(self.elev_proc, self.pitch_proc, fs=self.fs, nperseg=IMU_nperseg, \
+        _, p12 = signal.csd(self.accz_proc, self.pitch_proc, fs=self.fs, nperseg=IMU_nperseg, \
                 noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
-        _, p13 = signal.csd(self.elev_proc, self.roll_proc, fs=self.fs, nperseg=IMU_nperseg, \
+        _, p13 = signal.csd(self.accz_proc, self.roll_proc, fs=self.fs, nperseg=IMU_nperseg, \
                 noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
         _, p23 = signal.csd(self.pitch_proc, self.roll_proc, fs=self.fs, nperseg=IMU_nperseg, \
                 noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
@@ -209,12 +209,12 @@ class WaveStatistics(object):
         omega = 2*np.pi*f11
         g = 9.81
         k0 = omega**2 / g
-        k = np.sqrt( (p22 + p33) / p11 )
+        k = np.sqrt( (p22 + p33) / (p11 * omega**(-4)) )
 
         # now calculate circular moments
-        a0 = p11 / np.pi
-        a1 = np.imag(p12) / (k * np.pi)
-        b1 = np.imag(p13) / (k * np.pi)
+        a0 = p11 / (omega**4 * np.pi)
+        a1 = -np.imag(p12) / (omega**2 * k * np.pi)
+        b1 = -np.imag(p13) / (omega**2 * k * np.pi)
         a2 = (p22 - p33) / (k**2 * np.pi)
         b2 = 2*np.real(p23) / (k**2 * np.pi)
         m1 = np.sqrt ( (a1/a0)**2 + (b1/a0)**2 )
@@ -324,6 +324,8 @@ class WaveStatistics(object):
             plt.figure()
             plt.plot(self.f_PSD_WS,self.S_PSD_WS,'k-')
             plt.plot(self.limited_frequencies_frequencies, self.max_value_limited_spectrum*self.array_discretized_spectrum/255.0, 'r--')
+	    plt.plot(self.f_FFT, np.sqrt(self.S_FFT * self.S_FFT.conj()), 'g-')
+	    plt.xlim([0.04,0.6])
 
             plt.figure()
             plt.plot(self.f_PSD_WS, np.rad2deg(self.spread))
@@ -332,7 +334,7 @@ class WaveStatistics(object):
             plt.figure()
             plt.plot(self.f_PSD_WS, self.R)
             plt.ylabel('R')
-            plt.ylim([0,2])
+            #plt.ylim([0,2])
 
             plt.figure()
             plt.plot(self.f_PSD_WS, np.rad2deg(self.theta))
