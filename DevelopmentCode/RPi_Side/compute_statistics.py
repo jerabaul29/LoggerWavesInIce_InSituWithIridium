@@ -22,14 +22,14 @@ if plot_diag:
 
 # parameters for the band pass filtering
 global_fs = 10.0
-global_lowcut = 0.04
-global_highcut = 0.3
+global_lowcut = 0.05
+global_highcut = 0.25
 
 # parameters for the part of the acceleration signal to use
 # avoid beginning and end of signal, fixed length in FFTs and Welch so
 # that no need to transmit the frequence points by Iridium
 # lets use 1024 s ~ 17 minutes
-IMU_nfft = 2**11
+IMU_nfft = 2**12
 IMU_window = "hanning"
 IMU_nperseg = IMU_nfft/4.0
 IMU_noverlap = IMU_nperseg/2.0
@@ -38,13 +38,14 @@ IMU_detrend = "constant"
 # parameters for time
 IMU_buffer = int(120*global_fs) # buffer for beginning to end
 number_of_points_to_use = int(global_fs * 20 * 60)  # 17 minutes
-first_IMU_point_to_use = int(0)
+first_IMU_point_to_use = int(global_fs + 1)
 last_IMU_point_to_use = int(first_IMU_point_to_use + number_of_points_to_use + 2*IMU_buffer)
 # so the points to use are [first_IMU_point_to_use:last_IMU_point_to_use]
 
 
 # under sampling of the Fourier spectra
-global_under_sampling = 4
+global_under_sampling = 2
+number_of_downsamples = 2
 ################################################################################
 
 
@@ -77,9 +78,8 @@ class WaveStatistics(object):
         self.debug = debug
 
     def perform_all_processing(self):
-        #self.load_VN100_data()
-	self.load_test_data()
-        self.compute_detrend()
+        self.load_VN100_data()
+	#self.load_test_data()
         self.compute_vertical_elevation()
         self.compute_subsample()
         self.compute_SWH()
@@ -95,9 +95,29 @@ class WaveStatistics(object):
 
         self.data_I = np.genfromtxt(self.path_in + '/' + self.filename, delimiter=',')
 
-        self.PITCH = np.rad2deg(self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 0])
-        self.ROLL = np.rad2deg(self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 1])
+        self.PITCH = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 0]
+        self.ROLL = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 1]
         self.ACCZ = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 2]
+        
+        self.PITCH_mean = np.mean(self.PITCH)
+        self.ROLL_mean = np.mean(self.ROLL)
+        self.ACCZ_mean = np.mean(self.ACCZ)
+        self.PITCH_std = np.std(self.PITCH)
+        self.ROLL_std = np.std(self.ROLL)
+        self.ACCZ_std = np.std(self.ACCZ)
+
+        self.pitch_det = signal.detrend(self.PITCH)
+        self.roll_det = signal.detrend(self.ROLL)
+        self.accz_det = signal.detrend(self.ACCZ)
+
+        if self.verbose > 3:
+            printi('Time duration of record is {} minutes'.format(len(self.ACCZ)/self.fs/60))
+            printi('Mean PITCH = {}'.format(self.PITCH_mean))
+            printi('Mean ROLL = {}'.format(self.ROLL_mean))
+            printi('Mean ACCZ = {}'.format(self.ACCZ_mean))
+            printi('Std PITCH = {}'.format(self.PITCH_std))
+            printi('Std ROLL = {}'.format(self.ROLL_std))
+            printi('Std ACCZ = {}'.format(self.ACCZ_std))
 
 
     def load_VN100_data(self):
@@ -112,34 +132,51 @@ class WaveStatistics(object):
 
         if self.verbose > 3:
             printi('Shape of input data is {}'.format(self.data_I.shape))
-            printi(str(self.data_I))
+            printi('Time duration of record is {} minutes'.format(len(self.data_I)/self.fs/60))
 
         self.PITCH = np.deg2rad(self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 12])
         self.ROLL = np.deg2rad(self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 13])
+        self.YAW = np.deg2rad(self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 11])
         self.ACCZ = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 28]
 
-    def compute_detrend(self):
-        """ program to run a detrend program on signals"""
+        self.PITCH_mean = np.mean(self.PITCH)
+        self.ROLL_mean = np.mean(self.ROLL)
+        self.YAW_mean = np.mean(self.YAW)
+        self.ACCZ_mean = np.mean(self.ACCZ)
 
-        pm = signal.detrend(self.PITCH, type=IMU_detrend)
-        rm = signal.detrend(self.ROLL, type=IMU_detrend)
-        azf = signal.detrend(self.ACCZ, type=IMU_detrend)
-        
-        # save detrended signals
-        self.pitch_det = pm
-        self.roll_det = rm
-        self.accz_det = azf
+        self.pitch_det = signal.detrend(self.PITCH)
+        self.roll_det = signal.detrend(self.ROLL)
+        self.accz_det = signal.detrend(self.ACCZ)
+
+        # apply filter
+        ## butter = ButterFiltering(fs=self.fs)
+        ## self.pitch_det = bp.filter_data(self.pitch_det)
+        ## self.roll_det = bp.filter_data(self.roll_det)
+        ## self.accz_det = bp.filter_data(self.accz_det)
+
+        if self.verbose > 3:
+            printi('Mean PITCH = {}'.format(np.mean(self.PITCH)))
+            printi('Mean ROLL = {}'.format(np.mean(self.ROLL)))
+            printi('Mean YAW = {}'.format(np.mean(self.YAW)))
+            printi('Mean ACCZ = {}'.format(np.mean(self.ACCZ)))
+            printi('Std PITCH = {}'.format(np.std(self.PITCH)))
+            printi('Std ROLL = {}'.format(np.std(self.ROLL)))
+            printi('Std YAW = {}'.format(np.std(self.YAW)))
+            printi('Std ACCZ = {}'.format(np.std(self.ACCZ)))
 
 
     def compute_vertical_elevation(self):
         '''integrate twice using fft and ifft'''
 
 	# calculate fft, filter, and then ifft to get heights
+
+        # suppress divide by 0 warning
+        np.seterr(divide='ignore')
         
         Y = np.fft.fft(self.accz_det)
 
 	# calculate weights before applying ifft
-        freq = np.fft.fftfreq(self.accz_det.size, d=1/global_fs)
+        freq = np.fft.fftfreq(self.accz_det.size, d=1.0/global_fs)
         weights = -1.0/( (2*np.pi*freq)**2 )
     # need to do some filtering for low frequency (from Kohout)
         f1 = 0.02
@@ -148,9 +185,10 @@ class WaveStatistics(object):
         ind = np.where(np.logical_and(freq>=f1,freq<=f2))
         Yf[ind] = Y[ind] * 0.5*(1 - np.cos(np.pi*(freq[ind]-f1)/(f2-f1)))*weights[ind]
         Yf[freq>f2] = Y[freq>f2]*weights[freq>f2]
+
 	
 	# apply ifft to get height
-        self.elev = np.real(np.fft.ifft(2*Yf))
+        self.elev = -np.real(np.fft.ifft(2*Yf))
 
 
     def compute_subsample(self):
@@ -175,6 +213,7 @@ class WaveStatistics(object):
             plt.ylabel('elev')
             plt.figure()
             plt.plot(np.arange(len(self.accz_proc))/self.fs,self.accz_proc)
+            plt.ylabel('accz')
             plt.figure()
             plt.plot(np.arange(len(self.pitch_proc))/self.fs,np.rad2deg(self.pitch_proc), label='pitch')
             plt.plot(np.arange(len(self.roll_proc))/self.fs,np.rad2deg(self.roll_proc), label='roll')
@@ -192,15 +231,18 @@ class WaveStatistics(object):
     def compute_directional_spectrum(self):
         """Calculate directional spectrum moments for direction and spread"""
 
-        f11, p11 = signal.csd(self.accz_proc, self.accz_proc, fs=self.fs, nperseg=IMU_nperseg, \
+        # suppress divide by 0 warning
+        np.seterr(divide='ignore', invalid='ignore')
+
+        f11, p11 = signal.csd(self.elev_proc, self.elev_proc, fs=self.fs, nperseg=IMU_nperseg, \
                 noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
         _, p22 = signal.csd(self.pitch_proc, self.pitch_proc, fs=self.fs, nperseg=IMU_nperseg, \
                 noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
         _, p33 = signal.csd(self.roll_proc, self.roll_proc, fs=self.fs, nperseg=IMU_nperseg, \
                 noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
-        _, p12 = signal.csd(self.accz_proc, self.pitch_proc, fs=self.fs, nperseg=IMU_nperseg, \
+        _, p12 = signal.csd(self.elev_proc, self.pitch_proc, fs=self.fs, nperseg=IMU_nperseg, \
                 noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
-        _, p13 = signal.csd(self.accz_proc, self.roll_proc, fs=self.fs, nperseg=IMU_nperseg, \
+        _, p13 = signal.csd(self.elev_proc, self.roll_proc, fs=self.fs, nperseg=IMU_nperseg, \
                 noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
         _, p23 = signal.csd(self.pitch_proc, self.roll_proc, fs=self.fs, nperseg=IMU_nperseg, \
                 noverlap=IMU_noverlap, nfft=IMU_nfft, return_onesided=True)
@@ -209,12 +251,12 @@ class WaveStatistics(object):
         omega = 2*np.pi*f11
         g = 9.81
         k0 = omega**2 / g
-        k = np.sqrt( (p22 + p33) / (p11 * omega**(-4)) )
+        k = np.sqrt( (p22 + p33) / p11 )
 
         # now calculate circular moments
-        a0 = p11 / (omega**4 * np.pi)
-        a1 = -np.imag(p12) / (omega**2 * k * np.pi)
-        b1 = -np.imag(p13) / (omega**2 * k * np.pi)
+        a0 = p11 / np.pi
+        a1 = -np.imag(p12) / (k * np.pi)
+        b1 = -np.imag(p13) / (k * np.pi)
         a2 = (p22 - p33) / (k**2 * np.pi)
         b2 = 2*np.real(p23) / (k**2 * np.pi)
         m1 = np.sqrt ( (a1/a0)**2 + (b1/a0)**2 )
@@ -236,6 +278,8 @@ class WaveStatistics(object):
         # Fourier spectrum using FFT
         self.S_FFT = np.fft.fft(self.elev_proc)
         self.f_FFT = np.fft.fftfreq(self.elev_proc.size, d=1/self.fs)
+        self.f_PSD_h, self.S_PSD_h = signal.welch(self.elev_proc, fs=self.fs, nperseg=IMU_nperseg, \
+                noverlap=IMU_noverlap, nfft=IMU_nfft)
 
     def find_valid_index_PSD_WS(self):
         """Find the limiting index that are within global_lowcut global_highcut."""
@@ -249,6 +293,12 @@ class WaveStatistics(object):
         self.spread = self.spread[ind1:ind2]
         self.theta = self.theta[ind1:ind2]
         self.R = self.R[ind1:ind2]
+        
+        ind1 = np.argmin(np.abs(self.f_PSD_h - global_lowcut))
+        ind2 = np.argmin(np.abs(self.f_PSD_h - global_highcut))
+        self.f_PSD_h = self.f_PSD_h[ind1:ind2]
+        self.S_PSD_h = self.S_PSD_h[ind1:ind2]
+
 
         if self.verbose > 2:
             printi("Smax = " + str(np.max(self.S_PSD_WS)))
@@ -288,9 +338,12 @@ class WaveStatistics(object):
         self.T_z = 2.0 * np.pi * np.sqrt(self.M0 / self.M2)
         self.T_c = 2.0 * np.pi * np.sqrt(self.M2 / self.M4)
         self.T_p = 1.0 / self.f_PSD_WS[np.argmax(self.S_PSD_WS)]
+        M02 = integrate.trapz(self.S_PSD_h, 2*np.pi*self.f_PSD_h)
+        Hs2 = np.sqrt(M02) * 4.0 / np.sqrt(2 * np.pi)
 
         if self.verbose > 1:
-            printi("Hs = " + str(self.Hs))
+            printi("Hs(from M0 acc) = " + str(self.Hs))
+            printi("Hs(from M0 elev) = " + str(Hs2))
             printi("T_z = " + str(self.T_z))
             printi("T_c = " + str(self.T_c))
             printi("T_p = " + str(self.T_p))
@@ -300,10 +353,14 @@ class WaveStatistics(object):
         Reduction in information is obtained by restraining the frequency domain,
         reducing to 8 bits per frequency"""
 
-        num = len(self.f_PSD_WS) / global_under_sampling
-
-        self.array_discretized_spectrum, self.limited_frequencies_frequencies = \
-                signal.resample(self.S_PSD_WS, num, self.f_PSD_WS)
+        S0 = self.S_PSD_WS
+        f0 = self.f_PSD_WS
+        for i in range(number_of_downsamples):
+            num = len(f0) / global_under_sampling
+            S0, f0 = signal.resample(S0, num, t=f0)
+        
+        self.array_discretized_spectrum = S0
+        self.limited_frequencies_frequencies = f0
         self.max_value_limited_spectrum = np.max(self.array_discretized_spectrum)
 
         # normalize by max value and change to uint8
@@ -316,16 +373,26 @@ class WaveStatistics(object):
             printi("limited_frequencies_frequencies = " + str(self.limited_frequencies_frequencies))
             printi("array_discretized_spectrum = " + str(self.array_discretized_spectrum))
             printi("max reduced = " + str(self.max_value_limited_spectrum))
+            printi("number of limited frequencies = {}".format(len(self.limited_frequencies_frequencies)))
+            printi("number of non-zero amplitudes = {}".format(len(np.argwhere(self.array_discretized_spectrum>0))))
 
     def save_all_results(self):
 
         if plot_diag:
             # first plot spec
+            noise_acc = (0.2*9.81*1e-3)**2
+            noise_spec = noise_acc / ( (2*np.pi*self.f_PSD_WS)**4 )
             plt.figure()
             plt.plot(self.f_PSD_WS,self.S_PSD_WS,'k-')
-            plt.plot(self.limited_frequencies_frequencies, self.max_value_limited_spectrum*self.array_discretized_spectrum/255.0, 'r--')
-	    plt.plot(self.f_FFT, np.sqrt(self.S_FFT * self.S_FFT.conj()), 'g-')
-	    plt.xlim([0.04,0.6])
+            plt.plot(self.limited_frequencies_frequencies, self.max_value_limited_spectrum*self.array_discretized_spectrum/255.0, 'r.')
+            plt.plot(self.f_PSD_WS, noise_spec, 'k:')
+	    plt.xlim([global_lowcut, global_highcut])
+            plt.yscale('log')
+
+            plt.figure()
+            plt.plot(self.f_PSD_WS, self.S_PSD_WS - noise_spec, 'k-')
+            plt.xlim([global_lowcut, global_highcut])
+            plt.yscale('linear')
 
             plt.figure()
             plt.plot(self.f_PSD_WS, np.rad2deg(self.spread))
