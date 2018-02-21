@@ -69,7 +69,7 @@ volatile int nbr_remaining;
 #define PIN_CMD_LED 13     // command of intern LED
 
 #define BAT_THRESHOLD_V 3.6  // threshold for full battery
-#define BAT_EMPTY_V 2.9     // threshold for empty battery
+#define BAT_EMPTY_V 2.8     // threshold for empty battery
 #define MIN_MARGIN_PANEL 0.5  // minimum over voltage panel vs battery for it to be worth connecting
 
 // number of loop () cycles before waking up the Mega
@@ -500,7 +500,7 @@ void configure_wdt(void)
   sei();                           // re-enable interrupts
 }
 
-// Put the Arduino to deep sleep. Only an interrupt can wake it up.
+// Put the Arduino to deep sleep for a number of cycles. Only an interrupt can wake it up.
 void sleep(int ncycles)
 {
   nbr_remaining = ncycles; // defines how many cycles should sleep
@@ -512,23 +512,24 @@ void sleep(int ncycles)
 
   // Set sleep to full power down.  Only external interrupts or
   // the watchdog timer can wake the CPU!
-  power_all_disable();
-
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 
-  // Turn off the ADC while asleep.
+  // Turn off all modules and the ADC while asleep.
+  power_all_disable();
   // power_adc_disable();
   cbi(ADCSRA,ADEN);
 
-  sleep_enable();
-
   while (nbr_remaining > 0){ // while some cycles left, sleep!
 
-    // Enable sleep and enter sleep mode.
+    // Enable sleep
+    sleep_enable();
+
+    // enter sleep
     sleep_mode();
 
     // CPU is now asleep and program execution completely halts!
-    // Once awake, execution will resume at this point if the
+    // when the watchdog fires, the ISR will be called.
+    // Once awake after ISR, execution will resume at this point if the
     // watchdog is configured for resume rather than restart
 
     // When awake, disable sleep mode
@@ -537,7 +538,6 @@ void sleep(int ncycles)
   }
 
   // put everything on again
-  // power_all_enable();
   sbi(ADCSRA,ADEN);
   power_all_enable();
 
