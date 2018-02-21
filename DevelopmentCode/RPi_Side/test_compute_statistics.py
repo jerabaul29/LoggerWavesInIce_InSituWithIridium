@@ -41,14 +41,14 @@ from compute_statistics import global_fs
 #    fileDir = '/home/graigorys/Data/WOICE/pi_logger/ResultAnalyzis/'
 #    inFile = 'test_real.csv'
 
-#fileDir = '/Users/gsutherland/Data/WOICE/LanceCruise/'
+inDir = '/Users/gsutherland/Data/WOICE/LanceCruise/'
 #inDir = '/home/graigorys/Data/WOICE/pi_logger/LanceTest/'
 #inFile = 'S1_20160502T023802.txt'
 # test real data
-inDir = '/home/graigorys/Data/WOICE/pi_logger/ResultAnalyzis/'
+#inDir = '/home/graigorys/Data/WOICE/pi_logger/ResultAnalyzis/'
 inFile = 'test_real2.csv'
 
 # process
 instance_compute_statistics = WaveStatistics(path_in=inDir, filename=inFile, verbose=5)
 instance_compute_statistics.perform_all_processing()
-instance_compute_statistics.save_all_results()
+#instance_compute_statistics.save_all_results()
