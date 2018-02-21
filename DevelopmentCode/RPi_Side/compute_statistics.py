@@ -23,17 +23,19 @@ if plot_diag:
 # parameters for the band pass filtering
 global_fs = 10.0
 global_lowcut = 0.05
-global_highcut = 0.25
+global_highcut = 0.3
+
+global_noise_acc=(0.14*9.81*1e-3)**2
 
 # parameters for the part of the acceleration signal to use
 # avoid beginning and end of signal, fixed length in FFTs and Welch so
 # that no need to transmit the frequence points by Iridium
 # lets use 1024 s ~ 17 minutes
-IMU_nfft = 2**12
+IMU_nfft = 2**13
 IMU_window = "hanning"
-IMU_nperseg = IMU_nfft/4.0
+IMU_nperseg = IMU_nfft/8.0
 IMU_noverlap = IMU_nperseg/2.0
-IMU_detrend = "constant"
+IMU_detrend = "linear"
 
 # parameters for time
 IMU_buffer = int(120*global_fs) # buffer for beginning to end
@@ -44,15 +46,15 @@ last_IMU_point_to_use = int(first_IMU_point_to_use + number_of_points_to_use + 2
 
 
 # under sampling of the Fourier spectra
-global_under_sampling = 2
-number_of_downsamples = 2
+global_under_sampling = 4
+number_of_downsamples = 1
 ################################################################################
 
 
 class ButterFiltering(object):
     """A class to perform bandpass filtering using Butter filter."""
 
-    def __init__(self, lowcut=global_lowcut, highcut=global_highcut, fs=global_fs, order=4):
+    def __init__(self, lowcut=global_lowcut, highcut=global_highcut, fs=global_fs, order=2):
         """lowcut, highcut and fs are in Hz."""
         nyq = 0.5 * fs
         low = lowcut / nyq
@@ -271,6 +273,46 @@ class WaveStatistics(object):
         self.theta = theta
         self.R = R
 
+        if plot_diag:
+            weights = (2 * np.pi * f11)**(-2)
+            noise_gyr = (0.0035 * np.pi / 180.0)**2
+            noise = noise_gyr * weights
+            plt.figure()
+            plt.plot(f11, p22, label='pitch')
+            plt.plot(f11, p33, label='roll')
+            plt.plot(f11, noise, 'k--', label='noise')
+            plt.axvline(x=global_lowcut, color=[0.5,0.5,0.5], linestyle='-')
+            plt.axvline(x=global_highcut, color=[0.5,0.5,0.5], linestyle='-')
+            plt.xlim([0.01, 0.5])
+            plt.yscale('log')
+            plt.legend()
+            weights = (2 * np.pi * f11)**(-4)
+            plt.figure()
+            plt.plot(f11, p11, label='elev')
+            plt.plot(f11, global_noise_acc*weights, 'k--', label='noise')
+            plt.axvline(x=global_lowcut, color=[0.5,0.5,0.5], linestyle='-')
+            plt.axvline(x=global_highcut, color=[0.5,0.5,0.5], linestyle='-')
+            plt.xlim([.01, 0.5])
+            plt.yscale('log')
+            plt.legend()
+            plt.figure()
+            plt.plot(f11, np.real(p12), label='real(p12)')
+            plt.plot(f11, np.real(p13), label='real(p13)')
+            plt.xlim([.01, 0.5])
+            plt.yscale('linear')
+            plt.axvline(x=global_lowcut, color=[0.5,0.5,0.5], linestyle='-')
+            plt.axvline(x=global_highcut, color=[0.5,0.5,0.5], linestyle='-')
+            plt.legend()
+            plt.figure()
+            plt.plot(f11, np.imag(p12), label='imag(p12)')
+            plt.plot(f11, np.imag(p13), label='imag(p13)')
+            plt.xlim([.01, 0.5])
+            plt.yscale('linear')
+            plt.axvline(x=global_lowcut, color=[0.5,0.5,0.5], linestyle='-')
+            plt.axvline(x=global_highcut, color=[0.5,0.5,0.5], linestyle='-')
+            plt.legend()
+
+
 
     def compute_elevation_spectrum(self):
         """Compute elevation spectrum from the double integrated vertical acceleration."""
@@ -293,12 +335,21 @@ class WaveStatistics(object):
         self.spread = self.spread[ind1:ind2]
         self.theta = self.theta[ind1:ind2]
         self.R = self.R[ind1:ind2]
+
+        # set values below noise floor to 0
+        weights = (2 * np.pi * self.f_PSD_WS)**(-4)
+        self.S_PSD_WS = self.S_PSD_WS - global_noise_acc*weights
+        self.S_PSD_WS[self.S_PSD_WS < 0.0] = 0.0
         
         ind1 = np.argmin(np.abs(self.f_PSD_h - global_lowcut))
         ind2 = np.argmin(np.abs(self.f_PSD_h - global_highcut))
         self.f_PSD_h = self.f_PSD_h[ind1:ind2]
         self.S_PSD_h = self.S_PSD_h[ind1:ind2]
 
+        # subtract noise and set negative values to zero
+        weights = (2 * np.pi * self.f_PSD_h)**(-4)
+        self.S_PSD_h = self.S_PSD_h - global_noise_acc*weights
+        self.S_PSD_h[self.S_PSD_h < 0.0] = 0.0
 
         if self.verbose > 2:
             printi("Smax = " + str(np.max(self.S_PSD_WS)))
@@ -369,6 +420,21 @@ class WaveStatistics(object):
         self.array_discretized_spectrum = self.array_discretized_spectrum / self.max_value_limited_spectrum
         self.array_discretized_spectrum = np.uint8(255 * self.array_discretized_spectrum)
 
+        # also reduce theta, R, and spread
+        f0 = self.f_PSD_WS
+        theta0 = self.theta
+        R0 = self.R
+        spread0 = self.spread
+        for i in range(number_of_downsamples):
+            num = len(f0) / global_under_sampling
+            theta0, f0 = signal.resample(theta0, num, t=f0)
+            R0 = signal.resample(R0, num)
+            spread0 = signal.resample(spread0, num)
+
+        self.theta_reduced = theta0
+        self.spread_reduced = spread0
+        self.R_reduced = R0
+
         if self.verbose > 3:
             printi("limited_frequencies_frequencies = " + str(self.limited_frequencies_frequencies))
             printi("array_discretized_spectrum = " + str(self.array_discretized_spectrum))
@@ -380,31 +446,27 @@ class WaveStatistics(object):
 
         if plot_diag:
             # first plot spec
-            noise_acc = (0.2*9.81*1e-3)**2
-            noise_spec = noise_acc / ( (2*np.pi*self.f_PSD_WS)**4 )
+            noise_spec = global_noise_acc / ( (2*np.pi*self.f_PSD_WS)**4 )
             plt.figure()
             plt.plot(self.f_PSD_WS,self.S_PSD_WS,'k-')
             plt.plot(self.limited_frequencies_frequencies, self.max_value_limited_spectrum*self.array_discretized_spectrum/255.0, 'r.')
-            plt.plot(self.f_PSD_WS, noise_spec, 'k:')
 	    plt.xlim([global_lowcut, global_highcut])
             plt.yscale('log')
 
             plt.figure()
-            plt.plot(self.f_PSD_WS, self.S_PSD_WS - noise_spec, 'k-')
-            plt.xlim([global_lowcut, global_highcut])
-            plt.yscale('linear')
-
-            plt.figure()
             plt.plot(self.f_PSD_WS, np.rad2deg(self.spread))
+            plt.plot(self.limited_frequencies_frequencies, np.rad2deg(self.spread_reduced), 'r.')
             plt.ylabel('spread')
 
             plt.figure()
             plt.plot(self.f_PSD_WS, self.R)
+            plt.plot(self.limited_frequencies_frequencies, self.R_reduced, 'r.')
             plt.ylabel('R')
             #plt.ylim([0,2])
 
             plt.figure()
             plt.plot(self.f_PSD_WS, np.rad2deg(self.theta))
+            plt.plot(self.limited_frequencies_frequencies, np.rad2deg(self.theta_reduced), 'r.')
             plt.ylabel('theta')
             plt.show()
 
