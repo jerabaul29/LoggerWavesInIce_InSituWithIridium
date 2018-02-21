@@ -87,6 +87,7 @@ volatile int nbr_remaining;
 // this means that every 40s, the mC will wake up, take care of solar power,
 // take care of the Mega.
 #define CYCLES_DEEP_SLEEP 5
+// #define CYCLES_DEEP_SLEEP 2  // test value
 
 // number of loop () cycles before trying to wake up the Mega after is has been set asleep
 // or refused to wake up.
@@ -96,6 +97,7 @@ volatile int nbr_remaining;
 // and the Mega can decide to be always awake (never stop asking current), or to perform measurements
 // every 20 minutes (sleep one cycle), or every 40 minutes (sleep 2 cycles), etc.
 #define CYCLES_BEFORE_MEGA_WAKEUP 30
+// #define CYCLES_BEFORE_MEGA_WAKEUP 3 // test value
 
 float meas_battery = 0.0;
 float meas_solar_panel_anode = 0.0;
