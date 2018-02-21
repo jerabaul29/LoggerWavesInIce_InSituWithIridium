@@ -37,6 +37,11 @@ class RPi_control(object):
 
         wait_for_acknowledged_connection = True
 
+        # clear the incoming buffer except last received char
+        while self.serial_port.in_waiting > 1:
+            self.serial_port.read()
+
+        # look at last received char
         while wait_for_acknowledged_connection:
             if self.serial_port.in_waiting > 0:
                 crrt_char = self.serial_port.read()
@@ -80,7 +85,7 @@ class RPi_control(object):
                 crrt_char = self.serial_port.read()
 
                 if self.verbose > 1:
-                    printi('RC: ' + str(crrt_char))
+                    printi('Received char: ' + str(crrt_char))
 
                 if crrt_char == 'C':
                     self.list_of_commands.append(''.join(current_command))
@@ -105,7 +110,7 @@ class RPi_control(object):
                 crrt_char = self.serial_port.read()
 
                 if self.verbose > 1:
-                    printi('RC: ' + str(crrt_char))
+                    printi('Received char: ' + str(crrt_char))
 
                 if crrt_char == 'N':
                     wait_for_filename = False
@@ -129,7 +134,7 @@ class RPi_control(object):
                 crrt_char = self.serial_port.read()
 
                 if self.verbose > 1:
-                    printi('RC: ' + str(crrt_char))
+                    printi('Received char: ' + str(crrt_char))
 
                 data_list.append(crrt_char)
 
@@ -217,6 +222,8 @@ class RPi_control(object):
 
     def processing(self):
         """Launch the processing of data"""
+
+        # NOTE: this is here I should rather use the code from Graig!!
 
         # do the parsing of the file from the Mega
         path_in = self.main_path + 'Data/'

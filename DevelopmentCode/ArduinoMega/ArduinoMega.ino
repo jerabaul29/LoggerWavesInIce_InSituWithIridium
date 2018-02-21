@@ -44,12 +44,10 @@
  *
  * CHECKLIST:
  * -- DURATION_LOGGING_MS
- * -- TIME_WNF  NOTE: to avoid losing the early data, with this simple logging, should have TIME_WNF > DURATION_LOGGING_MS + margin
- *                       where margin should be at least several tens of seconds
- * -- SERIAL_PRINT  NOTE: it should probably be either SERIAL_PRINT or SERIAL_RPI
- * -- SERIAL_RPI  NOTE: it should probably be either SERIAL_PRINT or SERIAL_RPI
+ * -- SERIAL_PRINT
+ * -- SERIAL_RPI
  * -- USE_IRIDIUM
- * -- EEPROM initialized with right value at address_total_sleeps, otherwise never sleeps
+ * -- EEPROM initialized with right value for sleep
  *
  * CONVENTIONS:
  * - S,: message about the Start of the file: booting, or new file timer
@@ -72,7 +70,7 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
  /*
   * TODO:
   *
-  * Check that enough battery at the end of the logging; if not, do not reboot but sleep
+  * take aways uses of strings, and resort to true buffers instead?
   *
   * Test that work sending RaspberryPi information by Iridium
   *
@@ -220,9 +218,6 @@ String dataStringGPS = "";
 char currentFileName[] = "F00000";
 // number of zeros after the letter in the name convention
 int nbrOfZeros = 5;
-// time in milliseconds after which write to a new file, 900 s is 900 000 milliseconds is 15 minutes
-// for production: 960000
-#define TIME_WNF 24000 // put some margin relatively to duration_logging_ms
 
 // time tracking variable for writting new file
 unsigned long time_tracking_WNF = 1;
@@ -309,18 +304,21 @@ String dataStringIMU = "";
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 // how often should wake up -----------------------------------------------------
-// how many 'wake up cycles' by the power controlleft before really wake up
+// how many 'wake up cycles' by the power controller currently left before really wake up
 // this should be stored in EEPROM, see EEPROM section: address_sleeps_left
 uint8_t number_sleeps_left;
+
 // how many 'wake up cycles' should sleep between two real wake ups
-// initially hard coded (but then not possible to update via Iridium)
-// #define TOTAL_NUMBER_SLEEPS_BEFORE_WAKEUP 1
-// now defined in EEPROM so that possible to update by Iridium
+// defined in EEPROM so that possible to update by Iridium
+// total_number_sleeps_before_wakeup value 0 means that never sleep
+// total_number_sleeps_before_wakeup value 1 means that measures and then sleeps
+// once (ie sleep typically 20 minutes)
 uint8_t total_number_sleeps_before_wakeup;
 
 // how long should log ----------------------------------------------------------
-// for production: 930000
-#define DURATION_LOGGING_MS 20000
+// for production: 25 * 60 * 1000 = 1500000 ms
+#define DURATION_LOGGING_MS 1500000
+// #define DURATION_LOGGING_MS 20000  // for tests
 unsigned long time_start_logging_ms = 1;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -329,9 +327,15 @@ unsigned long time_start_logging_ms = 1;
 // Parameters about serial connections on Serial (USB port) ---------------------
 
 // for debugging: print strings about actions on serial
-#define SERIAL_PRINT true
+#define SERIAL_PRINT false
 // for connection with the Raspberry Pi
-#define SERIAL_RPI false
+#define SERIAL_RPI true
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Battery
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#define PIN_MSR_BATTERY A0
+#define BAT_EMPTY_V 2.8     // threshold for empty battery
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Iridium
@@ -341,7 +345,6 @@ unsigned long time_start_logging_ms = 1;
 #define PIN_IRD_SLEEP 49
 #define SERIAL_IRIDIUM Serial2
 
-#define PIN_MSR_BATTERY A0
 String string_battery = "";
 
 IridiumSBD isbd(SERIAL_IRIDIUM, PIN_IRD_SLEEP);
@@ -369,30 +372,34 @@ int ird_feedback = -1;
 
 void setup(){
 
+  // No power to Raspberry Pi %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  pinMode(PIN_MFT_RPI, OUTPUT);
+  digitalWrite(PIN_MFT_RPI, HIGH);
+
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // OPEN SERIAL IF NECESSARY
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   #if SERIAL_PRINT || SERIAL_RPI
-  // #if SERIAL_PRINT
-    // Open serial communications and wait for port to open:
     Serial.begin(115200);
-  #endif
-
-  /*
-  #if SERIAL_RPI
-    // Open serial communications and wait for port to open:
-    Serial.begin(115200);
-  #endif
-  */
-
-  #if SERIAL_PRINT
     while (!Serial) {
       ; // wait for serial port to connect.
     }
+  #endif
+
+  #if SERIAL_PRINT
     Serial.println();
     Serial.println();
     Serial.println("D;Booting");
   #endif
+
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // SEE IF ENOUGH BATTERY FOR WORKING
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  // necessary to check battery here, because maybe in the case where no sleep at
+  // all: then need to check that there is enough battery
+
+  check_battery_level();
 
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // SEE IF SHOULD WAKE UP OR JUST SLEEP MORE
@@ -454,7 +461,9 @@ void loop(){
   // VITAL INFORMATION IRIDIUM
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  // NOTE: we do it here as doing it earlier means less time for the GPS to get a fix
+  // send some diagnostic strings by Iridum, including detailed GPS position.
+  // done here as doing it at this point one most likely has a GPS fix and full
+  // Iridium capacitors
   #if USE_IRIDIUM
     send_receive_Iridium_vital_information();
   #endif
@@ -463,13 +472,18 @@ void loop(){
   // RASPBERRY PI INTERACTION
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  raspberry_pi_interaction();
+  #if SERIAL_RPI
+    raspberry_pi_interaction();
+  #endif
 
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  // EVERYTHING IS DONE: SLEEP OR REBOOT
+  // EVERYTHING IS DONE: REBOOT
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  sleep_or_reboot();
+  // if it is time to sleep, this will be caught by the decide_if_wakeup function
+  wdt_enable(WDTO_15MS);
+  while(1){
+  }
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -477,6 +491,29 @@ void loop(){
 // FUNCTIONS / OTHER
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// check the battery level
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+void check_battery_level(void){
+  float battery_level =  float(analogRead(PIN_MSR_BATTERY)) * 5.0 / 1024.0;
+
+  if (battery_level < BAT_EMPTY_V){
+    #if SERIAL_PRINT
+      Serial.println("D;Low battery!");
+    #endif
+
+    // should stop now to try to save the logger
+    pinMode(PIN_FBK_MGA, OUTPUT);
+    digitalWrite(PIN_FBK_MGA, LOW);
+
+    while(1){
+      make_sleep();
+    }
+  }
+
+}
+
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // LED PIN_MGA_LED blink
@@ -533,17 +570,6 @@ void postSD(String dataStringPost){
     Serial.print("D;Time log beginning: ");
     Serial.println(startLog);
   #endif
-
-  // decide if time to write to a new file
-  if (millis() - time_tracking_WNF > TIME_WNF){
-    // update time tracking
-    time_tracking_WNF += TIME_WNF;
-    #if SERIAL_PRINT
-      Serial.println("D;Update file name because timer");
-    #endif
-    UpdateCurrentFile();
-    dataFile.println("S,New file created (timer)\n");
-  }
 
   // if the file is available, write to it:
   if (dataFile) {
@@ -786,10 +812,6 @@ void setup_logging(void){
   wdt_enable(WDTO_8S);
   wdt_reset();
 
-  // No power to Raspberry Pi %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  pinMode(PIN_MFT_RPI, OUTPUT);
-  digitalWrite(PIN_MFT_RPI, HIGH);
-
   // setup SD card %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   // see if the card is present and can be initialized:
@@ -890,6 +912,9 @@ void setup_logging(void){
 // decide if should really wake up or just sleep more
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+// look at the values contained in EEPROM indicating how many times need to sleep
+// use them to decide if should sleep or not
+// if number_sleeps_left is 0 when this function called, time to wake up.
 void decide_if_wakeup(void){
 
   // pull up FBK_MEGA
@@ -928,14 +953,14 @@ void decide_if_wakeup(void){
 
     EEPROM.write(address_sleeps_left, total_number_sleeps_before_wakeup);
 
-    pinMode(PIN_FBK_MGA, INPUT);
+    digitalWrite(PIN_FBK_MGA, LOW);
 
     while(1){
       make_sleep();
     }
   }
 
-  // if ok value >1: must sleep more; decrease by one and sleep
+  // if number_sleeps_left > 0: must sleep more; decrease by one and sleep
   else if (number_sleeps_left > 0){
 
     #if SERIAL_PRINT
@@ -945,37 +970,24 @@ void decide_if_wakeup(void){
 
     EEPROM.write(address_sleeps_left, uint8_t(number_sleeps_left - 1));
 
-    pinMode(PIN_FBK_MGA, INPUT);
+    digitalWrite(PIN_FBK_MGA, LOW);
 
     while(1){
       make_sleep();
     }
   }
 
-  // time to wake up
-  else if (number_sleeps_left <= 0){
+  // else, time to wake up
+  else {
     #if SERIAL_PRINT
       Serial.println(F("D;Time to wake up!"));
       delay(5);
     #endif
 
+    // write how many sleeping cycles left
     EEPROM.write(address_sleeps_left, total_number_sleeps_before_wakeup);
   }
 
-  else{
-    #if SERIAL_PRINT
-      Serial.println(F("D;Something wrong"));
-      delay(5);
-    #endif
-
-    EEPROM.write(address_sleeps_left, 0);
-
-    pinMode(PIN_FBK_MGA, INPUT);
-
-    while(1){
-      make_sleep();
-    }
-  }
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1038,19 +1050,28 @@ void setup_iridium(void){
 // send and receive Iridium vital information and commands
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+// NOTE: there is much improvement room for this function
+
+// note: as of now, this is inefficient with Iridium space, as it uses
+// plaintext way of noting information; but it makes it easier to debug vital
+// data
 void send_receive_Iridium_vital_information(void){
   wdt_reset();
 
   // wake up the Iridium ------------------------------------------------------
   isbd.begin();
+  wdt_reset();
 
   // get the Iridium feedback string ready ------------------------------------
   set_battery_value_Iridium_message();
+  wdt_reset();
 
   set_file_number_Iridium_message();
+  wdt_reset();
 
   obtain_GPRMC_Iridium_message();
   set_GPRMC_Iridium_message();
+  wdt_reset();
 
   #if SERIAL_PRINT
     Serial.println((uint8_t)Iridium_msg);
@@ -1062,6 +1083,8 @@ void send_receive_Iridium_vital_information(void){
   ird_feedback = isbd.sendReceiveSBDBinary((uint8_t *)Iridium_msg, size_t(1 + GPS_rx_buffer_position),
                                            Ird_rx, Ird_rx_position);  // NOTE: strange that Ird_rx_position; should it be a pointer?
                                                                       // check all occurences
+
+  wdt_reset();
 
   #if SERIAL_PRINT
     if (ird_feedback != 0){
@@ -1092,10 +1115,8 @@ void send_receive_Iridium_vital_information(void){
 
     wdt_reset();
 
-    // use do...while to go through all messages
-    // check also commands to RPi
-
-    // check if command back ----------------------------------------------------
+    // check if command back ---------------------------------------------------
+    // NOTE: need a better command back control system
     if (Ird_rx_position > 0){
       #if SERIAL_PRINT
         Serial.print(F("Ird_rx_position > 0: "));
@@ -1104,7 +1125,7 @@ void send_receive_Iridium_vital_information(void){
 
       // check if should update number of sleep cycles --------------------------
       // this kind of message should be of the form: SLP(12) [set the number of sleep cycles
-      // to 12, where (12) is in binary value]
+      // to 12, where (12) is one byte in binary value]
       if (char(Ird_rx[0]) == 'S' && char(Ird_rx[1]) == 'L' && char(Ird_rx[2]) == 'P'){
          uint8_t value_sleep = uint8_t(Ird_rx[3]);
 
@@ -1145,7 +1166,6 @@ void send_receive_Iridium_vital_information(void){
     }
 
   }while(true);
-
 
 }
 
@@ -1194,6 +1214,10 @@ void set_file_number_Iridium_message(void){
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Obtain a GPS GPRMC string to be used in the Iridium message
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+// obtain a GPRMC string for sending through Iridium
+// read at most 10 GPRMC strings trying to get a valid signal
+// if no valid GPS signal after 10 GPRMC strings, just send the last one
 void obtain_GPRMC_Iridium_message(void){
 
   // flush GPS buffer
@@ -1201,17 +1225,24 @@ void obtain_GPRMC_Iridium_message(void){
     SERIAL_GPS.read();
   }
 
-  // variable for holding GPS chars
-  char c_GPS = '0';
+  // variable for holding current GPS chars
+  char c_GPS;
 
   // try to read at most 10 GPS strings; if no valid GPRMC strings
   // 10 times in a row, just use the last one
+  current_n_read_GPS = 0;
+
   while (current_n_read_GPS < 10) {
 
     wdt_reset();
 
-    // if this is the beginning of a new GPS message, log it,
-    // check if GPRMC and check if valid
+    // see if some GPS data available
+    if (SERIAL_GPS.available() > 0) {
+            c_GPS = GPS.read();
+    }
+
+    // if this is the beginning of a new GPS message, log it; otherwise, just
+    // try to read next character by restarting the loop
     if (c_GPS == '\n') {
 
       #if SERIAL_PRINT
@@ -1230,16 +1261,20 @@ void obtain_GPRMC_Iridium_message(void){
 
           c_GPS = GPS.read();
 
+          // newline: end of the GPS message
           if (c_GPS == '\n') {
             end_GPS_msg = true;
           }
 
+          // other than newline: GPS message continues
           else {
             GPS_rx_buffer[GPS_rx_buffer_position] = c_GPS;
             GPS_rx_buffer_position++;
           }
         }
       }
+
+      // now a full GPS message has been logged
 
       #if SERIAL_PRINT
         Serial.print(F("D;Read:"));
@@ -1250,6 +1285,7 @@ void obtain_GPRMC_Iridium_message(void){
       #endif
 
       // check if the logged message was GPRMC
+      // if not a GPRMC, just try to log the next incoming GPS string
       if ((GPS_rx_buffer[0] == '$') && (GPS_rx_buffer[1] == 'G') && (GPS_rx_buffer[2] == 'P') &&
           (GPS_rx_buffer[3] == 'R') && (GPS_rx_buffer[4] == 'M') && (GPS_rx_buffer[5] == 'C')) {
 
@@ -1257,9 +1293,7 @@ void obtain_GPRMC_Iridium_message(void){
           Serial.println("D;GPRMC");
       #endif
 
-      }
-
-      // check if valid fix; if it is the case, finish here
+      // if valid fix: we have the GPRMC string we want to send, stop here.
       if (GPS_rx_buffer[18] == 'A') {
       #if SERIAL_PRINT
           Serial.println("D;Valid");
@@ -1270,13 +1304,8 @@ void obtain_GPRMC_Iridium_message(void){
 
       current_n_read_GPS++;
 
+      }
     }
-    // if GPS logging started at the middle of a string,
-    // wait for the end of next message
-    else if (SERIAL_GPS.available() > 0) {
-            c_GPS = GPS.read();
-    }
-
   }
 }
 
@@ -1300,7 +1329,7 @@ void set_GPRMC_Iridium_message(void){
   #if SERIAL_PRINT
     Serial.print(F("Iridum_msg length:"));
     Serial.println(GPS_rx_buffer_position + 1);
-    for (int i = 0; i < 1 + GPS_rx_buffer_position; i++) {
+    for (int i = 0; i < 1 + GPS_rx_buffer_position; i++) { // note: maybe missing last GPRMC character?
       Serial.print(Iridium_msg[i]);
     }
     Serial.println();
@@ -1313,37 +1342,6 @@ void set_GPRMC_Iridium_message(void){
 bool ISBDCallback(void){
   wdt_reset();
   return(true);
-}
-
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// Sleep or reboot
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void sleep_or_reboot(void){
-  if (total_number_sleeps_before_wakeup == 0){
-    #if SERIAL_PRINT
-      Serial.println(F("D;Do not sleep; log again at once"));
-    #endif
-
-    // reboot
-    wdt_enable(WDTO_15MS);     // enable the watchdog, 15 ms
-    while(1){
-    }
-  }
-
-  else{
-
-    #if SERIAL_PRINT
-      Serial.println(F("D;Ask no more current and sleep"));
-    #endif
-
-    pinMode(PIN_FBK_MGA, INPUT);
-
-    wdt_disable();
-
-    while (1){
-      make_sleep();
-    }
-  }
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1371,14 +1369,10 @@ void raspberry_pi_interaction(void){
 
   wdt_reset();
 
-  delay(4000);
-  wdt_reset();
-  delay(4000);
-  wdt_reset();
-  delay(4000);
-  wdt_reset();
-  delay(4000);
-  wdt_reset();
+  for (int nbr_seconds=0; nbr_seconds<15; nbr_seconds++){
+    delay(1000);
+    wdt_reset();
+  }
 
   // flush the buffer -------------------------------------------
   while (Serial.available() > 0){
@@ -1388,11 +1382,11 @@ void raspberry_pi_interaction(void){
   wdt_reset();
 
   // check if the RPi has booted --------------------------------
-  // TODO: make the double checking of booting more robust: need to
-  // TODO: send again 'B' if no answer after some given time
-  Serial.print('B');
 
   while(true){
+
+    Serial.print('B');
+    delay(100);
 
     if (Serial.available() > 0){
       char answer = Serial.read();
@@ -1406,27 +1400,25 @@ void raspberry_pi_interaction(void){
   wdt_reset();
 
   // send commmand updates to the RPi --------------------------
-  // TODO: ask to do another form for processing
+  // TODO: send a list of commands to execute to the RPi. Those commands can
+  //       be updated from Iridium
 
   // send the file name to the RPi -----------------------------
   Serial.print('N');
-  Serial.print(currentFileName[0]);
-  Serial.print(currentFileName[1]);
-  Serial.print(currentFileName[2]);
-  Serial.print(currentFileName[3]);
-  Serial.print(currentFileName[4]);
-  Serial.print(currentFileName[5]);
+  for (int i=0; i<6; i++){
+    Serial.print(currentFileName[i]);
+  }
 
-  delay(500);
+  Serial.print('N');
+
+  delay(50);
 
   wdt_reset();
 
   // send the file content to the RPi ---------------------------
   File dataFile = SD.open(currentFileName);
 
-  // if the file is available, read it to the Arduino:
-  Serial.print('N');
-
+  // if the file is available, send it all
   if (dataFile) {
     while (dataFile.available()) {
       Serial.write(dataFile.read());
@@ -1455,7 +1447,8 @@ void raspberry_pi_interaction(void){
 
   wdt_reset();
 
-  // get back the data to send by Iridium, or shut off if RPi is done --------------
+  // get back the data to send by Iridium, or shut off if RPi is done ----------
+  // TODO
   while(true){
     wdt_reset();
 

@@ -372,7 +372,7 @@ void loop() {
 // implements the solar panel logics: when to couple it
 
 // return true if should connect the battery and the solar panel, return false if not
-bool should_connect_array(meas_battery, solar_panel_voltage){
+bool should_connect_array(float meas_battery, float solar_panel_voltage){
 
   if (meas_battery > BAT_THRESHOLD_V){
     #if DEBUG
@@ -427,7 +427,7 @@ float read_solar_panel_anode(){
 }
 
 // take care of connecting or not the solar pannel
-void take_care_battery_solar(connect_battery_panel){
+void take_care_battery_solar(bool connect_battery_panel){
 
   if (connect_battery_panel){
     #if DEBUG
