@@ -22,7 +22,7 @@ if plot_diag:
 # parameters for the band pass filtering
 global_fs = 10.0
 global_lowcut = 0.05
-global_highcut = 0.35
+global_highcut = 0.25
 
 global_noise_acc=(0.14*9.81*1e-3)**2
 
@@ -45,8 +45,21 @@ last_IMU_point_to_use = int(first_IMU_point_to_use + number_of_points_to_use + 2
 
 
 # under sampling of the Fourier spectra
-global_downsample_length = 30
+global_downsample_length = 25
+dfreq = (global_highcut - global_lowcut) / global_downsample_length
 ################################################################################
+
+# some basic functions
+
+def DownSample16bit(freq_all, sig_all, freq_red, downsample):
+    """A function to downsample a signal and convert to 16-bit integer"""
+    max_val = 2**15 - 1
+    sig_red1, freq_red1 = signal.resample(sig_all, downsample+5, t=freq_all)
+    f_int = interp1d(freq_red1, sig_red1)
+    sig_red_int = f_int(freq_red)
+    sig_red_max = np.max([sig_red_int.max(), -sig_red_int.min()])
+    sig_red_16bit = np.int16(max_val * sig_red_int / sig_red_max)
+    return sig_red_16bit, sig_red_max
 
 
 class BandPass(object):
@@ -232,20 +245,21 @@ class WaveStatistics(object):
         omega = 2*np.pi*f11
         g = 9.81
         k0 = omega**2 / g
-        k = np.sqrt( (p22 + p33) / p11 )
+        self.k = np.sqrt( (p22 + p33) / p11 )
+        self.R = self.k / k0
 
         # now calculate circular moments
 	self.freq = f11
         self.a0 = p11
-        self.a1 = -np.imag(p12) / k
-        self.b1 = -np.imag(p13) / k 
-        self.a2 = (p22 - p33) / (k**2)
-        self.b2 = 2*np.real(p23) / (k**2)
+        self.a1 = -np.imag(p12) / self.k
+        self.b1 = -np.imag(p13) / self.k 
+        self.a2 = (p22 - p33) / (self.k**2)
+        self.b2 = 2*np.real(p23) / (self.k**2)
 
     def find_valid_index_PSD_WS(self):
         """Find the limiting index that are within global_lowcut global_highcut."""
         
-	index = np.argwhere(np.logical_and(self.freq>=global_lowcut,self.freq<=global_highcut))
+	index = np.argwhere(np.logical_and(self.freq>=global_lowcut-dfreq,self.freq<=global_highcut+dfreq))
 
         # apply limits to values
 	self.freq = np.squeeze(self.freq[index])
@@ -254,9 +268,7 @@ class WaveStatistics(object):
 	self.b1 = np.squeeze(self.b1[index])
 	self.a2 = np.squeeze(self.a2[index])
 	self.b2 = np.squeeze(self.b2[index])
-
-	# not have negative values of self.a0
-	self.a0[self.a0<0] = 0.0
+        self.R = np.squeeze(self.R[index])
 
     def compute_wave_spectrum_moments(self):
         """Compute the moments of the wave spectrum."""
@@ -300,46 +312,33 @@ class WaveStatistics(object):
         reducing to 8 bits per frequency"""
 
 	# reduce spectra with resample
-
-	f0 = np.linspace(global_lowcut, global_highcut, global_downsample_length+1)
+        #t0 = np.linspace(1/global_highcut, 1/global_lowcut, global_downsample_length+1)
+        #f0 = 1/t0
+        f1 = np.log(global_lowcut)
+        f2 =  np.log(global_highcut)
+        f0 = np.exp(np.linspace(f1, f2, global_downsample_length+1))
+	#f0 = np.linspace(global_lowcut, global_highcut, global_downsample_length+1)
 	self.freq_reduc = 0.5 * (f0[0:-1] + f0[1:])
-	#fit_type='slinear'
-	#fa0 = interp1d(self.freq, self.a0, kind=fit_type)
-	#fa1 = interp1d(self.freq, self.a1, kind=fit_type)
-	#fb1 = interp1d(self.freq, self.b1, kind=fit_type)
-	#fa2 = interp1d(self.freq, self.a2, kind=fit_type)
-	#fb2 = interp1d(self.freq, self.b2, kind=fit_type)
-	#self.a0_reduc = fa0(self.freq_reduc)
-	#self.a1_reduc = fa1(self.freq_reduc)
-	#self.b1_reduc = fb1(self.freq_reduc)
-	#self.a2_reduc = fa2(self.freq_reduc)
-	#self.b2_reduc = fb2(self.freq_reduc)
-	
-	self.a0_reduc, self.freq_reduc = signal.resample(self.a0, global_downsample_length, t=self.freq)
-	self.a1_reduc, _ = signal.resample(self.a1, global_downsample_length, t=self.freq)
-	self.b1_reduc, _ = signal.resample(self.b1, global_downsample_length, t=self.freq)
-	self.a2_reduc, _ = signal.resample(self.a2, global_downsample_length, t=self.freq)
-	self.b2_reduc, _ = signal.resample(self.b2, global_downsample_length, t=self.freq)
 
-	# calculate maximum
-	self.a0_reduc_max = np.max([self.a0_reduc.max(), -self.a0_reduc.min()])
-	self.a1_reduc_max = np.max([self.a1_reduc.max(), -self.a1_reduc.min()])
-	self.b1_reduc_max = np.max([self.b1_reduc.max(), -self.b1_reduc.min()])
-	self.a2_reduc_max = np.max([self.a2_reduc.max(), -self.a2_reduc.min()])
-	self.b2_reduc_max = np.max([self.b2_reduc.max(), -self.b2_reduc.min()])
+        self.a0_reduc, self.a0_reduc_max = DownSample16bit(self.freq, self.a0, \
+                self.freq_reduc, global_downsample_length)
+        self.a1_reduc, self.a1_reduc_max = DownSample16bit(self.freq, self.a1, \
+                self.freq_reduc, global_downsample_length)
+        self.b1_reduc, self.b1_reduc_max = DownSample16bit(self.freq, self.b1, \
+                self.freq_reduc, global_downsample_length)
+        self.a2_reduc, self.a2_reduc_max = DownSample16bit(self.freq, self.a2, \
+                self.freq_reduc, global_downsample_length)
+        self.b2_reduc, self.b2_reduc_max = DownSample16bit(self.freq, self.b2, \
+                self.freq_reduc, global_downsample_length)
+        self.R_reduc, self.R_reduc_max = DownSample16bit(self.freq, self.R, \
+                self.freq_reduc, global_downsample_length)
 	
 	# normalize by max value and change to int16
-	self.a0_reduc = self.a0_reduc / self.a0_reduc_max
-	self.a0_reduc = np.int16((2**15-1) * self.a0_reduc)
-	self.a1_reduc = self.a1_reduc / self.a1_reduc_max
-	self.a1_reduc = np.int16((2**15-1) * self.a1_reduc)
-	self.b1_reduc = self.b1_reduc / self.b1_reduc_max
-	self.b1_reduc = np.int16((2**15-1) * self.b1_reduc)
-	self.a2_reduc = self.a2_reduc / self.a2_reduc_max
-	self.a2_reduc = np.int16((2**15-1) * self.a2_reduc)
-	self.b2_reduc = self.b2_reduc / self.b2_reduc_max
-	self.b2_reduc = np.int16((2**15-1) * self.b2_reduc)
-	
+        norm_val = 2**15 - 1
+
+        M0_reduc = integrate.trapz(self.a0_reduc *self.a0_reduc_max / norm_val, x=2*np.pi*self.freq_reduc)
+        Hs_reduc = np.sqrt(M0_reduc) * 4.0 / np.sqrt(2 * np.pi)
+
         
         if self.verbose > 3:
             printi("limited_frequencies_frequencies = " + str(self.freq_reduc))
@@ -349,37 +348,55 @@ class WaveStatistics(object):
             printi("max a2 reduced = " + str(self.a2_reduc_max))
             printi("max b1 reduced = " + str(self.b1_reduc_max))
             printi("max b2 reduced = " + str(self.b2_reduc_max))
+            printi('Hs reduced = {}'.format(Hs_reduc))
 
 	if plot_diag :
 	    plt.figure()
 	    plt.plot(self.freq, self.a0)
-	    plt.plot(self.freq_reduc, self.a0_reduc * self.a0_reduc_max / (2**(15)-1), 'r.')
+	    plt.plot(self.freq_reduc, self.a0_reduc * self.a0_reduc_max / norm_val, '-ro')
 	    plt.xlim([global_lowcut, global_highcut])
 	    plt.yscale('linear')
 	    plt.ylabel('a0')
-	    plt.figure()
+            plt.savefig('a0_exp_h.png')
+	    
+            plt.figure()
 	    plt.plot(self.freq, self.a1)
-	    plt.plot(self.freq_reduc, self.a1_reduc * self.a1_reduc_max / (2**(15)-1), 'r.')
+	    plt.plot(self.freq_reduc, self.a1_reduc * self.a1_reduc_max / norm_val, '-ro')
 	    plt.xlim([global_lowcut, global_highcut])
 	    plt.yscale('linear')
 	    plt.ylabel('a1')
-	    plt.figure()
+	    
+            plt.figure()
 	    plt.plot(self.freq, self.b1)
-	    plt.plot(self.freq_reduc, self.b1_reduc * self.b1_reduc_max / (2**(15)-1), 'r.')
+	    plt.plot(self.freq_reduc, self.b1_reduc * self.b1_reduc_max / norm_val, '-ro')
 	    plt.xlim([global_lowcut, global_highcut])
 	    plt.yscale('linear')
 	    plt.ylabel('b1')
-	    plt.figure()
+	    
+            plt.figure()
 	    plt.plot(self.freq, self.a2)
-	    plt.plot(self.freq_reduc, self.a2_reduc * self.a2_reduc_max / (2**(15)-1), 'r.')
+	    plt.plot(self.freq_reduc, self.a2_reduc * self.a2_reduc_max / norm_val, '-ro')
 	    plt.xlim([global_lowcut, global_highcut])
 	    plt.yscale('linear')
 	    plt.ylabel('a2')
-	    plt.figure()
+	    
+            plt.figure()
 	    plt.plot(self.freq, self.b2)
-	    plt.plot(self.freq_reduc, self.b2_reduc * self.b2_reduc_max / (2**(15)-1), 'r.')
+	    plt.plot(self.freq_reduc, self.b2_reduc * self.b2_reduc_max / norm_val, '-ro')
 	    plt.xlim([global_lowcut, global_highcut])
 	    plt.yscale('linear')
 	    plt.ylabel('b2')
+
+            plt.figure()
+            plt.plot(self.freq, self.R)
+            plt.plot(self.freq_reduc, (self.R_reduc * self.R_reduc_max / norm_val), '-ro')
+	    plt.xlim([global_lowcut, global_highcut])
+	    plt.yscale('linear')
+	    plt.ylabel('R')
+
 	    plt.show()
+
+    def writeStruct(self):
+        '''write the data to a data structure file'''
+
 

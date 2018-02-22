@@ -41,11 +41,11 @@ from compute_statistics import global_fs
 #    fileDir = '/home/graigorys/Data/WOICE/pi_logger/ResultAnalyzis/'
 #    inFile = 'test_real.csv'
 
-inDir = '/Users/gsutherland/Data/WOICE/LanceCruise/'
+#inDir = '/Users/gsutherland/Data/WOICE/LanceCruise/'
 #inDir = '/home/graigorys/Data/WOICE/pi_logger/LanceTest/'
 #inFile = 'S1_20160502T023802.txt'
 # test real data
-#inDir = '/home/graigorys/Data/WOICE/pi_logger/ResultAnalyzis/'
+inDir = '/home/graigorys/Data/WOICE/pi_logger/ResultAnalyzis/'
 inFile = 'test_real2.csv'
 
 # process
