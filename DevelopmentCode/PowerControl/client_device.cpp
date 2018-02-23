@@ -29,7 +29,8 @@ CDV::CDV(int pin_feedback, int pin_control, int cycles_sleep, const float * cons
   pin_control(pin_control),
   cycles_sleep(cycles_sleep),
   battery_voltage(battery_voltage),
-  device_awake(false)  // off by default
+  device_awake(false),  // off by default
+  cycles_counter(0)  // ready to wake up at once
 {
 }
 
@@ -44,7 +45,7 @@ void CDV::check_number_cycles(void){
 
 void CDV::update_status(void){
   CDV::check_number_cycles();
-  
+
   if (device_awake){
     CDV::update_awake();
   }
