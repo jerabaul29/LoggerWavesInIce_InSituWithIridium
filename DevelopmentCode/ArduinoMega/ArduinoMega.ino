@@ -317,8 +317,8 @@ uint8_t total_number_sleeps_before_wakeup;
 
 // how long should log ----------------------------------------------------------
 // for production: 25 * 60 * 1000 = 1500000 ms
-#define DURATION_LOGGING_MS 1500000
-// #define DURATION_LOGGING_MS 20000  // for tests
+// #define DURATION_LOGGING_MS 1500000
+#define DURATION_LOGGING_MS 20000  // for tests
 unsigned long time_start_logging_ms = 1;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -329,7 +329,7 @@ unsigned long time_start_logging_ms = 1;
 // for debugging: print strings about actions on serial
 #define SERIAL_PRINT false
 // for connection with the Raspberry Pi
-#define SERIAL_RPI true
+#define SERIAL_RPI false
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Battery
