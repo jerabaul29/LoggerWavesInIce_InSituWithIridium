@@ -1,6 +1,7 @@
 import numpy as np
 from compute_statistics import WaveStatistics
 from compute_statistics import global_fs
+import os
 
 
 #synthetic_signal = False
@@ -41,13 +42,15 @@ from compute_statistics import global_fs
 #    fileDir = '/home/graigorys/Data/WOICE/pi_logger/ResultAnalyzis/'
 #    inFile = 'test_real.csv'
 
+home = os.path.expanduser("~")
+
 #inDir = '/Users/gsutherland/Data/WOICE/LanceCruise/'
 #inDir = '/home/graigorys/Data/WOICE/pi_logger/LanceTest/'
 #inFile = 'S1_20160502T023802.txt'
 # test real data
-dataDir = '/home/graigorys/Data/WOICE/SvalbardPolarsyssel2017/Data_IMU_20170424_parsed/1/'
-inDir = '/home/graigorys/Data/WOICE/pi_logger/ResultAnalyzis/'
-f1 = 654
+dataDir = home + '/Data/WOICE/SvalbardPolarsyssel2017/Data_IMU_20170424_parsed/1/'
+inDir = home + '/Data/WOICE/pi_logger/ResultAnalyzis/'
+f1 = 488
 f2 = f1+1
 file1 = 'F{:05d}_B'.format(f1)
 file2 = 'F{:05d}_B'.format(f2)

@@ -28,7 +28,7 @@ global_fs = 10.0
 global_lowcut = 0.05
 global_highcut = 0.25
 
-global_noise_acc=(0.14*9.81*1e-3)**2
+global_noise_acc=(0.24*9.81*1e-3)**2
 
 # parameters for the part of the acceleration signal to use
 # avoid beginning and end of signal, fixed length in FFTs and Welch so
@@ -351,14 +351,14 @@ class WaveStatistics(object):
         reducing to 8 bits per frequency"""
 
 	# reduce spectra with resample
-        pwr = -1
-        t0 = np.linspace(global_highcut**pwr, global_lowcut**pwr, global_downsample_length+1)
-        f0 = np.sort(t0**pwr)
-        #f1 = np.log(global_lowcut)
-        #f2 =  np.log(global_highcut)
-        #self.freq_reduc = np.exp(np.linspace(f1, f2, global_downsample_length))
+        #pwr = -1
+        #t0 = np.linspace(global_highcut**pwr, global_lowcut**pwr, global_downsample_length+1)
+        #f0 = np.sort(t0**pwr)
+        f1 = np.log(global_lowcut)
+        f2 =  np.log(global_highcut)
+        self.freq_reduc = np.exp(np.linspace(f1, f2, global_downsample_length))
 	#f0 = np.linspace(global_lowcut, global_highcut, global_downsample_length+1)
-	self.freq_reduc = 0.5 * (f0[0:-1] + f0[1:])
+	#self.freq_reduc = 0.5 * (f0[0:-1] + f0[1:])
 
         self.a0_reduc, self.a0_reduc_max = DownSampleNbit(self.freq, self.a0, \
                 self.freq_reduc)
@@ -443,9 +443,9 @@ class WaveStatistics(object):
 
         with open(self.path_in + '/' + basename + '.bin', 'wb') as f:
             fmt_hdr = '<' + 'f'*10
-            f.write(struct.pack(fmt_hdr, self.SWH, self.T_z0, self.Hs, self.T_z, self.T_c, \
+            f.write(struct.pack(fmt_hdr, self.SWH, self.T_z0, self.Hs, self.T_z, \
                     self.a0_reduc_max, self.a1_reduc_max, self.b1_reduc_max, \
-                    self.a2_reduc_max, self.b2_reduc_max))
+                    self.a2_reduc_max, self.b2_reduc_max, self.R_reduc_max))
             # create a new format
             # now I need to write arrys
             fmt_array = '<' + 'h'*global_downsample_length
