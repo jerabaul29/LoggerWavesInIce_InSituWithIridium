@@ -80,12 +80,6 @@ void configure_wdt(void)
   sei();                           // re-enable interrupts
 }
 
-/*
- *
- * Make sleep in the lowest energy consumption level for a duration:
- *                   ncycles * 8 s
- *
-*/
 void sleep(int ncycles)
 {
   nbr_remaining = ncycles; // defines how many cycles should sleep

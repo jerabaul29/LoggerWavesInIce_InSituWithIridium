@@ -13,6 +13,10 @@
  *
  * - The parameters are set in the parameters.h header file
  *
+ * TODO:
+ *   write a post about the power manager
+ *   point to the post
+ *
  * NOTE / TODO:
  *
  * - Possible optimization (require hardware update; overkill)
