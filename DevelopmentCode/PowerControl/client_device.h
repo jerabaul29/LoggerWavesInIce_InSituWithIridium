@@ -36,19 +36,16 @@
  *
  */
 
- #if ARDUINO >= 100
-   #include "Arduino.h"
- #else
-   #include "WProgram.h"
- #endif
+#if ARDUINO >= 100
+ #include "Arduino.h"
+#else
+ #include "WProgram.h"
+#endif
+
+#include"parameters.h"
 
 #ifndef CLIENT_DEVICE
 #define CLIENT_DEVICE
-#define CLIENT_DEVICE_VERSION 1.1
-
-#ifndef THRESHOLD_VOLTAGE
-#define THRESHOLD_VOLTAGE 2.8
-#endif
 
 class CDV{
 

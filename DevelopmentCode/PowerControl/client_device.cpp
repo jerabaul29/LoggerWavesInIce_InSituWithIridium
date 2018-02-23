@@ -69,7 +69,7 @@ void CDV::update_asleep(void){
   if (0 == cycles_counter){  // ------------------------------------------------
 
     // if enough battery
-    if (*battery_voltage > THRESHOLD_VOLTAGE){ // --------------
+    if (*battery_voltage > BAT_EMPTY_V){ // --------------
       // power
       CDV::switch_on();
 
