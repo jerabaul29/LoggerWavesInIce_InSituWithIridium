@@ -45,10 +45,26 @@ from compute_statistics import global_fs
 #inDir = '/home/graigorys/Data/WOICE/pi_logger/LanceTest/'
 #inFile = 'S1_20160502T023802.txt'
 # test real data
+dataDir = '/home/graigorys/Data/WOICE/SvalbardPolarsyssel2017/Data_IMU_20170424_parsed/1/'
 inDir = '/home/graigorys/Data/WOICE/pi_logger/ResultAnalyzis/'
-inFile = 'test_real2.csv'
+f1 = 654
+f2 = f1+1
+file1 = 'F{:05d}_B'.format(f1)
+file2 = 'F{:05d}_B'.format(f2)
+inFile = 'test_{0:05d}_{1:05d}.csv'.format(f1,f2)
+
+data1 = np.genfromtxt(dataDir+file1, skip_header=1, delimiter=',')
+data2 = np.genfromtxt(dataDir+file2, skip_header=1, delimiter=',')
+data_all = np.concatenate( (data1, data2), axis=0)
+# read in header
+with open(dataDir+file1) as f:
+    hdr = f.readline()
+
+#write to text file
+np.savetxt(inDir+inFile, data_all, fmt='%.6e', delimiter=',', header=hdr)
 
 # process
 instance_compute_statistics = WaveStatistics(path_in=inDir, filename=inFile, verbose=5)
 instance_compute_statistics.perform_all_processing()
+instance_compute_statistics.writeData()
 #instance_compute_statistics.save_all_results()

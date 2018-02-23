@@ -4,6 +4,10 @@ from scipy import integrate
 from scipy.signal import butter, lfilter
 from scipy import signal
 from scipy.interpolate import interp1d
+from matplotlib.mlab import find
+import sys
+import os
+import struct
 
 """
 NOTES / TODO
@@ -47,20 +51,36 @@ last_IMU_point_to_use = int(first_IMU_point_to_use + number_of_points_to_use + 2
 # under sampling of the Fourier spectra
 global_downsample_length = 25
 dfreq = (global_highcut - global_lowcut) / global_downsample_length
+
+# global_nbit resolution for spectra
+global_nbit = 16 
 ################################################################################
 
 # some basic functions
 
-def DownSample16bit(freq_all, sig_all, freq_red, downsample):
+def DownSampleNbit(freq_all, sig_all, freq_red, downsample=global_downsample_length, nbit=global_nbit):
     """A function to downsample a signal and convert to 16-bit integer"""
-    max_val = 2**15 - 1
-    sig_red1, freq_red1 = signal.resample(sig_all, downsample+5, t=freq_all)
+
+    # make a dictionary for bit conversion
+    nbit_convert = {
+             8 : np.int8,
+            16 : np.int16,
+            32 : np.int32,
+            64 : np.int64,
+            }
+    # check if nbit exists in nbit_convert and exit if it does not
+    if nbit not in nbit_convert:
+        sys.exit('Can not convert to {} bit integer'.format(nbit))
+
+    # for a signed nbit integer so make it plus/minus 2**(nbit-1) -1
+    max_val = 2**(nbit-1) - 1
+    sig_red1, freq_red1 = signal.resample(sig_all, int(downsample*1.3), t=freq_all)
     f_int = interp1d(freq_red1, sig_red1)
     sig_red_int = f_int(freq_red)
     sig_red_max = np.max([sig_red_int.max(), -sig_red_int.min()])
-    sig_red_16bit = np.int16(max_val * sig_red_int / sig_red_max)
+    
+    sig_red_16bit = nbit_convert[nbit](max_val * sig_red_int / sig_red_max)
     return sig_red_16bit, sig_red_max
-
 
 class BandPass(object):
     """A class to perform bandpass filtering using Butter filter."""
@@ -95,6 +115,7 @@ class WaveStatistics(object):
         self.compute_vertical_elevation()
         self.compute_subsample()
         self.compute_SWH()
+        self.compute_zerocrossing()
         self.compute_directional_spectrum()
         self.find_valid_index_PSD_WS()
         self.compute_wave_spectrum_moments()
@@ -185,8 +206,8 @@ class WaveStatistics(object):
         freq = np.fft.fftfreq(self.accz_det.size, d=1.0/global_fs)
         weights = -1.0/( (2*np.pi*freq)**2 )
     # need to do some filtering for low frequency (from Kohout)
-        f1 = 0.02
-        f2 = 0.03
+        f1 = 0.03
+        f2 = 0.04
         Yf = np.zeros_like(Y)
         ind = np.argwhere(np.logical_and(freq>=f1,freq<=f2))
         Yf[ind] = Y[ind] * 0.5*(1 - np.cos(np.pi*(freq[ind]-f1)/(f2-f1)))*weights[ind]
@@ -199,9 +220,6 @@ class WaveStatistics(object):
 
     def compute_subsample(self):
         """delete first and last IMU_buffer lengths"""
-
-        print self.pitch_det.shape
-        print IMU_buffer
 
         self.pitch_proc = self.pitch_det[IMU_buffer:-IMU_buffer]
         self.roll_proc = self.roll_det[IMU_buffer:-IMU_buffer]
@@ -221,6 +239,22 @@ class WaveStatistics(object):
 
         if self.verbose > 1:
             printi("SWH = " + str(self.SWH))
+
+    def compute_zerocrossing(self):
+        """Compute zero-crossing from time series"""
+
+        # estimate zero crossing from timeseries
+        indices = find((self.elev_proc[1:] >= 0) & (self.elev_proc[:-1] < 0))
+        
+        # More accurate, using linear interpolation to find intersample
+        # zero-crossings
+        crossings = [i - self.elev_proc[i] / (self.elev_proc[i+1] - self.elev_proc[i]) for i in indices]
+        # calculate mean period by averaging indices over total indices / divided by fs
+        self.T_z0 = np.mean(np.diff(crossings) / self.fs)
+ 
+        if self.verbose > 1:
+            printi('T_z0 = {}'.format(self.T_z0))
+        
 
     def compute_directional_spectrum(self):
         """Calculate directional spectrum moments for direction and spread"""
@@ -270,14 +304,14 @@ class WaveStatistics(object):
 	self.b2 = np.squeeze(self.b2[index])
         self.R = np.squeeze(self.R[index])
 
+        # make sure self.a0 is positive
+        noise = global_noise_acc * ( (2*np.pi*self.freq)**(-4) )
+        self.a0[self.a0<noise] = noise[self.a0<noise]
+
     def compute_wave_spectrum_moments(self):
         """Compute the moments of the wave spectrum."""
 
         omega = 2 * np.pi * self.freq
-
-	print 'min, max of freq is {}, {}'.format(self.freq.min(),self.freq.max())
-	print 'a0 shape is {}'.format(self.a0.shape)
-	print 'f shape is {}'.format(self.freq.shape)
 
         # note: integrate only on the 'valid' part of the spectrum
 	
@@ -289,6 +323,10 @@ class WaveStatistics(object):
         self.MM1 = integrate.trapz(self.a0 * (omega**(-1)), x=omega)
         self.MM2 = integrate.trapz(self.a0 * (omega**(-2)), x=omega)
 
+        if self.verbose > 1:
+            printi('min, max of freq is {}, {}'.format(self.freq.min(),self.freq.max()))
+            printi('f shape is {}'.format(self.freq.shape))
+
 
     def compute_spectral_properties(self):
         """Compute SWH and the peak period, both zero up-crossing and peak-to-peak,
@@ -298,6 +336,7 @@ class WaveStatistics(object):
         self.T_z = 2.0 * np.pi * np.sqrt(self.M0 / self.M2)
         self.T_c = 2.0 * np.pi * np.sqrt(self.M2 / self.M4)
         self.T_p = 1.0 / self.freq[np.argmax(self.a0)]
+
 
 	if self.verbose > 2:
 		printi('Hs (from M0) = {}'.format(self.Hs))
@@ -312,36 +351,38 @@ class WaveStatistics(object):
         reducing to 8 bits per frequency"""
 
 	# reduce spectra with resample
-        #t0 = np.linspace(1/global_highcut, 1/global_lowcut, global_downsample_length+1)
-        #f0 = 1/t0
-        f1 = np.log(global_lowcut)
-        f2 =  np.log(global_highcut)
-        f0 = np.exp(np.linspace(f1, f2, global_downsample_length+1))
+        pwr = -1
+        t0 = np.linspace(global_highcut**pwr, global_lowcut**pwr, global_downsample_length+1)
+        f0 = np.sort(t0**pwr)
+        #f1 = np.log(global_lowcut)
+        #f2 =  np.log(global_highcut)
+        #self.freq_reduc = np.exp(np.linspace(f1, f2, global_downsample_length))
 	#f0 = np.linspace(global_lowcut, global_highcut, global_downsample_length+1)
 	self.freq_reduc = 0.5 * (f0[0:-1] + f0[1:])
 
-        self.a0_reduc, self.a0_reduc_max = DownSample16bit(self.freq, self.a0, \
-                self.freq_reduc, global_downsample_length)
-        self.a1_reduc, self.a1_reduc_max = DownSample16bit(self.freq, self.a1, \
-                self.freq_reduc, global_downsample_length)
-        self.b1_reduc, self.b1_reduc_max = DownSample16bit(self.freq, self.b1, \
-                self.freq_reduc, global_downsample_length)
-        self.a2_reduc, self.a2_reduc_max = DownSample16bit(self.freq, self.a2, \
-                self.freq_reduc, global_downsample_length)
-        self.b2_reduc, self.b2_reduc_max = DownSample16bit(self.freq, self.b2, \
-                self.freq_reduc, global_downsample_length)
-        self.R_reduc, self.R_reduc_max = DownSample16bit(self.freq, self.R, \
-                self.freq_reduc, global_downsample_length)
-	
+        self.a0_reduc, self.a0_reduc_max = DownSampleNbit(self.freq, self.a0, \
+                self.freq_reduc)
+        self.a1_reduc, self.a1_reduc_max = DownSampleNbit(self.freq, self.a1, \
+                self.freq_reduc)
+        self.b1_reduc, self.b1_reduc_max = DownSampleNbit(self.freq, self.b1, \
+                self.freq_reduc)
+        self.a2_reduc, self.a2_reduc_max = DownSampleNbit(self.freq, self.a2, \
+                self.freq_reduc)
+        self.b2_reduc, self.b2_reduc_max = DownSampleNbit(self.freq, self.b2, \
+                self.freq_reduc)
+        self.R_reduc, self.R_reduc_max = DownSampleNbit(self.freq, self.R, \
+                self.freq_reduc)
+
 	# normalize by max value and change to int16
-        norm_val = 2**15 - 1
+        norm_val = 2**(global_nbit-1) - 1
 
         M0_reduc = integrate.trapz(self.a0_reduc *self.a0_reduc_max / norm_val, x=2*np.pi*self.freq_reduc)
         Hs_reduc = np.sqrt(M0_reduc) * 4.0 / np.sqrt(2 * np.pi)
 
         
         if self.verbose > 3:
-            printi("limited_frequencies_frequencies = " + str(self.freq_reduc))
+            printi('limited_frequencies_frequencies = {}'.format(self.freq_reduc))
+            printi('limited periods = {}'.format(1/self.freq_reduc))
             printi("array_discretized_spectrum = " + str(self.a0_reduc))
             printi("max a0 reduced = " + str(self.a0_reduc_max))
             printi("max a1 reduced = " + str(self.a1_reduc_max))
@@ -354,10 +395,10 @@ class WaveStatistics(object):
 	    plt.figure()
 	    plt.plot(self.freq, self.a0)
 	    plt.plot(self.freq_reduc, self.a0_reduc * self.a0_reduc_max / norm_val, '-ro')
+            plt.plot(self.freq, global_noise_acc * ( (2*np.pi*self.freq)**(-4)), 'k--')
 	    plt.xlim([global_lowcut, global_highcut])
-	    plt.yscale('linear')
+	    plt.yscale('log')
 	    plt.ylabel('a0')
-            plt.savefig('a0_exp_h.png')
 	    
             plt.figure()
 	    plt.plot(self.freq, self.a1)
@@ -396,7 +437,21 @@ class WaveStatistics(object):
 
 	    plt.show()
 
-    def writeStruct(self):
+    def writeData(self):
         '''write the data to a data structure file'''
+        basename = os.path.splitext(self.filename)[0]
 
-
+        with open(self.path_in + '/' + basename + '.bin', 'wb') as f:
+            fmt_hdr = '<' + 'f'*10
+            f.write(struct.pack(fmt_hdr, self.SWH, self.T_z0, self.Hs, self.T_z, self.T_c, \
+                    self.a0_reduc_max, self.a1_reduc_max, self.b1_reduc_max, \
+                    self.a2_reduc_max, self.b2_reduc_max))
+            # create a new format
+            # now I need to write arrys
+            fmt_array = '<' + 'h'*global_downsample_length
+            f.write(struct.pack(fmt_array, *self.a0_reduc))
+            f.write(struct.pack(fmt_array, *self.a1_reduc))
+            f.write(struct.pack(fmt_array, *self.b1_reduc))
+            f.write(struct.pack(fmt_array, *self.a2_reduc))
+            f.write(struct.pack(fmt_array, *self.b2_reduc))
+            f.write(struct.pack(fmt_array, *self.R_reduc))
