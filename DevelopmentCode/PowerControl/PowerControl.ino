@@ -103,10 +103,7 @@ float solar_panel_voltage = 0.0;
 
 bool connect_battery_panel = false;
 
-int command_from_mega = 0;
-
-int remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
-bool mega_awake = false;
+CDV mega_device(PIN_FBK_MGA, PIN_MFT_MGA, CYCLES_BEFORE_MEGA_WAKEUP, &meas_battery);
 
 //clear bit macro
 #ifndef cbi
@@ -196,7 +193,6 @@ void loop() {
   meas_battery = float(analogRead(PIN_MSR_BAT)) * 5.0 / 1024.0;
   meas_solar_panel_anode = read_solar_panel_anode();  // the call to take_care_battery_solar comes in next block (decide what to do)
   solar_panel_voltage = meas_battery - meas_solar_panel_anode;
-  command_from_mega = digitalRead(PIN_FBK_MGA);
 
   #if DEBUG
     Serial.print(F("meas_battery: "));
@@ -225,11 +221,15 @@ void loop() {
   // Decide what to do with the Arduino Mega
   // --------------------------------------------------------------
 
+  /*
   check_number_reminding_mega_sleep_cycles();
   wdt_reset();
 
   update_mega_switching();
   wdt_reset();
+  */
+
+  mega_device.update_status();
 
   // --------------------------------------------------------------
   // Sleep
@@ -243,6 +243,7 @@ void loop() {
 // Arduino Mega stuff
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
 // immplements the Arduino Mega logics: when to give it power
 
 // check that no problem with the number of remaining sleeps
@@ -401,6 +402,7 @@ void update_mega_switching(void){
     update_sleeping_mega();
   }
 }
+*/
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
