@@ -33,9 +33,18 @@ CDV::CDV(int pin_feedback, int pin_control, int cycles_sleep, const float * cons
 {
 }
 
+void CDV::check_number_cycles(void){
+  if (cycles_counter > cycles_sleep){
+    cycles_counter = cycles_sleep;
+  }
+  else if (cycles_counter < 0){
+    cycles_counter = cycles_sleep;
+  }
+}
 
-// update status: different if asleep or awake
 void CDV::update_status(void){
+  CDV::check_number_cycles();
+  
   if (device_awake){
     CDV::update_awake();
   }
@@ -44,7 +53,6 @@ void CDV::update_status(void){
   }
 }
 
-// update awake: just need to check if wants more current
 void CDV::update_awake(void){
   if (digitalRead(pin_feedback)){
     // nothing to do!
@@ -54,7 +62,6 @@ void CDV::update_awake(void){
   }
 }
 
-// update asleep: check the counter
 void CDV::update_asleep(void){
 
   // if time to wake up...

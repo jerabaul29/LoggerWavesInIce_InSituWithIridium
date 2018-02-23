@@ -53,35 +53,26 @@
 class CDV{
 
 public:
+
   CDV(int pin_feedback, int pin_control, int cycles_sleep, const float * const battery_voltage);
 
+  /*
+    update the status of the client, and adapts the control (power or no power)
+    in consequence.
+  */
   void update_status(void);
 
 private:
 
-  //////////////////////////////////////////////////////////////////////////////
-  // VARIABLES
-  //////////////////////////////////////////////////////////////////////////////
-
-  // pins definition -----------------------------------------------------------
   const int pin_feedback;  // feedback from the device
   const int pin_control;  // control of the device
 
-  // status of the device ------------------------------------------------------
   bool device_awake;
 
-  // control of number of sleeps -----------------------------------------------
   int cycles_sleep;  // how many cycles should sleep before wake up
   int cycles_counter;  // counter for either cycles sleep left or cycles awake elapsed
 
-  // check battery levels ------------------------------------------------------
   const float * const battery_voltage;
-  float voltage_volts;
-  bool enough_volts;
-
-  //////////////////////////////////////////////////////////////////////////////
-  // METHODS
-  //////////////////////////////////////////////////////////////////////////////
 
   void switch_on(void);
 
@@ -91,6 +82,11 @@ private:
 
   void update_asleep(void);
 
+  /*
+    check that the number of sleep cycles remaining is valid (between 0 and cycles_sleep)
+    if not, set it to cycles_sleep
+  */
+  void check_number_cycles(void);
 
 };
 

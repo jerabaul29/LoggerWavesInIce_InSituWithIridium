@@ -56,6 +56,7 @@
 #include <avr/interrupt.h>      // library for interrupts handling
 #include <avr/sleep.h>          // library for sleep
 #include <avr/power.h>          // library for power control
+#include "client_device.h"
 
 // how many times remain to sleep before wake up
 // volatile to be modified in interrupt function
