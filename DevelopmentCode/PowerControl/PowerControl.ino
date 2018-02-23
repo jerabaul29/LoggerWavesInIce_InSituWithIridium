@@ -26,12 +26,9 @@
  *          Typically, this could be 30 cycles: 30 * 40 = 1200s, i.e. 20 minutes, i.e. the Mega will be given the change to wake
  *          up if it wants every 20 minutes.
  *
- * NOTE / TODO:
+ * NOTE / TODO:s
  *
- * - Possible minor timing bug:
- * check rigorously the number of wake and sleep cycles and the conditions (< vs <= 0 etc)
- *
- * - Possible optimization:
+ * - Possible optimization: require hardware update
  * put the pololu on a MOSFET from the battery side (to disconnect it when not needed, ie when not using
  * the Mega). Then need to be sure voltage on capacitors do not get too low: re connect pololu when logging with
  * Mega, and connect at least 8 seconds each 15 minutes [note: check values].
@@ -227,127 +224,10 @@ void loop() {
   // Decide what to do with the Arduino Mega
   // --------------------------------------------------------------
 
-  // check that no problem with the number of remaining sleeps
-  if (remaining_before_mega_wakeup > CYCLES_BEFORE_MEGA_WAKEUP){
-    #if DEBUG
-      Serial.println(F("Error; reset number of cycles before Mega up"));
-    #endif
+  check_number_reminding_mega_sleep_cycles();
+  wdt_reset();
 
-    remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
-  }
-
-  // what to do if the Mega already is awake: check if asks for more current
-  if (mega_awake){
-    // if the Mega is asking more current, just keep it awake
-    if (command_from_mega){
-      #if DEBUG
-        Serial.println(F("Mega is asking for more current; keep awake"));
-        delay(50);
-      #endif
-      #if SHOW_LED
-        controlled_blink(25, 20);
-      #endif
-    }
-    // if not asking for more current, time to shut it down
-    else{
-      #if DEBUG
-        Serial.println(F("Mega is not asking for more current; shut down"));
-        delay(50);
-      #endif
-      #if SHOW_LED
-        controlled_blink(500, 2);
-      #endif
-
-    // disconnect the Mega
-    pinMode(PIN_MFT_MGA, INPUT);
-    mega_awake = false;
-    remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
-    }
-  }
-
-  // otherwise, if the Mega is not awake, see if time to wake it up
-  else{
-    // if time to wake up
-    if (remaining_before_mega_wakeup <= 0){
-      #if DEBUG
-        Serial.println(F("Time to wake up the mega"));
-        delay(50);
-      #endif
-      #if SHOW_LED
-        controlled_blink(50, 10);
-      #endif
-
-      // if battery is enough to power the Mega, check if it wants to wake up
-      if (BAT_EMPTY_V < meas_battery){
-        #if DEBUG
-          Serial.println(F("Enough battery"));
-          delay(50);
-        #endif
-
-        // power the Mega
-        pinMode(PIN_MFT_MGA, OUTPUT);
-        digitalWrite(PIN_MFT_MGA, HIGH);
-
-        // see if the Mega actually wanted to be waken up
-        // this is because we could decide to change the sampling frequency
-        // give the Mega the time to boot
-        wdt_reset();
-
-        delay(4000);
-
-        wdt_reset();
-
-        // measure again the level of the Mega
-        command_from_mega = digitalRead(PIN_FBK_MGA);
-
-        // if the Mega wants to be up, it is now really awake
-        if (command_from_mega){
-          #if DEBUG
-            Serial.println(F("The mega wants to be up"));
-          #endif
-          mega_awake = true;
-        }
-
-        // if the Mega does not want to be up, put it down again
-        else{
-          #if DEBUG
-            Serial.println(F("The mega wants to be down"));
-          #endif
-
-          pinMode(PIN_MFT_MGA, INPUT);
-          mega_awake = false;
-        }
-
-      }
-
-      // if battery is not enough to power the Mega; try to save the logger, do not
-      // wake up the Mega
-      else{
-        #if DEBUG
-          Serial.println(F("Not enough battery"));
-          Serial.println(F("Skip this wakeup"));
-          delay(50);
-        #endif
-
-        // mega sleeps and gets no current
-        pinMode(PIN_MFT_MGA, INPUT);
-        mega_awake = false;
-      }
-
-      remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
-    }
-
-    // else, it is not yet time to wake up the Mega
-    else{
-      #if DEBUG
-        Serial.println(F("Mega should sleep more"));
-        delay(50);
-      #endif
-
-      remaining_before_mega_wakeup--;
-    }
-  }
-
+  update_mega_switching();
   wdt_reset();
 
   // --------------------------------------------------------------
@@ -363,6 +243,163 @@ void loop() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // immplements the Arduino Mega logics: when to give it power
+
+// check that no problem with the number of remaining sleeps
+void check_number_reminding_mega_sleep_cycles(void){
+  if (remaining_before_mega_wakeup > CYCLES_BEFORE_MEGA_WAKEUP){
+    #if DEBUG
+      Serial.println(F("Error; reset number of cycles before Mega up"));
+    #endif
+
+    remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
+  }
+
+  else if(remaining_before_mega_wakeup < 0){
+    #if DEBUG
+      Serial.println(F("Error; negative number of cycles before Mega up"));
+    #endif
+
+    remaining_before_mega_wakeup = 0;
+  }
+}
+
+void update_awake_mega(void){
+  command_from_mega = digitalRead(PIN_FBK_MGA);
+  // if the Mega is asking more current, just keep it awake
+  if (command_from_mega){
+    #if DEBUG
+      Serial.println(F("Mega is asking for more current; keep awake"));
+      delay(50);
+    #endif
+    #if SHOW_LED
+      controlled_blink(25, 20);
+    #endif
+  }
+  // if not asking for more current, time to shut it down
+  else{
+    #if DEBUG
+      Serial.println(F("Mega is not asking for more current; shut down"));
+      delay(50);
+    #endif
+    #if SHOW_LED
+      controlled_blink(500, 2);
+    #endif
+
+  // disconnect the Mega
+  pinMode(PIN_MFT_MGA, INPUT);
+  mega_awake = false;
+  remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
+  }
+}
+
+void update_sleeping_mega(void){
+  // if time to wake up
+  if (0 == remaining_before_mega_wakeup){
+    finished_sleep_mega();
+  }
+
+  // else, it is not yet time to wake up the Mega
+  else{
+    more_sleep_mega();
+  }
+}
+
+void enough_battery_for_mega_wakeup(void){
+  #if DEBUG
+    Serial.println(F("Enough battery"));
+    delay(50);
+  #endif
+
+  // power the Mega
+  pinMode(PIN_MFT_MGA, OUTPUT);
+  digitalWrite(PIN_MFT_MGA, HIGH);
+
+  // see if the Mega actually wanted to be waken up
+  // this is because we could decide to change the sampling frequency
+  // give the Mega the time to boot
+  wdt_reset();
+
+  delay(4000);
+
+  wdt_reset();
+
+  // measure again the level of the Mega
+  command_from_mega = digitalRead(PIN_FBK_MGA);
+
+  // if the Mega wants to be up, it is now really awake
+  if (command_from_mega){
+    #if DEBUG
+      Serial.println(F("The mega wants to be up"));
+    #endif
+    mega_awake = true;
+  }
+
+  // if the Mega does not want to be up, put it down again
+  else{
+    #if DEBUG
+      Serial.println(F("The mega wants to be down"));
+    #endif
+
+    pinMode(PIN_MFT_MGA, INPUT);
+    mega_awake = false;
+  }
+}
+
+void not_enough_battery_for_mega_wakeup(void){
+  #if DEBUG
+    Serial.println(F("Not enough battery"));
+    Serial.println(F("Skip this wakeup"));
+    delay(50);
+  #endif
+
+  // mega sleeps and gets no current
+  pinMode(PIN_MFT_MGA, INPUT);
+  mega_awake = false;
+}
+
+void finished_sleep_mega(void){
+    #if DEBUG
+      Serial.println(F("Time to wake up the mega"));
+      delay(50);
+    #endif
+    #if SHOW_LED
+      controlled_blink(50, 10);
+    #endif
+
+    // if battery is enough to power the Mega, check if it wants to wake up
+    if (BAT_EMPTY_V < meas_battery){
+      enough_battery_for_mega_wakeup();
+    }
+
+    // if battery is not enough to power the Mega; try to save the logger, do not
+    // wake up the Mega
+    else{
+      not_enough_battery_for_mega_wakeup();
+    }
+
+    remaining_before_mega_wakeup = CYCLES_BEFORE_MEGA_WAKEUP;
+}
+
+void more_sleep_mega(void){
+  #if DEBUG
+    Serial.println(F("Mega should sleep more"));
+    delay(50);
+  #endif
+
+  remaining_before_mega_wakeup--;
+}
+
+void update_mega_switching(void){
+  // what to do if the Mega already is awake: check if asks for more current
+  if (mega_awake){
+    update_awake_mega();
+  }
+
+  // otherwise, if the Mega is not awake, see if time to wake it up
+  else{
+    update_sleeping_mega();
+  }
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
