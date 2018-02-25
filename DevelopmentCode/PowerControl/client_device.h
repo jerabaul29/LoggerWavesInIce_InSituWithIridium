@@ -9,7 +9,7 @@
  * This also includes some checks, such as:
  * - checking if the battery is enough when performing a new start up
  * TODO - allowing only a maximum number of cycles during which the device is awake in a row
- *   before considering it a hang
+ *   before considering it a hang.
  *
  * by Jean RABAULT <jean.rblt@gmail.com>
 
@@ -55,7 +55,8 @@ public:
 
   /*
     update the status of the client, and adapts the control (power or no power)
-    in consequence.
+    in consequence. You MUST have updated the value pointed by battery_voltage
+    before calling this!!
   */
   void update_status(void);
 

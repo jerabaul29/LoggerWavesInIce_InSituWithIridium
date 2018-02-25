@@ -17,9 +17,8 @@
  *   write a post about the power manager
  *   point to the post
  *
- * NOTE / TODO:
- *
- * - Possible optimization (require hardware update; overkill)
+ * TODO:
+ * - Possible optimization (require hardware update; overkill and probably over engineering)
  * put the pololu on a MOSFET from the battery side (to disconnect it when not needed, ie when not using
  * the Mega). Then need to be sure voltage on capacitors do not get too low: re connect pololu when logging with
  * Mega, and connect at least 8 seconds each 15 minutes [note: check values].
