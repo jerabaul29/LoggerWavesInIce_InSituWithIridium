@@ -24,48 +24,14 @@ SOFTWARE.
 
 #include "sleep_and_watchdog.h"
 
-// how many times remain to sleep before wake up
-// volatile to be modified in interrupt function
-volatile int nbr_remaining = 0;
+// how many sleep cycles left; must be a global variable so that ISR find it
+volatile int nbr_remaining;
 
-/*
- *
- * Check if it is a normal watchdog (just sleeping) or if should reboot.
- * If normal watchdog, decrease number of remaining sleeps
- * If should reboot, watchdog reboot
- *
- */
-ISR(WDT_vect)
-{
-    // Check if we are in sleep mode or it is a genuine WDR.
-    if(nbr_remaining > 0)
-    {
-        // not hang out, just waiting
-        // decrease the number of remaining avail loops
-        nbr_remaining = nbr_remaining - 1;
-        wdt_reset();
-    }
-    else
-    {
-        // must be rebooted
-        // configure
-        MCUSR = 0;                          // reset flags
-
-                                            // Put timer in reset-only mode:
-        WDTCSR |= 0b00011000;               // Enter config mode.
-        WDTCSR =  0b00001000 | 0b000000;    // clr WDIE (interrupt enable...7th from left)
-                                            // set WDE (reset enable...4th from left), and set delay interval
-                                            // reset system in 16 ms...
-                                            // unless wdt_disable() in loop() is reached first
-
-        // reboot
-        while(1);
-    }
+SleepWatchdog::SleepWatchdog(){
+  nbr_remaining = 0;
 }
 
-void configure_wdt(void)
-{
-
+void SleepWatchdog::configure_wdt(void){
   cli();                           // disable interrupts for changing the registers
 
   MCUSR = 0;                       // reset status register flags
@@ -80,7 +46,7 @@ void configure_wdt(void)
   sei();                           // re-enable interrupts
 }
 
-void sleep(int ncycles)
+void SleepWatchdog::sleep(int ncycles)
 {
   nbr_remaining = ncycles; // defines how many cycles should sleep
 
@@ -125,4 +91,39 @@ void sleep(int ncycles)
     pinMode(PIN_CMD_LED, OUTPUT);
     digitalWrite(PIN_CMD_LED, LOW);
   #endif
+}
+
+/*
+ *
+ * Check if it is a normal watchdog (just sleeping) or if should reboot.
+ * If normal watchdog, decrease number of remaining sleeps
+ * If should reboot, watchdog reboot
+ *
+ */
+ISR(WDT_vect)
+{
+    // Check if we are in sleep mode or it is a genuine WDR.
+    if(nbr_remaining > 0)
+    {
+        // not hang out, just waiting
+        // decrease the number of remaining avail loops
+        nbr_remaining = nbr_remaining - 1;
+        wdt_reset();
+    }
+    else
+    {
+        // must be rebooted
+        // configure
+        MCUSR = 0;                          // reset flags
+
+                                            // Put timer in reset-only mode:
+        WDTCSR |= 0b00011000;               // Enter config mode.
+        WDTCSR =  0b00001000 | 0b000000;    // clr WDIE (interrupt enable...7th from left)
+                                            // set WDE (reset enable...4th from left), and set delay interval
+                                            // reset system in 16 ms...
+                                            // unless wdt_disable() in loop() is reached first
+
+        // reboot
+        while(1);
+    }
 }

@@ -52,8 +52,9 @@
 
 float battery_tension_V = 0.0;
 
-CDV mega_device(PIN_FBK_MGA, PIN_MFT_MGA, CYCLES_BEFORE_MEGA_WAKEUP, &battery_tension_V);
-SolarController solar_controller_instance(PIN_MFT_SOL, PIN_MSR_SOL, &battery_tension_V);
+CDV mega_device{PIN_FBK_MGA, PIN_MFT_MGA, CYCLES_BEFORE_MEGA_WAKEUP, &battery_tension_V};
+SolarController solar_controller_instance{PIN_MFT_SOL, PIN_MSR_SOL, &battery_tension_V};
+SleepWatchdog sleep_watchdog_instance{};
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -63,7 +64,7 @@ void setup() {
   // Configure watchdog
   // --------------------------------------------------------------
 
-  configure_wdt();
+  sleep_watchdog_instance.configure_wdt();
   wdt_reset();
 
   // --------------------------------------------------------------
@@ -116,7 +117,7 @@ void loop() {
   // --------------------------------------------------------------
   // Sleep
   // --------------------------------------------------------------
-  sleep(CYCLES_DEEP_SLEEP);
+  sleep_watchdog_instance.sleep(CYCLES_DEEP_SLEEP);
 }
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
