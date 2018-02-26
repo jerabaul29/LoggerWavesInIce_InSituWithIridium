@@ -348,7 +348,7 @@ class WaveStatistics(object):
     def reduce_wave_spectrum(self):
         """A reduced wave spectrum, so that easier to transmit (less information).
         Reduction in information is obtained by restraining the frequency domain,
-        reducing to 8 bits per frequency"""
+        reducing to 16 bits per frequency"""
 
 	# reduce spectra with resample
         #pwr = -1
