@@ -53,6 +53,8 @@ SOFTWARE.
 #ifndef SLEEP_AND_WATCHDOG
 #define SLEEP_AND_WATCHDOG
 
+#define DURATION_SLEEP_WDT_MS 8000UL  // duration of one watchdog sleep in ms
+
 class SleepWatchdog{
 public:
   SleepWatchdog(void);
@@ -70,6 +72,17 @@ public:
    *
    */
   void configure_wdt(void);
+
+  /*
+   *
+   * Return the true elapsed time, taking into account how many times
+   * have been slept.
+   *
+   */
+  unsigned long int millis(void) const;
+
+private:
+  unsigned long int number_of_cycles_slept;
 };
 
 #endif

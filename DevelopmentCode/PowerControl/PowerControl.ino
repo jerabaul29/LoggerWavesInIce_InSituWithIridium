@@ -52,9 +52,9 @@
 
 float battery_tension_V = 0.0;
 
+SleepWatchdog sleep_watchdog_instance{};
 CDV mega_device{PIN_FBK_MGA, PIN_MFT_MGA, CYCLES_BEFORE_MEGA_WAKEUP, &battery_tension_V};
 SolarController solar_controller_instance{PIN_MFT_SOL, PIN_MSR_SOL, &battery_tension_V};
-SleepWatchdog sleep_watchdog_instance{};
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

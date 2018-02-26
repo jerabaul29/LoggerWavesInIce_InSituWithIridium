@@ -29,6 +29,11 @@ volatile int nbr_remaining;
 
 SleepWatchdog::SleepWatchdog(){
   nbr_remaining = 0;
+  number_of_cycles_slept = 0UL;
+}
+
+SleepWatchdog::millis(){
+  return(millis() + DURATION_SLEEP_WDT_MS * number_of_cycles_slept);
 }
 
 void SleepWatchdog::configure_wdt(void){
@@ -65,6 +70,8 @@ void SleepWatchdog::sleep(int ncycles)
   cbi(ADCSRA,ADEN);
 
   while (nbr_remaining > 0){ // while some cycles left, sleep!
+
+    number_of_cycles_slept += 1;
 
     // Enable sleep
     sleep_enable();
