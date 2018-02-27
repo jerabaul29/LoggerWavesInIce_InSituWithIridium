@@ -32,7 +32,7 @@ SleepWatchdog::SleepWatchdog(){
   number_of_cycles_slept = 0UL;
 }
 
-SleepWatchdog::millis(){
+unsigned long SleepWatchdog::millis() const{
   return(millis() + DURATION_SLEEP_WDT_MS * number_of_cycles_slept);
 }
 

@@ -24,10 +24,10 @@ SOFTWARE.
 
 #include "solar_controller.h"
 
-SolarController::SolarController(const int pin_control_panel, const int pin_measure_anode_divider, const float * const battery_tension_V) :
+SolarController::SolarController(const int pin_control_panel, const int pin_measure_anode_divider, BatteryController * const battery_controller_instance) :
   pin_control_panel(pin_control_panel),
   pin_measure_anode_divider(pin_measure_anode_divider),
-  battery_tension_V(battery_tension_V)
+  battery_controller_instance(battery_controller_instance)
 {
 }
 
@@ -36,9 +36,10 @@ void SolarController::update_panel_status(void){
   tension_solar_panel_anode_V = SolarController::read_solar_panel_anode();
 
   float solar_panel_tension;
-  solar_panel_tension = *battery_tension_V - tension_solar_panel_anode_V;
+  float battery_tension_V = battery_controller_instance->battery_voltage();
+  solar_panel_tension = battery_tension_V - tension_solar_panel_anode_V;
 
-  if (SolarController::should_connect_array(*battery_tension_V, solar_panel_tension)){
+  if (SolarController::should_connect_array(battery_tension_V, solar_panel_tension)){
     SolarController::connect_array();
   }
 
@@ -78,7 +79,7 @@ float SolarController::read_solar_panel_anode(void){
   return(tension_solar_panel_anode_V);
 }
 
-bool SolarController::should_connect_array(const float battery_tension_V, float solar_panel_tension){
+bool SolarController::should_connect_array(float battery_tension_V, float solar_panel_tension){
   // battery full
   if (battery_tension_V > BAT_FULL_V){
     return(false);

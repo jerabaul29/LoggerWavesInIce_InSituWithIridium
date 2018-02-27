@@ -79,7 +79,7 @@ public:
    * have been slept.
    *
    */
-  unsigned long int millis(void) const;
+  unsigned long millis(void) const;
 
 private:
   unsigned long int number_of_cycles_slept;

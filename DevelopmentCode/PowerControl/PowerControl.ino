@@ -50,11 +50,10 @@
 #include "client_device.h"
 #include "solar_controller.h"
 
-float battery_tension_V = 0.0;
-
 SleepWatchdog sleep_watchdog_instance{};
-CDV mega_device{PIN_FBK_MGA, PIN_MFT_MGA, CYCLES_BEFORE_MEGA_WAKEUP, &battery_tension_V};
-SolarController solar_controller_instance{PIN_MFT_SOL, PIN_MSR_SOL, &battery_tension_V};
+BatteryController battery_controller_instance{PIN_MSR_BAT, &sleep_watchdog_instance};
+CDV mega_device{PIN_FBK_MGA, PIN_MFT_MGA, CYCLES_BEFORE_MEGA_WAKEUP, &battery_controller_instance};
+SolarController solar_controller_instance{PIN_MFT_SOL, PIN_MSR_SOL, &battery_controller_instance};
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -76,6 +75,11 @@ void setup() {
   pinMode(PIN_MFT_SOL, INPUT);
   pinMode(PIN_MFT_MGA, INPUT);
 
+  // --------------------------------------------------------------
+  // first battery measurement
+  // --------------------------------------------------------------
+  battery_controller_instance.update();
+
 }
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -94,7 +98,7 @@ void loop() {
   // measure battery
   // --------------------------------------------------------------
 
-  battery_tension_V = float(analogRead(PIN_MSR_BAT)) * 5.0 / 1024.0;
+  battery_controller_instance.update();
 
   wdt_reset();
 
