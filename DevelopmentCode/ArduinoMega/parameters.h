@@ -42,11 +42,20 @@ SOFTWARE.
 // feedback mega pin: high as long as the Mega should get power
 #define PIN_FBK_MGA 48
 
+// how long should log
+// #define DURATION_LOGGING_MS 1500000
+#define DURATION_LOGGING_MS 20000  // for tests
+
 // Mosfet power Raspberry Pi
 #define PIN_MFT_RPI 46
 
 // LED
 #define PIN_MGA_LED 13
+
+// EEPROM
+#define ADDRESS_LONG_FILENBR 1  // address for the filenumber; takes 4 bytes
+#define ADDRESS_SLEEPS_LEFT 5  // address for where number of sleep cycles left stored
+#define ADDRESS_TOTAL_NBR_SLEEPS 6  // address for what is the total number of sleep cycles
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Some parameters for serial

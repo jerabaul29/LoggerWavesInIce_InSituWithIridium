@@ -2,6 +2,7 @@
 #include <SD.h>
 #include "EEPROM_interaction.cpp"
 #include "parameters.h"
+#include <stdlib.h>
 
 #ifndef SD_MANAGER
 #define SD_MANAGER
@@ -45,7 +46,7 @@ class SDManager{
         File dataFile;
         char current_file_name[] = "F00000";
         const int nbr_of_numbers_file_name = 5;
-        const long address_number_file = 1;
+        const long address_number_file = ADDRESS_LONG_FILENBR;
         bool is_started = false;
 };
 
