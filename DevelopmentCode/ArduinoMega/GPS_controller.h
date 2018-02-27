@@ -15,6 +15,10 @@
 #ifndef GPS_CONTROLLER
 #define GPS_CONTROLLER
 
+// NOTE: buffering here is redundant with the ring buffer of the serial port, but proably
+// necessary as do not want to miss with the ring byffers and take the risk to miss some
+// bytes.
+
 class GPSController{
 public:
   GPSController(Serial * serial_port_gps, SDManager * sd_manager){};
@@ -28,6 +32,18 @@ public:
   call catch_message, if a full message is received then post it on the SD card
   */
   void catch_log_message(void);
+
+  /*
+   Load a GPRMC message in the GPS buffer. Perform a maximum of MAX_NUMBER_ATTEMPTS_GPRMC
+   attempts to get a valid GPRMC message. Return the size of the message in buffer.
+   */
+  int load_gprmc_message(void);
+
+  /*
+   Clen the Arduino RX buffer corresponding to the GPS, until the end of a
+   message is reached.
+   */
+  void clean_incoming_buffer(void);
 
 
 private:

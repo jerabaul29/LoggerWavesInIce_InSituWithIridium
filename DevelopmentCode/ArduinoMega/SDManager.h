@@ -1,6 +1,7 @@
 #include <SPI.h>
 #include <SD.h>
 #include "EEPROM_interaction.cpp"
+#include "parameters.h"
 
 #ifndef SD_MANAGER
 #define SD_MANAGER
@@ -8,6 +9,11 @@
 class SDManager{
     public:
         SDManager(void);
+
+        /*
+         Start the SD card
+         */
+        void start_sd(void);
 
         /*
          * Update the current file, based on the values stored in EEPROM memory, update the EEPROM,
@@ -38,8 +44,9 @@ class SDManager{
 
         File dataFile;
         char current_file_name[] = "F00000";
-        int nbr_of_numbers_file_name = 5;
-        long address_number_file = 1;
+        const int nbr_of_numbers_file_name = 5;
+        const long address_number_file = 1;
+        bool is_started = false;
 };
 
 #endif

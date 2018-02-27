@@ -1,8 +1,25 @@
 #include "SDManager.h"
 
-SDManager::SDManager(){};
+SDManager::SDManager() :
+is_started(false)
+{}
+
+SDManager::start_sd(){
+  if (!SD.begin(PIN_SELECT_SD)) {
+    // reboot
+    while (true){
+      // do nothing
+    }
+  }
+
+  is_started = true;
+}
 
 SDManager::update_current_file(void){
+  if (!is_started){
+    this->start_sd();
+  }
+
   // note: could be problem at initialization in the setup loop, no file opened yet
   // but the library is handling the exception right
   // close current file
@@ -53,21 +70,32 @@ void SDManager::post_on_SD_card(String dataStringPost){
 
   this->check_SD_available();
 
-    dataFile.println(dataStringPost);
+  dataFile.println(dataStringPost);
 
-    this->post_timestamp();
+  this->post_timestamp();
 
-    delay(5);
+  delay(5);
 }
 
 void SDManager::post_on_SD_card(char [] array_to_post, int end_position){
 
   this->check_SD_available();
 
-    dataFile.write(array_to_post, end_position);
-    dataFile.print("\n");
+  dataFile.write(array_to_post, end_position);
+  dataFile.print("\n");
 
-    this->post_timestamp();
+  this->post_timestamp();
 
-    delay(5);
+  delay(5);
 }
+
+/*
+NOTE: a piece of code that could be included for debugging
+
+#if SERIAL_PRINT
+  // show the content of all files
+  root = SD.open("/");
+  printDirectory(root, 0);
+  Serial.println("D;done!");
+#endif
+ */

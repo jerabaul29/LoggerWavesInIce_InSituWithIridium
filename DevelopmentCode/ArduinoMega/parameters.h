@@ -31,10 +31,13 @@ SOFTWARE.
 #ifndef PARAMETERS_LOGGER_MEGA
 #define PARAMETERS_LOGGER_MEGA
 
+// SD
 #define PIN_SELECT_SD 53
 
+// GPS
 #define SERIAL_GPS Serial1
 #define SIZE_GPS_BUFFER 128
+#define MAX_NUMBER_ATTEMPTS_GPRMC 10
 
 // feedback mega pin: high as long as the Mega should get power
 #define PIN_FBK_MGA 48
@@ -44,5 +47,15 @@ SOFTWARE.
 
 // LED
 #define PIN_MGA_LED 13
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Some parameters for serial
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Parameters about serial connections on Serial (USB port) ---------------------
+
+// for debugging: print strings about actions on serial
+#define SERIAL_PRINT false
+// for connection with the Raspberry Pi
+#define SERIAL_RPI false
 
 #endif
