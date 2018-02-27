@@ -24,9 +24,81 @@ SOFTWARE.
 
 #include "sleep_and_watchdog.h"
 
-// how many times remain to sleep before wake up
-// volatile to be modified in interrupt function
-volatile int nbr_remaining = 0;
+// how many sleep cycles left; must be a global variable so that ISR find it
+volatile int nbr_remaining;
+
+SleepWatchdog::SleepWatchdog(){
+  nbr_remaining = 0;
+  number_of_cycles_slept = 0UL;
+}
+
+unsigned long SleepWatchdog::millis() const{
+  return(millis() + DURATION_SLEEP_WDT_MS * number_of_cycles_slept);
+}
+
+void SleepWatchdog::configure_wdt(void){
+  cli();                           // disable interrupts for changing the registers
+
+  MCUSR = 0;                       // reset status register flags
+
+                                   // Put timer in interrupt-only mode:
+  WDTCSR |= 0b00011000;            // Set WDCE (5th from left) and WDE (4th from left) to enter config mode,
+                                   // using bitwise OR assignment (leaves other bits unchanged).
+  WDTCSR =  0b01000000 | 0b100001; // set WDIE: interrupt enabled
+                                   // clr WDE: reset disabled
+                                   // and set delay interval (right side of bar) to 8 seconds
+
+  sei();                           // re-enable interrupts
+}
+
+void SleepWatchdog::sleep(int ncycles)
+{
+  nbr_remaining = ncycles; // defines how many cycles should sleep
+
+  // let all non needed pins float to reduce power use
+  #if SHOW_LED
+    pinMode(PIN_CMD_LED, INPUT);
+  #endif
+
+  // Set sleep to full power down.  Only external interrupts or
+  // the watchdog timer can wake the CPU!
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+
+  // Turn off all modules and the ADC while asleep.
+  power_all_disable();
+  // power_adc_disable();
+  cbi(ADCSRA,ADEN);
+
+  while (nbr_remaining > 0){ // while some cycles left, sleep!
+
+    number_of_cycles_slept += 1;
+
+    // Enable sleep
+    sleep_enable();
+
+    // enter sleep
+    sleep_mode();
+
+    // CPU is now asleep and program execution completely halts!
+    // when the watchdog fires, the ISR will be called.
+    // Once awake after ISR, execution will resume at this point if the
+    // watchdog is configured for resume rather than restart
+
+    // When awake, disable sleep mode
+    sleep_disable();
+
+  }
+
+  // put everything on again
+  sbi(ADCSRA,ADEN);
+  power_all_enable();
+
+  // put non needed pins out of float
+  #if SHOW_LED
+    pinMode(PIN_CMD_LED, OUTPUT);
+    digitalWrite(PIN_CMD_LED, LOW);
+  #endif
+}
 
 /*
  *
@@ -61,68 +133,4 @@ ISR(WDT_vect)
         // reboot
         while(1);
     }
-}
-
-void configure_wdt(void)
-{
-
-  cli();                           // disable interrupts for changing the registers
-
-  MCUSR = 0;                       // reset status register flags
-
-                                   // Put timer in interrupt-only mode:
-  WDTCSR |= 0b00011000;            // Set WDCE (5th from left) and WDE (4th from left) to enter config mode,
-                                   // using bitwise OR assignment (leaves other bits unchanged).
-  WDTCSR =  0b01000000 | 0b100001; // set WDIE: interrupt enabled
-                                   // clr WDE: reset disabled
-                                   // and set delay interval (right side of bar) to 8 seconds
-
-  sei();                           // re-enable interrupts
-}
-
-void sleep(int ncycles)
-{
-  nbr_remaining = ncycles; // defines how many cycles should sleep
-
-  // let all non needed pins float to reduce power use
-  #if SHOW_LED
-    pinMode(PIN_CMD_LED, INPUT);
-  #endif
-
-  // Set sleep to full power down.  Only external interrupts or
-  // the watchdog timer can wake the CPU!
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-
-  // Turn off all modules and the ADC while asleep.
-  power_all_disable();
-  // power_adc_disable();
-  cbi(ADCSRA,ADEN);
-
-  while (nbr_remaining > 0){ // while some cycles left, sleep!
-
-    // Enable sleep
-    sleep_enable();
-
-    // enter sleep
-    sleep_mode();
-
-    // CPU is now asleep and program execution completely halts!
-    // when the watchdog fires, the ISR will be called.
-    // Once awake after ISR, execution will resume at this point if the
-    // watchdog is configured for resume rather than restart
-
-    // When awake, disable sleep mode
-    sleep_disable();
-
-  }
-
-  // put everything on again
-  sbi(ADCSRA,ADEN);
-  power_all_enable();
-
-  // put non needed pins out of float
-  #if SHOW_LED
-    pinMode(PIN_CMD_LED, OUTPUT);
-    digitalWrite(PIN_CMD_LED, LOW);
-  #endif
 }

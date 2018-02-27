@@ -34,6 +34,7 @@ SOFTWARE.
 */
 
 #include "parameters.h"
+#include "battery_controller.h"
 
 #if ARDUINO >= 100
  #include "Arduino.h"
@@ -47,13 +48,11 @@ SOFTWARE.
 class SolarController{
 
 public:
-  SolarController(const int pin_control_panel, const int pin_measure_anode_divider, const float * const battery_tension_V);
+  SolarController(const int pin_control_panel, const int pin_measure_anode_divider, BatteryController * const battery_controller_instance);
 
   /*
     The function to call to update the status of the panel. Computes how much tension
-    the panel can provide, and couple it if relevant. CAREFUL: you must have an up
-    to date measurement of the battery (const float * const battery_tension_V) before
-    calling this function.
+    the panel can provide, and couple it if relevant.
   */
   void update_panel_status(void);
 
@@ -61,12 +60,12 @@ private:
 
   const int pin_control_panel;  // the pin to the MOSFET that couples the panel on and off to the battery
   const int pin_measure_anode_divider;  // the pin that measures the output of the voltage divider on the anode of the panel
-  const float * const battery_tension_V;  // to the tension of the battery
+  BatteryController * const battery_controller_instance;
 
   /*
     the logics to decide if should couple the solar panel or not
   */
-  bool should_connect_array(const float battery_tension_V, float solar_panel_tension);
+  bool should_connect_array(float battery_tension_V, float solar_panel_tension);
 
   /*
     read the potential at the anode of the solar panel

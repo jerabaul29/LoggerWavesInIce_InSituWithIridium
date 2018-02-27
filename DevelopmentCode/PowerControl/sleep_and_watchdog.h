@@ -1,7 +1,10 @@
 /*
 
  *
- * Some functions to help use the watchdog for both deep sleep and watchdog.
+ * A class to help use the watchdog for both deep sleep and watchdog.
+ *
+ * Careful: remember that once this class has been called, then the watchdog
+ * is running: need to call wdt_reset at least each 8 seconds.
  *
 
 Copyright (c) 2015 Jean Rabault jean.rblt@gmail.com
@@ -50,20 +53,36 @@ SOFTWARE.
 #ifndef SLEEP_AND_WATCHDOG
 #define SLEEP_AND_WATCHDOG
 
-/*
- *
- * MUST be called first once to be able to use sleep
- *
- */
-void configure_wdt(void);
+#define DURATION_SLEEP_WDT_MS 8000UL  // duration of one watchdog sleep in ms
 
-/*
- *
- * MUST have called the configure_wdt routine once first to use this function
- * Make sleep in the lowest energy consumption level for a duration:
- *                   ncycles * 8 s
- *
- */
-void sleep(int ncycles);
+class SleepWatchdog{
+public:
+  SleepWatchdog(void);
+
+  /*
+   *
+   * Make sleep for ncycles using the lowest power level.
+   *
+   */
+  void sleep(int ncycles);
+
+  /*
+   *
+   * Configure the watchodg for later use for sleep and watchdog keeping.
+   *
+   */
+  void configure_wdt(void);
+
+  /*
+   *
+   * Return the true elapsed time, taking into account how many times
+   * have been slept.
+   *
+   */
+  unsigned long millis(void) const;
+
+private:
+  unsigned long int number_of_cycles_slept;
+};
 
 #endif

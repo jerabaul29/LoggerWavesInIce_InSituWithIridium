@@ -24,11 +24,11 @@ SOFTWARE.
 
 #include "client_device.h"
 
-CDV::CDV(int pin_feedback, int pin_control, int cycles_sleep, const float * const battery_voltage) :
+CDV::CDV(int pin_feedback, int pin_control, int cycles_sleep, BatteryController * const battery_controller_instance) :
   pin_feedback(pin_feedback),
   pin_control(pin_control),
   cycles_sleep(cycles_sleep),
-  battery_voltage(battery_voltage),
+  battery_controller_instance(battery_controller_instance),
   device_awake(false),  // off by default
   cycles_counter(0)  // ready to wake up at once
 {
@@ -69,7 +69,7 @@ void CDV::update_asleep(void){
   if (0 == cycles_counter){  // ------------------------------------------------
 
     // if enough battery
-    if (*battery_voltage > BAT_EMPTY_V){ // --------------
+    if (battery_controller_instance->battery_voltage() > BAT_EMPTY_V){ // --------------
       // power
       CDV::switch_on();
 
@@ -78,6 +78,8 @@ void CDV::update_asleep(void){
       // NOTE: if extend the delay, be careful: the watchdog will fire after 8
       // seconds
       delay(6000);
+
+      wdt_reset();
 
       // if wants to be awake
       if (digitalRead(pin_feedback)){

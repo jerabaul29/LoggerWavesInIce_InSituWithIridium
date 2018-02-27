@@ -9,7 +9,7 @@
  * This also includes some checks, such as:
  * - checking if the battery is enough when performing a new start up
  * TODO - allowing only a maximum number of cycles during which the device is awake in a row
- *   before considering it a hang
+ *   before considering it a hang.
  *
  * by Jean RABAULT <jean.rblt@gmail.com>
 
@@ -42,7 +42,9 @@
  #include "WProgram.h"
 #endif
 
-#include"parameters.h"
+#include "parameters.h"
+#include "battery_controller.h"
+#include "sleep_and_watchdog.h"
 
 #ifndef CLIENT_DEVICE
 #define CLIENT_DEVICE
@@ -51,7 +53,7 @@ class CDV{
 
 public:
 
-  CDV(int pin_feedback, int pin_control, int cycles_sleep, const float * const battery_voltage);
+  CDV(int pin_feedback, int pin_control, int cycles_sleep, BatteryController * const battery_controller_instance);
 
   /*
     update the status of the client, and adapts the control (power or no power)
@@ -69,7 +71,7 @@ private:
   int cycles_sleep;  // how many cycles should sleep before wake up
   int cycles_counter;  // counter for either cycles sleep left or cycles awake elapsed
 
-  const float * const battery_voltage;
+  BatteryController * const battery_controller_instance;
 
   void switch_on(void);
 

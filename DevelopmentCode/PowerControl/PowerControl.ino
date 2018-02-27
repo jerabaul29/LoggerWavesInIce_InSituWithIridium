@@ -17,9 +17,8 @@
  *   write a post about the power manager
  *   point to the post
  *
- * NOTE / TODO:
- *
- * - Possible optimization (require hardware update; overkill)
+ * TODO:
+ * - Possible optimization (require hardware update; overkill and probably over engineering)
  * put the pololu on a MOSFET from the battery side (to disconnect it when not needed, ie when not using
  * the Mega). Then need to be sure voltage on capacitors do not get too low: re connect pololu when logging with
  * Mega, and connect at least 8 seconds each 15 minutes [note: check values].
@@ -51,10 +50,10 @@
 #include "client_device.h"
 #include "solar_controller.h"
 
-float battery_tension_V = 0.0;
-
-CDV mega_device(PIN_FBK_MGA, PIN_MFT_MGA, CYCLES_BEFORE_MEGA_WAKEUP, &battery_tension_V);
-SolarController solar_controller_instance(PIN_MFT_SOL, PIN_MSR_SOL, &battery_tension_V);
+SleepWatchdog sleep_watchdog_instance{};
+BatteryController battery_controller_instance{PIN_MSR_BAT, &sleep_watchdog_instance};
+CDV mega_device{PIN_FBK_MGA, PIN_MFT_MGA, CYCLES_BEFORE_MEGA_WAKEUP, &battery_controller_instance};
+SolarController solar_controller_instance{PIN_MFT_SOL, PIN_MSR_SOL, &battery_controller_instance};
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,7 +63,7 @@ void setup() {
   // Configure watchdog
   // --------------------------------------------------------------
 
-  configure_wdt();
+  sleep_watchdog_instance.configure_wdt();
   wdt_reset();
 
   // --------------------------------------------------------------
@@ -75,6 +74,11 @@ void setup() {
   pinMode(PIN_FBK_MGA, INPUT);
   pinMode(PIN_MFT_SOL, INPUT);
   pinMode(PIN_MFT_MGA, INPUT);
+
+  // --------------------------------------------------------------
+  // first battery measurement
+  // --------------------------------------------------------------
+  battery_controller_instance.update();
 
 }
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -94,7 +98,7 @@ void loop() {
   // measure battery
   // --------------------------------------------------------------
 
-  battery_tension_V = float(analogRead(PIN_MSR_BAT)) * 5.0 / 1024.0;
+  battery_controller_instance.update();
 
   wdt_reset();
 
@@ -117,7 +121,7 @@ void loop() {
   // --------------------------------------------------------------
   // Sleep
   // --------------------------------------------------------------
-  sleep(CYCLES_DEEP_SLEEP);
+  sleep_watchdog_instance.sleep(CYCLES_DEEP_SLEEP);
 }
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
