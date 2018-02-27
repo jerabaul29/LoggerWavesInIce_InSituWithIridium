@@ -177,12 +177,10 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
 // include libraries
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #include <SPI.h>
-#include <SD.h>
 #include <Adafruit_GPS.h>
 // note: we do not use software serial but it seems to be necessary for initializing
 // Adafruit_GPS library
 #include <SoftwareSerial.h>
-#include <EEPROM.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LSM9DS0.h>
@@ -191,16 +189,6 @@ do not work) are stored in a _P (and timestamps in a _Pt) file.
 #include <avr/power.h>          // library for power control
 #include "IridiumSBD.h"
 #include<stdlib.h>
-
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// SD card
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// slave select on Arduino Mega: this is for the SPI driven SD card use
-const int chipSelect = 53;
-// name of the file on which writting in the SD card library type
-File dataFile;
-// for printing information about all files present on SD card
-File root;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // GPS
@@ -494,70 +482,6 @@ void blinkLED(){
     digitalWrite(PIN_MGA_LED, LOW);    // turn the LED
     delay(100);              // wait for a second
   }
-}
-
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// Write a 4 byte (32bit) long to the eeprom splitted on 4 bytes
-// at the specified address up to address + 3
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void EEPROMWritelong(int address, long value)
-{
-  //Decomposition from a long to 4 bytes by using bitshift.
-  //One = Most significant -> Four = Least significant byte
-  byte four = (value & 0xFF);
-  byte three = ((value >> 8) & 0xFF);
-  byte two = ((value >> 16) & 0xFF);
-  byte one = ((value >> 24) & 0xFF);
-
-  //Write the 4 bytes into the eeprom memory.
-  EEPROM.write(address, four);
-  EEPROM.write(address + 1, three);
-  EEPROM.write(address + 2, two);
-  EEPROM.write(address + 3, one);
-}
-
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// read 4 bytes of memory from the EEPROM (address up to address + 3)
-// assemble the 4 bytes to form a long variable
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-long EEPROMReadlong(long address)
-{
-  //Read the 4 bytes from the eeprom memory.
-  long four = EEPROM.read(address);
-  long three = EEPROM.read(address + 1);
-  long two = EEPROM.read(address + 2);
-  long one = EEPROM.read(address + 3);
-
-  //Return the recomposed long by using bitshift.
-  return ((four << 0) & 0xFF) + ((three << 8) & 0xFFFF) + ((two << 16) & 0xFFFFFF) + ((one << 24) & 0xFFFFFFFF);
-}
-
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// generate the dataStringIMU to be posted on SD card
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void generateDataStringIMU(void){
-  dataStringIMU = "";
-  dataStringIMU += "I;";
-  dataStringIMU += String(accel.acceleration.x);
-  dataStringIMU += ";";
-  dataStringIMU += String(accel.acceleration.y);
-  dataStringIMU += ";";
-  dataStringIMU += String(accel.acceleration.z);
-  dataStringIMU += ";";
-  dataStringIMU += String(gyro.gyro.x);
-  dataStringIMU += ";";
-  dataStringIMU += String(gyro.gyro.y);
-  dataStringIMU += ";";
-  dataStringIMU += String(gyro.gyro.z);
-  dataStringIMU += ";";
-  dataStringIMU += String(mag.magnetic.x);
-  dataStringIMU += ";";
-  dataStringIMU += String(mag.magnetic.y);
-  dataStringIMU += ";";
-  dataStringIMU += String(mag.magnetic.z);
-  dataStringIMU += ";";
-  dataStringIMU += "\nM,";
-  dataStringIMU += String(millis());
 }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1366,4 +1290,59 @@ void raspberry_pi_interaction(void){
     Serial.println(F("D; Done with RPi"));
   #endif
 
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// generate the dataStringIMU to be posted on SD card
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+void generateDataStringIMU(void){
+  dataStringIMU = "";
+  dataStringIMU += "I;";
+  dataStringIMU += String(accel.acceleration.x);
+  dataStringIMU += ";";
+  dataStringIMU += String(accel.acceleration.y);
+  dataStringIMU += ";";
+  dataStringIMU += String(accel.acceleration.z);
+  dataStringIMU += ";";
+  dataStringIMU += String(gyro.gyro.x);
+  dataStringIMU += ";";
+  dataStringIMU += String(gyro.gyro.y);
+  dataStringIMU += ";";
+  dataStringIMU += String(gyro.gyro.z);
+  dataStringIMU += ";";
+  dataStringIMU += String(mag.magnetic.x);
+  dataStringIMU += ";";
+  dataStringIMU += String(mag.magnetic.y);
+  dataStringIMU += ";";
+  dataStringIMU += String(mag.magnetic.z);
+  dataStringIMU += ";";
+  dataStringIMU += "\nM,";
+  dataStringIMU += String(millis());
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Set the GPS GPRMC string in the Iridium message
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+void set_GPRMC_Iridium_message(void){
+  #if SERIAL_PRINT
+    Serial.println(F("GPRMC message to use:"));
+    for (int i = 0; i < GPS_rx_buffer_position; i++) {
+      Serial.print(GPS_rx_buffer[i]);
+    }
+    Serial.println();
+  #endif
+
+  // add the GPS information into the message string
+  for (int i = 0; i < GPS_rx_buffer_position - 7; i++) {
+    Iridium_msg[8 + i] = GPS_rx_buffer[i + 7];
+  }
+
+  #if SERIAL_PRINT
+    Serial.print(F("Iridum_msg length:"));
+    Serial.println(GPS_rx_buffer_position + 1);
+    for (int i = 0; i < 1 + GPS_rx_buffer_position; i++) { // note: maybe missing last GPRMC character?
+      Serial.print(Iridium_msg[i]);
+    }
+    Serial.println();
+  #endif
 }

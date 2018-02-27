@@ -31,7 +31,10 @@ SOFTWARE.
 #ifndef PARAMETERS_LOGGER_MEGA
 #define PARAMETERS_LOGGER_MEGA
 
+#define PIN_SELECT_SD 53
+
 #define SERIAL_GPS Serial1
+#define SIZE_GPS_BUFFER 128
 
 // feedback mega pin: high as long as the Mega should get power
 #define PIN_FBK_MGA 48
