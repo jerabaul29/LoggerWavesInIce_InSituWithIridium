@@ -60,7 +60,7 @@ private:
   int GPS_rx_buffer_position;
 
   // the GPS object from adafruit
-  Adafruit_GPS instance_GPS{serial_port_gps};  // TODO: check if ok initialization and if ok regarding serial port set later on
+  Adafruit_GPS instance_GPS;
 
   // how many strings have been trying to read for Iridium
   int current_n_read_GPS;

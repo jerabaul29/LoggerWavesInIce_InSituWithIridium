@@ -8,6 +8,7 @@ GPSController::GPSController(HardwareSerial * serial_port_gps, SDManager * sd_ma
   serial_port_gps(serial_port_gps),
   sd_manager(sd_manager),
   GPS_rx_buffer_position(0),
+  instance_GPS(Adafruit_GPS{serial_port_gps}),
   current_n_read_GPS(0)
 {
 }

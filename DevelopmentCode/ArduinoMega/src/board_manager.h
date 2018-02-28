@@ -41,7 +41,7 @@ public:
   Compute the level of the battery
   */
 
-  void measure_battery_level(void);
+  float measure_battery_level(void);
 
   /*
     Ask to be on

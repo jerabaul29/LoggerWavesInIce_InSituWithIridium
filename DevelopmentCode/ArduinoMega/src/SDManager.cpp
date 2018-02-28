@@ -21,6 +21,7 @@ void SDManager::start_sd(void){
   is_started = true;
 }
 
+// TODO: break this in several methods: update the name, and close / open the datafile
 void SDManager::update_current_file(void){
   if (!is_started){
     this->start_sd();

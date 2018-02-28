@@ -51,3 +51,5 @@ class SDManager{
 };
 
 #endif
+
+// TODO: add methods to close / read the current dataFile

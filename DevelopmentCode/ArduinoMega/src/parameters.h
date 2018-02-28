@@ -43,6 +43,15 @@ SOFTWARE.
 #define SIZE_GPS_BUFFER 128
 #define MAX_NUMBER_ATTEMPTS_GPRMC 10
 
+// Iridium
+#define IRIDIUM_TRANSMIT_PACKET_SIZE 340
+#define IRIDIUM_RECEIVED_PACKET_SIZE 270
+#define USE_IRIDIUM false
+#define PIN_IRD_SLEEP 49
+#define SERIAL_IRIDIUM Serial2
+#define IRIDIUM_LOW_POWER_SUPPLY 1
+#define IRIDIUM_HIGH_POWER_SUPPLY 0
+
 // feedback mega pin: high as long as the Mega should get power
 #define PIN_FBK_MGA 48
 

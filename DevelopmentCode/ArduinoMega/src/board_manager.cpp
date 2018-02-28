@@ -77,8 +77,9 @@ void BoardManager::check_sleep_status(void)
     // negative value should not arise because from uint8
 }
 
-void BoardManager::measure_battery_level(void){
+float BoardManager::measure_battery_level(void){
     battery_level_V =  float(analogRead(PIN_MSR_BATTERY)) * 5.0 / 1024.0;
+    return(battery_level_V);
 }
 
 bool BoardManager::enough_battery(void){
@@ -91,6 +92,8 @@ bool BoardManager::enough_battery(void){
         return(true);
     }
 }
+
+// TODO: add sleep function
 
 /*
 
