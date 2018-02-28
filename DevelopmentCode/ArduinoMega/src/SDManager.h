@@ -1,13 +1,11 @@
 #include <SPI.h>
 #include <SD.h>
-#include "EEPROM_interaction.cpp"
+#include "EEPROM_interaction.h"
 #include "parameters.h"
 #include <stdlib.h>
 
 #ifndef SD_MANAGER
 #define SD_MANAGER
-
-#define NBR_ZEROS_FILENAME 5
 
 class SDManager{
     public:

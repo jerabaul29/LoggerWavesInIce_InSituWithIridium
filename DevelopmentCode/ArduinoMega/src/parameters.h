@@ -31,8 +31,12 @@ SOFTWARE.
 #ifndef PARAMETERS_LOGGER_MEGA
 #define PARAMETERS_LOGGER_MEGA
 
+#define PIN_MSR_BATTERY A0
+#define BAT_EMPTY_V 2.8     // threshold for empty battery
+
 // SD
 #define PIN_SELECT_SD 53
+#define NBR_ZEROS_FILENAME 5
 
 // GPS
 #define SERIAL_GPS Serial1

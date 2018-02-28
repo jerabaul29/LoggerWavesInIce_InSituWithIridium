@@ -4,31 +4,30 @@
 // fully use the Adafruit GPS class instead of doing some parsing by hand.
 // this may request spending some time looking at their library
 
-GPSController::GPSController(Serial * serial_port_gps, SDManager * sd_manager):
+GPSController::GPSController(HardwareSerial * serial_port_gps, SDManager * sd_manager):
   serial_port_gps(serial_port_gps),
   sd_manager(sd_manager),
   GPS_rx_buffer_position(0),
-  current_n_read_GPS(0),
+  current_n_read_GPS(0)
 {
-  Adafruit_GPS GPS(serial_port_gps);
 }
 
-GPSController::setup_GPS(){
+void GPSController::setup_GPS(void){
     delay(250);
 
-    GPS.begin(9600);
+    instance_GPS.begin(9600);
 
     // uncomment this line to turn on RMC (recommended minimum) and GGA (fix data) including altitude
-    GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
+    instance_GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
     // uncomment this line to turn on only the "minimum recommended" data
-    // GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
+    // instance_GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
 
     // Set the update rate
-    GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
-    GPS.sendCommand(PMTK_API_SET_FIX_CTL_1HZ);
+    instance_GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
+    instance_GPS.sendCommand(PMTK_API_SET_FIX_CTL_1HZ);
 
     // Request updates on antenna status, comment out to keep quiet
-    // GPS.sendCommand(PGCMD_ANTENNA);
+    // instance_GPS.sendCommand(PGCMD_ANTENNA);
 
     delay(1000);
 
@@ -37,11 +36,11 @@ GPSController::setup_GPS(){
     this->clean_incoming_buffer();
 }
 
-GPSController::catch_log_message(){
+void GPSController::catch_log_message(void){
   // while any chars incoming, grab them
   while (serial_port_gps->available() > 0){
     // if reach the end of a message, post it
-    int len = this->catch_message()
+    int len = this->catch_message();
     if(len > 0){
       sd_manager->post_on_SD_card(GPS_rx_buffer, len);
     }
@@ -52,10 +51,10 @@ GPSController::catch_log_message(){
 int GPSController::catch_message(void){
   while (serial_port_gps->available()>0){
 
-    char c_GPS = GPS.read();
+    char c_GPS = instance_GPS.read();
 
     if (c_GPS=='\n'){
-      int swp = GPS_rx_buffer_position
+      int swp = GPS_rx_buffer_position;
       GPS_rx_buffer_position = 0;
       return(swp);
     }
@@ -74,12 +73,12 @@ int GPSController::catch_message(void){
     }
   }
 
-  return(0)
-
-  wdt_reset();
+  return(0);
 }
 
 int GPSController::load_gprmc_message(){
+  int crrt_length_message;
+
   this->clean_incoming_buffer();
 
   current_n_read_GPS = 0;
@@ -89,8 +88,8 @@ int GPSController::load_gprmc_message(){
 
     // catch a complete message
     do{
-      int crrt_length_message = this->catch_message();
-    }while(0 == crrt_length_message)
+      crrt_length_message = this->catch_message();
+    }while(0 == crrt_length_message);
 
     // check if a GPRMC
     if ((GPS_rx_buffer[0] == '$') && (GPS_rx_buffer[1] == 'G') && (GPS_rx_buffer[2] == 'P') &&
@@ -110,7 +109,7 @@ int GPSController::load_gprmc_message(){
   return(crrt_length_message);
 }
 
-void clean_incoming_buffer(void){
+void GPSController::clean_incoming_buffer(void){
   // flush current GPS buffer
   while (serial_port_gps->available() > 0) {
     serial_port_gps->read();

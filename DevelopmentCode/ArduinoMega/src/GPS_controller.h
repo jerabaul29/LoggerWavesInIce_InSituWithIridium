@@ -1,16 +1,11 @@
+#include "Arduino.h"
 #include <Adafruit_GPS.h>
 // note: we do not use software serial but it seems to be necessary for initializing
 // Adafruit_GPS library
 #include <SoftwareSerial.h>
 #include "SDManager.h"
-
 #include <avr/wdt.h>
 
-#if ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
 
 #ifndef GPS_CONTROLLER
 #define GPS_CONTROLLER
@@ -21,12 +16,12 @@
 
 class GPSController{
 public:
-  GPSController(Serial * serial_port_gps, SDManager * sd_manager){};
+  GPSController(HardwareSerial * serial_port_gps, SDManager * sd_manager);
 
   /*
   Setup the GPS for making it ready to log
   */
-  void setup_GPS();
+  void setup_GPS(void);
 
   /*
   call catch_message, if a full message is received then post it on the SD card
@@ -54,7 +49,9 @@ private:
   */
   int catch_message(void);
 
-  Serial * serial_port_gps;
+  HardwareSerial * serial_port_gps;
+
+  SDManager * sd_manager;
 
   // a buffer for incoming GPS information
   char GPS_rx_buffer[SIZE_GPS_BUFFER];
@@ -63,12 +60,10 @@ private:
   int GPS_rx_buffer_position;
 
   // the GPS object from adafruit
-  Adafruit_GPS GPS;
+  Adafruit_GPS instance_GPS{serial_port_gps};  // TODO: check if ok initialization and if ok regarding serial port set later on
 
   // how many strings have been trying to read for Iridium
   int current_n_read_GPS;
-
-  SDManager * sd_manager;
 
 };
 
