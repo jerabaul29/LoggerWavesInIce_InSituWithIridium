@@ -16,6 +16,8 @@ class IridiumManager{
 public:
     IridiumManager(HardwareSerial *, GPSController *, BoardManager *, SDManager *);
 
+    void start(void);
+
     void send_receive_iridium_vital_information(void);
 
 private:
@@ -70,7 +72,4 @@ private:
 
 #endif
 
-
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// Iridium
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// TODO: add a function to fill transmit buffer with data and send it.

@@ -10,7 +10,17 @@
 
 class BoardManager{
 public:
+  /*
+    Constructor. Gives a well initialized board:
+    - put raspberry and led off
+    - decide if should wake up
+  */
   BoardManager(void);
+
+  /*
+    The function to run to initialize the object.
+  */
+  void start(void);
 
   /*
   Return a boolean, true if still should log, false if time to stop logging

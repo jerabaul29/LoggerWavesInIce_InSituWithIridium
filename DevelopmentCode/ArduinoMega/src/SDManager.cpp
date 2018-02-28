@@ -3,14 +3,16 @@
 SDManager::SDManager(void) :
   is_started(false)
 {
+  
+}
+
+void SDManager::start_sd(void){
   // intialise the filename
   this->current_file_name[0] = 'F';
   for (int i=0; i < NBR_ZEROS_FILENAME; i++){
     this->current_file_name[1 + i] = '0';
   }
-}
 
-void SDManager::start_sd(void){
   if (!SD.begin(PIN_SELECT_SD)) {
     // reboot
     while (true){
@@ -19,6 +21,8 @@ void SDManager::start_sd(void){
   }
 
   is_started = true;
+
+  SDManager::update_current_file();
 }
 
 // TODO: break this in several methods: update the name, and close / open the datafile

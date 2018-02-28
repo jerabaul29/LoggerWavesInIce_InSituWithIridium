@@ -2,6 +2,9 @@
 
 BoardManager::BoardManager(void)
 {
+}
+
+void BoardManager::start(void){
     wdt_enable(WDTO_8S);
 
     // disable the LED pin to save current
@@ -22,6 +25,10 @@ BoardManager::BoardManager(void)
     else
     {
         BoardManager::ask_to_be_off();
+        // make it stop here: TODO: make it sleep instead
+        while(true){
+            wdt_reset();
+        }
     }
 }
 

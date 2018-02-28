@@ -13,7 +13,7 @@ GPSController::GPSController(HardwareSerial * serial_port_gps, SDManager * sd_ma
 {
 }
 
-void GPSController::setup_GPS(void){
+void GPSController::start(void){
     delay(250);
 
     instance_GPS.begin(9600);

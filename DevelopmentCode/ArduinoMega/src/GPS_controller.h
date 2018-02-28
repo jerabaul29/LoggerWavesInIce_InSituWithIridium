@@ -21,7 +21,7 @@ public:
   /*
   Setup the GPS for making it ready to log
   */
-  void setup_GPS(void);
+  void start(void);
 
   /*
   call catch_message, if a full message is received then post it on the SD card

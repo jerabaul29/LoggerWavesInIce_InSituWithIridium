@@ -9,7 +9,9 @@ IridiumManager::IridiumManager(HardwareSerial *serial_port,
       board_manager(board_manager), sd_manager(sd_manager),
       iridium_sbd(IridiumSBD{SERIAL_IRIDIUM, PIN_IRD_SLEEP})
 {
+}
 
+void IridiumManager::start(void){
     IridiumManager::clean_reset_buffer_received();
     IridiumManager::clean_reset_buffer_transmit();
 
