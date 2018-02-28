@@ -1,8 +1,5 @@
-#if ARDUINO >= 100
- #include "Arduino.h"
-#else
- #include "WProgram.h"
-#endif
+#include "Arduino.h"
+#include <EEPROM.h>
 
 #ifndef EEPROM_INTERACTION
 #define EEPROM_INTERACTION
@@ -17,6 +14,6 @@ void EEPROMWritelong(int address, long value);
  * Read 4 bytes of memory from the EEPROM, at (address) up and included to (address + 3)
  * and assemble into a long variable.
  */
-long EEPROMReadlong(int address)
+long EEPROMReadlong(int address);
 
 #endif

@@ -7,6 +7,8 @@
 #ifndef SD_MANAGER
 #define SD_MANAGER
 
+#define NBR_ZEROS_FILENAME 5
+
 class SDManager{
     public:
         SDManager(void);
@@ -30,7 +32,7 @@ class SDManager{
         /*
          Post array_to_post until end_position (not included) on the SD card.
          */
-         void post_on_SD_card(char [] array_to_post, int end_position);
+         void post_on_SD_card(char array_to_post[], int end_position);
 
     private:
         /*
@@ -44,10 +46,10 @@ class SDManager{
         void check_SD_available(void);
 
         File dataFile;
-        char current_file_name[] = "F00000";
-        const int nbr_of_numbers_file_name = 5;
+        char current_file_name[NBR_ZEROS_FILENAME + 1];  // initialize from chars: no need for end string \0
         const long address_number_file = ADDRESS_LONG_FILENBR;
         bool is_started = false;
+        
 };
 
 #endif

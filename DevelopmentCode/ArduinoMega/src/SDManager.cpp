@@ -1,10 +1,16 @@
 #include "SDManager.h"
 
-SDManager::SDManager() :
-is_started(false)
-{}
+SDManager::SDManager(void) :
+  is_started(false)
+{
+  // intialise the filename
+  this->current_file_name[0] = 'F';
+  for (int i=0; i < NBR_ZEROS_FILENAME; i++){
+    this->current_file_name[1 + i] = '0';
+  }
+}
 
-SDManager::start_sd(){
+void SDManager::start_sd(void){
   if (!SD.begin(PIN_SELECT_SD)) {
     // reboot
     while (true){
@@ -15,7 +21,7 @@ SDManager::start_sd(){
   is_started = true;
 }
 
-SDManager::update_current_file(void){
+void SDManager::update_current_file(void){
   if (!is_started){
     this->start_sd();
   }
@@ -39,13 +45,13 @@ SDManager::update_current_file(void){
   int str_length = str_index.length();
 
   // put the characters of the name at the right place
-  for (int ind_rank = 0; ind_rank < max(nbr_of_numbers_file_name, str_length); ind_rank++){
-    currentFileName[nbr_of_numbers_file_name - ind_rank] = str_index[str_length - 1 - ind_rank];
+  for (int ind_rank = 0; ind_rank < max(NBR_ZEROS_FILENAME, str_length); ind_rank++){
+    current_file_name[NBR_ZEROS_FILENAME - ind_rank] = str_index[str_length - 1 - ind_rank];
   }
 
   delay(5);
   // open the file. only one file can be open at a time,
-  dataFile = SD.open(currentFileName, FILE_WRITE);
+  dataFile = SD.open(current_file_name, FILE_WRITE);
   delay(5);
 }
 
@@ -77,7 +83,7 @@ void SDManager::post_on_SD_card(String dataStringPost){
   delay(5);
 }
 
-void SDManager::post_on_SD_card(char [] array_to_post, int end_position){
+void SDManager::post_on_SD_card(char array_to_post[], int end_position){
 
   this->check_SD_available();
 
