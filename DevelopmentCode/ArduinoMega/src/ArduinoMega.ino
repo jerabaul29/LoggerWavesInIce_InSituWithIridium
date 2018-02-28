@@ -27,9 +27,14 @@
 
 // SD --------------------------------------------------------------------------
 SDManager sd_manager{};
-GPSController gps_controller;
 
+// GPS -------------------------------------------------------------------------
+GPSController gps_controller{&SERIAL_GPS, &sd_manager};
 
+// TODO: class for the VN100
+// TODO: class for interaction with Iridium
+// TODO: class for interaction with RaspberryPi
+// TODO: not urgent: class for the LSM9DS0
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // IMU
