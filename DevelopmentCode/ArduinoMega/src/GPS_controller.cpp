@@ -101,7 +101,7 @@ int GPSController::load_gprmc_message(){
 
           // if valid, this is what we want
           if (GPS_rx_buffer[18] == 'A'){
-            return(crrt_length_message);
+            return(max(crrt_length_message, SIZE_GPS_BUFFER));
           }
     }
   }
@@ -125,4 +125,8 @@ void GPSController::clean_incoming_buffer(void){
       }
     }
   }
+}
+
+const char * GPSController::get_rx_buffer(void) const{
+  return(GPS_rx_buffer);
 }

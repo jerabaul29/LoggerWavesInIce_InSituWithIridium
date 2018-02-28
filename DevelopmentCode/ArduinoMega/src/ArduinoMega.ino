@@ -5,6 +5,8 @@
 // TODO: to reduce energy consumption, make the board sleep if nothing to log
 // TODO: take a look at the watchdogs
 // TODO: check the ISBD callback routine wrt watchdog
+// TODO: could use struct(char *, str_length) instead of plain char *. I do not want to use strings
+// as dynamically allocated, ok on computers, bad on mC.
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,6 +39,7 @@ GPSController gps_controller{&SERIAL_GPS, &sd_manager};
 // TODO: class for interaction with Iridium
 // TODO: class for interaction with RaspberryPi
 // TODO: not urgent: class for the LSM9DS0
+// TODO: fix all names: name cpp file and header should be the same as class they contain
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // IMU

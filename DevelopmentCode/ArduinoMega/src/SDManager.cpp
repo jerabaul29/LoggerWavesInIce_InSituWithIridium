@@ -39,6 +39,7 @@ void SDManager::update_current_file(void){
 
   // update it by increasing by 1. This is the new file number to write on
   long new_value_fileIndex = value_before_fileIndex + 1L;
+  filenumber = new_value_fileIndex;
   EEPROMWritelong(address_number_file, new_value_fileIndex);
 
   // generate the string to put as the file numbering
@@ -94,6 +95,10 @@ void SDManager::post_on_SD_card(char array_to_post[], int end_position){
   this->post_timestamp();
 
   delay(5);
+}
+
+const char * SDManager::get_filename(void) const{
+  return(current_file_name);
 }
 
 /*

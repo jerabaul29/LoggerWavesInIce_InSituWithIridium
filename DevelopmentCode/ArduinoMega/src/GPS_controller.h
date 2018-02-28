@@ -40,6 +40,11 @@ public:
    */
   void clean_incoming_buffer(void);
 
+  /*
+    Get the address of the buffer.
+  */
+  const char * get_rx_buffer(void) const;
+
 
 private:
   /*

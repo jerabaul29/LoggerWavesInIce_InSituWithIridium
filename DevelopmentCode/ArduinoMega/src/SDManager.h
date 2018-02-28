@@ -3,6 +3,7 @@
 #include "EEPROM_interaction.h"
 #include "parameters.h"
 #include <stdlib.h>
+#include <Arduino.h>
 
 #ifndef SD_MANAGER
 #define SD_MANAGER
@@ -32,6 +33,13 @@ class SDManager{
          */
          void post_on_SD_card(char array_to_post[], int end_position);
 
+         // int return_filenumber(void) const;
+
+        /*
+          give the array as read only; we know how long it is since it is in parameters
+        */
+        const char * get_filename(void) const;
+
     private:
         /*
          Post the current millis timestamp.
@@ -47,9 +55,11 @@ class SDManager{
         char current_file_name[NBR_ZEROS_FILENAME + 1];  // initialize from chars: no need for end string \0
         const long address_number_file = ADDRESS_LONG_FILENBR;
         bool is_started = false;
+        long filenumber;
         
 };
 
 #endif
 
 // TODO: add methods to close / read the current dataFile
+// TODO: add methods that make sure opened or closed and keep track of status

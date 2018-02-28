@@ -51,6 +51,7 @@ SOFTWARE.
 #define SERIAL_IRIDIUM Serial2
 #define IRIDIUM_LOW_POWER_SUPPLY 1
 #define IRIDIUM_HIGH_POWER_SUPPLY 0
+#define NBR_SIGNIFICANT_DIGITS_BATT_LEVEL 2
 
 // feedback mega pin: high as long as the Mega should get power
 #define PIN_FBK_MGA 48
