@@ -1,4 +1,5 @@
 // TODO: got through all delays and clean / remove them
+// TODO: add information about board status (battery) in SD log files
 
 // TODO: attach a serial port for debugging
 // TODO: interaction with Raspberry Pi
