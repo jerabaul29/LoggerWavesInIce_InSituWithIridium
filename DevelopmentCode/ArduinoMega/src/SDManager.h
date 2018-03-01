@@ -26,12 +26,17 @@ class SDManager{
         /*
          * Post a string on the SD card.
          */
-        void post_on_SD_card(String message_to_post);
+        void post_on_SD_card(String message_to_post, bool should_timestamp=true);
 
         /*
          Post array_to_post until end_position (not included) on the SD card.
          */
          void post_on_SD_card(char array_to_post[], int end_position);
+
+        /*
+          Post binary data
+        */
+        void post_on_SD_card(byte * byte_array, int end_position);
 
         // int return_filenumber(void) const;
 

@@ -22,7 +22,7 @@ void IridiumManager::start(void){
     serial_port->begin(19200);
     delay(10);
     
-    iridium_sbd.setPowerProfile(IRIDIUM_HIGH_POWER_SUPPLY);
+    iridium_sbd.setPowerProfile(IRIDIUM_LOW_POWER_SUPPLY);
 
     iridium_sbd.begin();
     iridium_sbd.sleep(); // go to sleep: will not be needed in quite some time.

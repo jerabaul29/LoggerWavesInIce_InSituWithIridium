@@ -38,7 +38,7 @@ SOFTWARE.
 
 // Debug
 #define DEBUG true
-#define DEBUG_SLOW true
+#define DEBUG_SLOW false  // careful: debug slow can make things break, in particular VN100 logging
 #define SERIAL_DEBUG Serial
 
 // SD

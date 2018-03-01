@@ -21,9 +21,11 @@ void SDManager::start_sd(void)
 
 #if DEBUG
   SERIAL_DEBUG.print(F("Filename initialized:"));
+  delay(10);
   for (int i = 0; i < NBR_ZEROS_FILENAME + 2; i++)
   {
     SERIAL_DEBUG.print(this->current_file_name[i]);
+    delay(5);
   }
   SERIAL_DEBUG.println();
 #endif
@@ -38,9 +40,11 @@ void SDManager::start_sd(void)
 
 #if DEBUG
   SERIAL_DEBUG.print(F("Filename set:"));
+  delay(10);
   for (int i = 0; i < NBR_ZEROS_FILENAME + 2; i++)
   {
     SERIAL_DEBUG.print(this->current_file_name[i]);
+    delay(5);
   }
   SERIAL_DEBUG.println();
 #endif
@@ -120,19 +124,21 @@ void SDManager::post_timestamp(void)
   dataFile.print("M");
   dataFile.println(String(millis()));
 
-  delay(5);
+  // delay(5);
 }
 
-void SDManager::post_on_SD_card(String dataStringPost)
+void SDManager::post_on_SD_card(String dataStringPost, bool should_timestamp=true)
 {
 
   this->check_SD_available();
 
   dataFile.println(dataStringPost);
 
-  this->post_timestamp();
+  if (should_timestamp){
+    this->post_timestamp();
+  }
 
-  delay(5);
+  // delay(5);
 }
 
 void SDManager::post_on_SD_card(char array_to_post[], int end_position)
@@ -141,11 +147,22 @@ void SDManager::post_on_SD_card(char array_to_post[], int end_position)
   this->check_SD_available();
 
   dataFile.write(array_to_post, end_position);
-  dataFile.print("\n");
+  dataFile.print('\n');
 
   this->post_timestamp();
 
-  delay(5);
+  // delay(5);
+}
+
+void SDManager::post_on_SD_card(byte * byte_array, int end_position){
+  this->check_SD_available();
+
+  dataFile.write(byte_array, end_position);
+  dataFile.write('\n');
+
+  this->post_timestamp();
+
+  // delay(5); // TODO: take away all the hard coding in delays
 }
 
 const char *SDManager::get_filename(void) const
