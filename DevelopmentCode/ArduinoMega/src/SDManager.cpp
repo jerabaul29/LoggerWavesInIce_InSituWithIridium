@@ -121,8 +121,9 @@ void SDManager::post_timestamp(void)
 {
   this->check_SD_available();
 
-  dataFile.print("M");
+  dataFile.print("M,");
   dataFile.println(String(millis()));
+  dataFile.println();
 
   // delay(5);
 }

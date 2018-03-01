@@ -103,7 +103,7 @@ bool VN100Manager::catch_message(void){
             SERIAL_DEBUG.print(F("R"));
             SERIAL_DEBUG.println(buffer_rx_position);
             #endif
-            */)
+            */
             number_received_header_bytes = 0;
             return(true);
         }
@@ -128,5 +128,5 @@ void VN100Manager::perform_logging(void){
 
 void VN100Manager::post_to_SD_card(void){
     sd_manager->post_on_SD_card(String("B,\n"), false);
-    sd_manager->post_on_SD_card(buffer_rx, buffer_rx_position);
+    sd_manager->post_on_SD_card(buffer_rx, buffer_rx_position - SIZE_VN100_HEADER);
 }

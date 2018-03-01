@@ -37,7 +37,7 @@ SOFTWARE.
 #define BAT_EMPTY_V 2.8     // threshold for empty battery
 
 // Debug
-#define DEBUG true
+#define DEBUG false
 #define DEBUG_SLOW false  // careful: debug slow can make things break, in particular VN100 logging
 #define SERIAL_DEBUG Serial
 

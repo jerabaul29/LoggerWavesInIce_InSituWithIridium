@@ -1,4 +1,4 @@
-// TODO: add a VN100
+// TODO: got through all delays and clean / remove them
 
 // TODO: attach a serial port for debugging
 // TODO: interaction with Raspberry Pi
