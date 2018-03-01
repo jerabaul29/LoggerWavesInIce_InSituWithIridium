@@ -16,6 +16,8 @@ void IridiumManager::start(void){
     IridiumManager::clean_reset_buffer_transmit();
 
     serial_port->begin(19200);
+    delay(10);
+    
     iridium_sbd.setPowerProfile(IRIDIUM_HIGH_POWER_SUPPLY);
 
     iridium_sbd.begin();

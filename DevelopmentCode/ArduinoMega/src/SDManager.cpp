@@ -69,6 +69,10 @@ void SDManager::check_SD_available(){
   }
 }
 
+void SDManager::close_datafile(void){
+  dataFile.close();
+}
+
 void SDManager::post_timestamp(void){
   this->check_SD_available();
 

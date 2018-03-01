@@ -8,6 +8,11 @@
 #ifndef BOARD_MANAGER
 #define BOARD_MANAGER
 
+#define BOARD_STARTING 0
+#define BOARD_LOGGING 1
+#define BOARD_DONE_LOGGING 2
+#define BOARD_STATUS_ERROR -1
+
 class BoardManager{
 public:
   /*
@@ -67,8 +72,16 @@ public:
    Make sleep for a long time
   */
   // TODO: add some sleeping possibilities similar to the power control in the Arduino Uno
-  
 
+  /*
+    Start logging
+  */
+  void start_logging(unsigned long duration_ms);
+  
+  /*
+    return the status: update if necessary
+  */
+  int check_status(void);
 
 private:
 
@@ -96,6 +109,10 @@ private:
   uint8_t total_number_sleeps_before_wakeup;
 
   unsigned long time_start_logging_ms;  // when the logging actually started
+  unsigned long duration_ms;
+
+  // status of the board
+  int board_status;
 };
 
 #endif

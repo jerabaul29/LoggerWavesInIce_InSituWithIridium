@@ -7,6 +7,8 @@ BoardManager::BoardManager(void)
 void BoardManager::start(void){
     wdt_enable(WDTO_8S);
 
+    board_status = BOARD_STARTING;
+
     // disable the LED pin to save current
     pinMode(PIN_MGA_LED, INPUT);
 
@@ -98,6 +100,29 @@ bool BoardManager::enough_battery(void){
     else{
         return(true);
     }
+}
+
+void BoardManager::start_logging(unsigned long duration_ms){
+    this->duration_ms = duration_ms;
+    time_start_logging_ms = millis();
+    board_status = BOARD_LOGGING;
+}
+
+int BoardManager::check_status(void){
+    switch(board_status){
+        case BOARD_STARTING:
+            return(BOARD_STARTING);
+
+        case BOARD_LOGGING:
+            if (millis() - time_start_logging_ms < duration_ms){
+                return(BOARD_LOGGING);
+            }
+            else{
+                board_status = BOARD_DONE_LOGGING;
+                return(BOARD_DONE_LOGGING);
+            }
+    }
+    return(BOARD_STATUS_ERROR);
 }
 
 // TODO: add sleep function

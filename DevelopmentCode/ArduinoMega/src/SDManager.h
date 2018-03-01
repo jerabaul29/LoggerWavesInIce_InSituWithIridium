@@ -33,12 +33,17 @@ class SDManager{
          */
          void post_on_SD_card(char array_to_post[], int end_position);
 
-         // int return_filenumber(void) const;
+        // int return_filenumber(void) const;
 
         /*
           give the array as read only; we know how long it is since it is in parameters
         */
         const char * get_filename(void) const;
+
+        /*
+          close the currently active datafile
+        */
+        void close_datafile(void);
 
     private:
         /*

@@ -17,6 +17,7 @@ void GPSController::start(void){
     delay(250);
 
     instance_GPS.begin(9600);
+    delay(10);
 
     // uncomment this line to turn on RMC (recommended minimum) and GGA (fix data) including altitude
     instance_GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
@@ -37,7 +38,7 @@ void GPSController::start(void){
     this->clean_incoming_buffer();
 }
 
-void GPSController::catch_log_message(void){
+void GPSController::perform_logging(void){
   // while any chars incoming, grab them
   while (serial_port_gps->available() > 0){
     // if reach the end of a message, post it

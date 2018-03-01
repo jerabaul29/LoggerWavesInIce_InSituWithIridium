@@ -1,3 +1,4 @@
+// TODO: attach a serial port for debugging
 // TODO: interaction with Raspberry Pi
 // TODO: Arduino board manager (sleeps, wake up, feedback)
 // TODO: prepare VN100 IMU
@@ -15,12 +16,16 @@
 #include "SDManager.h"
 #include "board_manager.h"
 #include "Iridium_manager.h"
+#include "VN100Manager.h"
 
 // board manager
 BoardManager board_manager{};
 
 // SD
 SDManager sd_manager{};
+
+// VN100
+VN100Manager vn100_manager{&SERIAL_VN100, &sd_manager};
 
 // GPS
 GPSController gps_controller{&SERIAL_GPS, &sd_manager};
@@ -44,24 +49,47 @@ void setup(){
   sd_manager.start_sd();
   wdt_reset();
 
-  // make GPS ready
-  gps_controller.start();
-  wdt_reset();
-
   // make Iridium ready
   iridium_manager.start();
   wdt_reset();
 
-  // VN100
+  // make GPS ready
+  gps_controller.start();
+  wdt_reset();
+
+  // make VN100 ready
+  vn100_manager.start();
+  wdt_reset();
 
   // raspberry Pi
+
+  // start logging!
+  board_manager.start_logging(DURATION_LOGGING_MS);
 }
 
 void loop(){
 
   wdt_reset();
 
-  // decide which step in the process at: board manager?
+  // decide which step in the process at
+  int board_status = board_manager.check_status();
+
+  switch(board_status){
+    case BOARD_LOGGING:
+      vn100_manager.perform_logging();
+      gps_controller.perform_logging();
+      break;
+    case BOARD_DONE_LOGGING:
+      // close SD card
+      sd_manager.close_datafile();
+      // go through Iridium vital messages
+      // go through Raspberry Pi interaction
+      // go through send data by Iridium
+      // ask to be put off
+      board_manager.ask_to_be_off();
+      // put to deep sleep: TODO: implement in board_manager
+      break;
+  }
 
   // act in consequence.
 }

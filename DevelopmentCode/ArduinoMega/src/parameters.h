@@ -31,6 +31,8 @@ SOFTWARE.
 #ifndef PARAMETERS_LOGGER_MEGA
 #define PARAMETERS_LOGGER_MEGA
 
+#define DELAY_START_SERIAL 20
+
 #define PIN_MSR_BATTERY A0
 #define BAT_EMPTY_V 2.8     // threshold for empty battery
 
@@ -53,12 +55,16 @@ SOFTWARE.
 #define IRIDIUM_HIGH_POWER_SUPPLY 0
 #define NBR_SIGNIFICANT_DIGITS_BATT_LEVEL 2
 
+// VN 100
+#define SERIAL_VN100 Serial3
+#define SIZE_BUFFER_VN100 256
+
 // feedback mega pin: high as long as the Mega should get power
 #define PIN_FBK_MGA 48
 
 // how long should log
-// #define DURATION_LOGGING_MS 1500000
-#define DURATION_LOGGING_MS 20000  // for tests
+// #define DURATION_LOGGING_MS 1500000UL
+#define DURATION_LOGGING_MS 20000UL  // for tests
 
 // Mosfet power Raspberry Pi
 #define PIN_MFT_RPI 46

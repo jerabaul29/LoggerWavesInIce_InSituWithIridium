@@ -26,7 +26,7 @@ public:
   /*
   call catch_message, if a full message is received then post it on the SD card
   */
-  void catch_log_message(void);
+  void perform_logging(void);
 
   /*
    Load a GPRMC message in the GPS buffer. Perform a maximum of MAX_NUMBER_ATTEMPTS_GPRMC
