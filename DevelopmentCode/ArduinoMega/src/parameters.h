@@ -82,14 +82,4 @@ SOFTWARE.
 #define ADDRESS_SLEEPS_LEFT 5  // address for where number of sleep cycles left stored
 #define ADDRESS_TOTAL_NBR_SLEEPS 6  // address for what is the total number of sleep cycles
 
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// Some parameters for serial
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// Parameters about serial connections on Serial (USB port) ---------------------
-
-// for debugging: print strings about actions on serial
-#define SERIAL_PRINT false
-// for connection with the Raspberry Pi
-#define SERIAL_RPI false
-
 #endif

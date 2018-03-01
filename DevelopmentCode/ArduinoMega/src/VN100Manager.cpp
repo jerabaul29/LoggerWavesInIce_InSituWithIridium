@@ -6,6 +6,10 @@ VN100Manager::VN100Manager(HardwareSerial * serial_port, SDManager * sd_manager)
     {}
 
 void VN100Manager::start(void){
+    #if DEBUG
+  SERIAL_DEBUG.println(F("start VN100"));
+#endif
+
     serial_port->begin(57600);
     delay(DELAY_START_SERIAL);
 

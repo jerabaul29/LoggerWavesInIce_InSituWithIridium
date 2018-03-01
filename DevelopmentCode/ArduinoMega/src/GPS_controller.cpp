@@ -14,6 +14,10 @@ GPSController::GPSController(HardwareSerial * serial_port_gps, SDManager * sd_ma
 }
 
 void GPSController::start(void){
+  #if DEBUG
+  SERIAL_DEBUG.println(F("start GPS"));
+#endif
+
     delay(250);
 
     instance_GPS.begin(9600);

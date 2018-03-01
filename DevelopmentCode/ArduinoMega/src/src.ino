@@ -1,3 +1,5 @@
+// TODO: add a VN100
+
 // TODO: attach a serial port for debugging
 // TODO: interaction with Raspberry Pi
 // TODO: Arduino board manager (sleeps, wake up, feedback)
@@ -48,42 +50,24 @@ void setup(){
    wdt_reset();
 
   // make SD card ready
-  #if DEBUG
-  SERIAL_DEBUG.println(F("start SD"));
-#endif
   sd_manager.start_sd();
   wdt_reset();
 
   // make Iridium ready
-   #if DEBUG
-  SERIAL_DEBUG.println(F("start Iridium"));
-#endif
   iridium_manager.start();
   wdt_reset();
 
   // make GPS ready
-  #if DEBUG
-  SERIAL_DEBUG.println(F("start GPS"));
-#endif
   gps_controller.start();
   wdt_reset();
 
   // make VN100 ready
-  #if DEBUG
-  SERIAL_DEBUG.println(F("start VN100"));
-#endif
   // vn100_manager.start();
   wdt_reset();
 
   // raspberry Pi
-  #if DEBUG
-  SERIAL_DEBUG.println(F("start RPi"));
-#endif
 
   // start logging!
-  #if DEBUG
-  SERIAL_DEBUG.println(F("start logging"));
-#endif
   board_manager.start_logging(DURATION_LOGGING_MS);
 }
 
@@ -92,29 +76,18 @@ void loop(){
   wdt_reset();
 
   #if DEBUG && DEBUG_SLOW
-  SERIAL_DEBUG.println(F("calling loop"));
-#endif
+    SERIAL_DEBUG.println(F("calling loop"));
+  #endif
 
   // decide which step in the process at
   int board_status = board_manager.check_status();
 
-  #if DEBUG && DEBUG_SLOW
-  SERIAL_DEBUG.print(F("status: "));
-  SERIAL_DEBUG.println(board_status);
-#endif
-
   switch(board_status){
     case BOARD_LOGGING:
-    #if DEBUG
-  SERIAL_DEBUG.println(F("board logging"));
-#endif
       vn100_manager.perform_logging();
       gps_controller.perform_logging();
       break;
     case BOARD_DONE_LOGGING:
-    #if DEBUG
-  SERIAL_DEBUG.println(F("done logging"));
-#endif
       // close SD card
       sd_manager.close_datafile();
       // go through Iridium vital messages
@@ -127,7 +100,7 @@ void loop(){
   }
 
   #if DEBUG_SLOW
-  delay(500);
+    delay(500);
   #endif
 
   // act in consequence.

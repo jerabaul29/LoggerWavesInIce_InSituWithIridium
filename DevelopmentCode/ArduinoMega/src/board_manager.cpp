@@ -116,12 +116,20 @@ bool BoardManager::enough_battery(void){
 }
 
 void BoardManager::start_logging(unsigned long duration_ms){
+    #if DEBUG
+  SERIAL_DEBUG.println(F("start logging"));
+#endif
     this->duration_ms = duration_ms;
     time_start_logging_ms = millis();
     board_status = BOARD_LOGGING;
 }
 
 int BoardManager::check_status(void){
+    #if DEBUG && DEBUG_SLOW
+  SERIAL_DEBUG.print(F("status: "));
+  SERIAL_DEBUG.println(board_status);
+#endif
+
     switch(board_status){
         case BOARD_STARTING:
             return(BOARD_STARTING);

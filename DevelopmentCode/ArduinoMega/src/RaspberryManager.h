@@ -1,5 +1,9 @@
 /*
 
+#if DEBUG
+  SERIAL_DEBUG.println(F("start RPi"));
+#endif
+
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Interaction with Raspberry Pi

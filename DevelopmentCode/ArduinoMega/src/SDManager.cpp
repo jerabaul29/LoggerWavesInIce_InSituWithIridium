@@ -6,6 +6,11 @@ SDManager::SDManager(void) : is_started(false)
 
 void SDManager::start_sd(void)
 {
+
+#if DEBUG
+  SERIAL_DEBUG.println(F("start SD"));
+#endif
+
   // intialise the filename
   this->current_file_name[0] = 'F';
   for (int i = 0; i < NBR_ZEROS_FILENAME; i++)
