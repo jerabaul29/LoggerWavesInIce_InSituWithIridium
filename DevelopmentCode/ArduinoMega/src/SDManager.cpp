@@ -1,33 +1,51 @@
 #include "SDManager.h"
 
-SDManager::SDManager(void) :
-  is_started(false)
+SDManager::SDManager(void) : is_started(false)
 {
-  
 }
 
-void SDManager::start_sd(void){
+void SDManager::start_sd(void)
+{
   // intialise the filename
   this->current_file_name[0] = 'F';
-  for (int i=0; i < NBR_ZEROS_FILENAME; i++){
+  for (int i = 0; i < NBR_ZEROS_FILENAME; i++)
+  {
     this->current_file_name[1 + i] = '0';
   }
+  current_file_name[NBR_ZEROS_FILENAME + 1] = '\0';
 
-  if (!SD.begin(PIN_SELECT_SD)) {
-    // reboot
-    while (true){
-      // do nothing
-    }
+#if DEBUG
+  SERIAL_DEBUG.print(F("Filename initialized:"));
+  for (int i = 0; i < NBR_ZEROS_FILENAME + 2; i++)
+  {
+    SERIAL_DEBUG.print(this->current_file_name[i]);
+  }
+  SERIAL_DEBUG.println();
+#endif
+
+  while (!SD.begin(PIN_SELECT_SD))
+  {
   }
 
   is_started = true;
 
   SDManager::update_current_file();
+
+#if DEBUG
+  SERIAL_DEBUG.print(F("Filename set:"));
+  for (int i = 0; i < NBR_ZEROS_FILENAME + 2; i++)
+  {
+    SERIAL_DEBUG.print(this->current_file_name[i]);
+  }
+  SERIAL_DEBUG.println();
+#endif
 }
 
 // TODO: break this in several methods: update the name, and close / open the datafile
-void SDManager::update_current_file(void){
-  if (!is_started){
+void SDManager::update_current_file(void)
+{
+  if (!is_started)
+  {
     this->start_sd();
   }
 
@@ -50,9 +68,22 @@ void SDManager::update_current_file(void){
   String str_index = String(new_value_fileIndex);
   int str_length = str_index.length();
 
+  #if DEBUG
+  SERIAL_DEBUG.print(F("string length: "));
+SERIAL_DEBUG.print(str_length);
+#endif
+
   // put the characters of the name at the right place
-  for (int ind_rank = 0; ind_rank < max(NBR_ZEROS_FILENAME, str_length); ind_rank++){
+  for (int ind_rank = 0; ind_rank < min(NBR_ZEROS_FILENAME, str_length); ind_rank++)
+  {
     current_file_name[NBR_ZEROS_FILENAME - ind_rank] = str_index[str_length - 1 - ind_rank];
+    #if DEBUG
+  SERIAL_DEBUG.print(F("set: "));
+SERIAL_DEBUG.print(str_index[str_length - 1 - ind_rank]);
+SERIAL_DEBUG.print(F(" at rank: "));
+SERIAL_DEBUG.print(NBR_ZEROS_FILENAME - ind_rank);
+  SERIAL_DEBUG.println();
+#endif
   }
 
   delay(5);
@@ -61,19 +92,24 @@ void SDManager::update_current_file(void){
   delay(5);
 }
 
-void SDManager::check_SD_available(){
-  if (!dataFile){
-    while(1){
+void SDManager::check_SD_available()
+{
+  if (!dataFile)
+  {
+    while (1)
+    {
       // do nothing: watchdog will fire
     }
   }
 }
 
-void SDManager::close_datafile(void){
+void SDManager::close_datafile(void)
+{
   dataFile.close();
 }
 
-void SDManager::post_timestamp(void){
+void SDManager::post_timestamp(void)
+{
   this->check_SD_available();
 
   dataFile.print("M");
@@ -82,7 +118,8 @@ void SDManager::post_timestamp(void){
   delay(5);
 }
 
-void SDManager::post_on_SD_card(String dataStringPost){
+void SDManager::post_on_SD_card(String dataStringPost)
+{
 
   this->check_SD_available();
 
@@ -93,7 +130,8 @@ void SDManager::post_on_SD_card(String dataStringPost){
   delay(5);
 }
 
-void SDManager::post_on_SD_card(char array_to_post[], int end_position){
+void SDManager::post_on_SD_card(char array_to_post[], int end_position)
+{
 
   this->check_SD_available();
 
@@ -105,8 +143,9 @@ void SDManager::post_on_SD_card(char array_to_post[], int end_position){
   delay(5);
 }
 
-const char * SDManager::get_filename(void) const{
-  return(current_file_name);
+const char *SDManager::get_filename(void) const
+{
+  return (current_file_name);
 }
 
 /*

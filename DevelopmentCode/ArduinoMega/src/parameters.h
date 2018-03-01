@@ -37,7 +37,8 @@ SOFTWARE.
 #define BAT_EMPTY_V 2.8     // threshold for empty battery
 
 // Debug
-#define DEBUG TRUE
+#define DEBUG true
+#define DEBUG_SLOW true
 #define SERIAL_DEBUG Serial
 
 // SD
@@ -68,7 +69,7 @@ SOFTWARE.
 
 // how long should log
 // #define DURATION_LOGGING_MS 1500000UL
-#define DURATION_LOGGING_MS 20000UL  // for tests
+#define DURATION_LOGGING_MS 10000UL  // for tests
 
 // Mosfet power Raspberry Pi
 #define PIN_MFT_RPI 46

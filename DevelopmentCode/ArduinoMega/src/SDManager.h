@@ -57,7 +57,9 @@ class SDManager{
         void check_SD_available(void);
 
         File dataFile;
-        char current_file_name[NBR_ZEROS_FILENAME + 1];  // initialize from chars: no need for end string \0
+        char current_file_name[NBR_ZEROS_FILENAME + 2];
+        // char current_file_name[NBR_ZEROS_FILENAME + 2] = "F00000";
+        // char current_file_name[] = "F00000";
         const long address_number_file = ADDRESS_LONG_FILENBR;
         bool is_started = false;
         long filenumber;

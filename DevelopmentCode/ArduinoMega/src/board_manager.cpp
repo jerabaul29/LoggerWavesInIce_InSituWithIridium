@@ -12,7 +12,7 @@ void BoardManager::start(void){
     #if DEBUG
         SERIAL_DEBUG.begin(57600);
         delay(DELAY_START_SERIAL);
-        SERIAL_DEBUG.println(F("Start debuggin!"));
+        SERIAL_DEBUG.println(F("Start debugging!"));
     #endif
 
     // disable the LED pin to save current
@@ -28,10 +28,17 @@ void BoardManager::start(void){
     // decide if should be awake
     if (BoardManager::should_wakeup())
     {
+        #if DEBUG
+        SERIAL_DEBUG.println(F("Ask to be on"));
+    #endif
+
         BoardManager::ask_to_be_on();
     }
     else
     {
+        #if DEBUG
+        SERIAL_DEBUG.println(F("Ask to be off"));
+    #endif
         BoardManager::ask_to_be_off();
         // make it stop here: TODO: make it sleep instead
         while(true){
@@ -127,6 +134,8 @@ int BoardManager::check_status(void){
                 board_status = BOARD_DONE_LOGGING;
                 return(BOARD_DONE_LOGGING);
             }
+        case BOARD_DONE_LOGGING:
+            return(BOARD_DONE_LOGGING);
     }
     return(BOARD_STATUS_ERROR);
 }
