@@ -62,7 +62,7 @@ void setup(){
   wdt_reset();
 
   // make VN100 ready
-  // vn100_manager.start();
+  vn100_manager.start();
   wdt_reset();
 
   // raspberry Pi
