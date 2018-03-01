@@ -1,8 +1,8 @@
-#include "Iridium_manager.h"
+#include "IridiumManager.h"
 #include "parameters.h"
 
 IridiumManager::IridiumManager(HardwareSerial *serial_port,
-                               GPSController *gps_controller,
+                               GPSManager *gps_controller,
                                BoardManager *board_manager,
                                SDManager *sd_manager)
     : serial_port(serial_port), gps_controller(gps_controller),

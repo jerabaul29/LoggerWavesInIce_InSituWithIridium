@@ -15,11 +15,11 @@
 // NOTE: cut the capacitor that prevents reboot when RPi opens serial
 
 #include "parameters.h"
-#include "GPS_controller.h"
+#include "GPSManager.h"
 #include "EEPROM_interaction.h"
 #include "SDManager.h"
-#include "board_manager.h"
-#include "Iridium_manager.h"
+#include "BoardManager.h"
+#include "IridiumManager.h"
 #include "VN100Manager.h"
 
 // board manager
@@ -32,7 +32,7 @@ SDManager sd_manager{};
 VN100Manager vn100_manager{&SERIAL_VN100, &sd_manager};
 
 // GPS
-GPSController gps_controller{&SERIAL_GPS, &sd_manager};
+GPSManager gps_controller{&SERIAL_GPS, &sd_manager};
 
 // Iridium
 IridiumManager iridium_manager{&SERIAL_IRIDIUM, &gps_controller, &board_manager, &sd_manager};

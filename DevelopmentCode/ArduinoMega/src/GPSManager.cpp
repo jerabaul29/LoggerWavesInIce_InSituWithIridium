@@ -1,10 +1,10 @@
-#include "GPS_controller.h"
+#include "GPSManager.h"
 
 // TODO:
 // fully use the Adafruit GPS class instead of doing some parsing by hand.
 // this may request spending some time looking at their library
 
-GPSController::GPSController(HardwareSerial * serial_port_gps, SDManager * sd_manager):
+GPSManager::GPSManager(HardwareSerial * serial_port_gps, SDManager * sd_manager):
   serial_port_gps(serial_port_gps),
   sd_manager(sd_manager),
   GPS_rx_buffer_position(0),
@@ -13,7 +13,7 @@ GPSController::GPSController(HardwareSerial * serial_port_gps, SDManager * sd_ma
 {
 }
 
-void GPSController::start(void){
+void GPSManager::start(void){
   #if DEBUG
   SERIAL_DEBUG.println(F("start GPS"));
 #endif
@@ -42,7 +42,7 @@ void GPSController::start(void){
     this->clean_incoming_buffer();
 }
 
-void GPSController::perform_logging(void){
+void GPSManager::perform_logging(void){
   // while any chars incoming, grab them
   while (serial_port_gps->available() > 0){
     // if reach the end of a message, post it
@@ -54,7 +54,7 @@ void GPSController::perform_logging(void){
 }
 
 
-int GPSController::catch_message(void){
+int GPSManager::catch_message(void){
   while (serial_port_gps->available()>0){
 
     char c_GPS = instance_GPS.read();
@@ -82,7 +82,7 @@ int GPSController::catch_message(void){
   return(0);
 }
 
-int GPSController::load_gprmc_message(){
+int GPSManager::load_gprmc_message(){
   int crrt_length_message;
 
   this->clean_incoming_buffer();
@@ -115,7 +115,7 @@ int GPSController::load_gprmc_message(){
   return(crrt_length_message);
 }
 
-void GPSController::clean_incoming_buffer(void){
+void GPSManager::clean_incoming_buffer(void){
   // flush current GPS buffer
   while (serial_port_gps->available() > 0) {
     serial_port_gps->read();
@@ -132,6 +132,6 @@ void GPSController::clean_incoming_buffer(void){
   }
 }
 
-const char * GPSController::get_rx_buffer(void) const{
+const char * GPSManager::get_rx_buffer(void) const{
   return(GPS_rx_buffer);
 }

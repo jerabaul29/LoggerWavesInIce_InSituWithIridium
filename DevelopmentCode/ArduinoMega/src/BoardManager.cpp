@@ -1,4 +1,4 @@
-#include "board_manager.h"
+#include "BoardManager.h"
 
 BoardManager::BoardManager(void)
 {

@@ -14,9 +14,9 @@
 // necessary as do not want to miss with the ring byffers and take the risk to miss some
 // bytes.
 
-class GPSController{
+class GPSManager{
 public:
-  GPSController(HardwareSerial * serial_port_gps, SDManager * sd_manager);
+  GPSManager(HardwareSerial * serial_port_gps, SDManager * sd_manager);
 
   /*
   Setup the GPS for making it ready to log

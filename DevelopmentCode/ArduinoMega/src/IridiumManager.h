@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "IridiumSBD.h"
 #include "parameters.h"
-#include "GPS_controller.h"
-#include "board_manager.h"
+#include "GPSManager.h"
+#include "BoardManager.h"
 #include "SDManager.h"
 
 // information can be found at: http://arduiniana.org/libraries/iridiumsbd/
@@ -14,7 +14,7 @@
 
 class IridiumManager{
 public:
-    IridiumManager(HardwareSerial *, GPSController *, BoardManager *, SDManager *);
+    IridiumManager(HardwareSerial *, GPSManager *, BoardManager *, SDManager *);
 
     void start(void);
 
@@ -23,7 +23,7 @@ public:
 private:
     HardwareSerial * serial_port;
 
-    GPSController * gps_controller;
+    GPSManager * gps_controller;
 
     BoardManager * board_manager;
 
