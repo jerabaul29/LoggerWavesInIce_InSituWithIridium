@@ -9,6 +9,12 @@ void BoardManager::start(void){
 
     board_status = BOARD_STARTING;
 
+    #if DEBUG
+        SERIAL_DEBUG.begin(57600);
+        delay(DELAY_START_SERIAL);
+        SERIAL_DEBUG.println(F("Start debuggin!"));
+    #endif
+
     // disable the LED pin to save current
     pinMode(PIN_MGA_LED, INPUT);
 

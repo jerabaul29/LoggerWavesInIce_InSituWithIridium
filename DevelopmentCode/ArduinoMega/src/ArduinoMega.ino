@@ -42,8 +42,8 @@ IridiumManager iridium_manager{&SERIAL_IRIDIUM, &gps_controller, &board_manager,
 void setup(){
 
   // manage the board: decide if should wake up
- board_manager.start();
- wdt_reset();
+   board_manager.start();
+   wdt_reset();
 
   // make SD card ready
   sd_manager.start_sd();

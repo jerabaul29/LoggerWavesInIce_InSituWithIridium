@@ -36,6 +36,10 @@ SOFTWARE.
 #define PIN_MSR_BATTERY A0
 #define BAT_EMPTY_V 2.8     // threshold for empty battery
 
+// Debug
+#define DEBUG TRUE
+#define SERIAL_DEBUG Serial
+
 // SD
 #define PIN_SELECT_SD 53
 #define NBR_ZEROS_FILENAME 5
