@@ -1,3 +1,5 @@
+// TODO: debug vital messages iridium
+// TODO: implement RPi interface
 // TODO: got through all delays and clean / remove them
 // TODO: add information about board status (battery) in SD log files
 
@@ -92,6 +94,7 @@ void loop(){
       // close SD card
       sd_manager.close_datafile();
       // go through Iridium vital messages
+      iridium_manager.send_receive_iridium_vital_information();
       // go through Raspberry Pi interaction
       // go through send data by Iridium
       // ask to be put off

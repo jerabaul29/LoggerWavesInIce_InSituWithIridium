@@ -92,6 +92,8 @@ int GPSManager::load_gprmc_message(){
   // limit the maximum number of attempts
   while (current_n_read_GPS < MAX_NUMBER_ATTEMPTS_GPRMC){
 
+    wdt_reset();
+
     // catch a complete message
     do{
       crrt_length_message = this->catch_message();

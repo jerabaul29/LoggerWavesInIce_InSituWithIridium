@@ -67,13 +67,21 @@ void IridiumManager::send_receive_iridium_vital_information(void)
     IridiumManager::set_filename_message();
     IridiumManager::set_GPRMC_message();
 
+    #if DEBUG
+        SERIAL_DEBUG.println(F("Iridium message:"));
+        for (int i=0; i<buffer_transmit_position; i++){
+            SERIAL_DEBUG.print((char)buffer_transmit[i]);
+        }
+        SERIAL_DEBUG.println();
+    #endif
+
     // try to send the Iridium feedback string ----------------------------------
     // note: retries the operation for up to 300 seconds by default; put watchdog
     // reset in
     // ISBDCallback.
     int ird_feedback;
     ird_feedback = iridium_sbd.sendReceiveSBDBinary(
-        (uint8_t *)buffer_transmit, buffer_received_position,
+        (uint8_t *)buffer_transmit, buffer_transmit_position,
         (uint8_t *)buffer_received, buffer_received_position);
 
     // TODO: take care of command received through Iridium to change the state of the logger
@@ -82,6 +90,10 @@ void IridiumManager::send_receive_iridium_vital_information(void)
 // TODO: on all set methods, put condition to check no buffer overflow
 
 void IridiumManager::set_battery_message(void){
+    #if DEBUG
+        SERIAL_DEBUG.println(F("set battery messsage"));
+    #endif
+
     // get the message
     float battery_level_V = board_manager->measure_battery_level();
     String battery_level_string = String{battery_level_V};
@@ -95,6 +107,10 @@ void IridiumManager::set_battery_message(void){
 }
 
 void IridiumManager::set_filename_message(void){
+    #if DEBUG
+        SERIAL_DEBUG.println(F("set filename messsage"));
+    #endif
+
     // get the filename
     const char * filename = sd_manager->get_filename();
 
@@ -106,6 +122,10 @@ void IridiumManager::set_filename_message(void){
 }
 
 void IridiumManager::set_GPRMC_message(void){
+    #if DEBUG
+        SERIAL_DEBUG.println(F("set gprmc messsage"));
+    #endif
+
     // get the GPRMC message
     int GPRMC_length = gps_controller->load_gprmc_message();
     const char * GPRMC_message = gps_controller->get_rx_buffer();
@@ -124,7 +144,14 @@ void IridiumManager::set_GPRMC_message(void){
 */
 bool ISBDCallback(void)
 {
+
+    #if DEBUG
+        SERIAL_DEBUG.println(F("call ISBDCallback"));  // this indicates that
+            // the Iridium library is trying to do something
+    #endif
+
     wdt_reset();
+    delay(1000);
     return (true);
 }
 

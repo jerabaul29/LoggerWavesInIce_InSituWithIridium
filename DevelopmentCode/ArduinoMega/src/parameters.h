@@ -37,7 +37,7 @@ SOFTWARE.
 #define BAT_EMPTY_V 2.8     // threshold for empty battery
 
 // Debug
-#define DEBUG false
+#define DEBUG true
 #define DEBUG_SLOW false  // careful: debug slow can make things break, in particular VN100 logging
 #define SERIAL_DEBUG Serial
 
@@ -48,7 +48,7 @@ SOFTWARE.
 // GPS
 #define SERIAL_GPS Serial1
 #define SIZE_GPS_BUFFER 128
-#define MAX_NUMBER_ATTEMPTS_GPRMC 10
+#define MAX_NUMBER_ATTEMPTS_GPRMC 10  // GPS works at 1Hz
 
 // Iridium
 #define IRIDIUM_TRANSMIT_PACKET_SIZE 340
