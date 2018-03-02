@@ -1,7 +1,9 @@
-// TODO: debug vital messages iridium
+// TODO: rationalize debug messages
+// TODO: macro define a debugprint and debugprintln function
 // TODO: implement RPi interface
 // TODO: got through all delays and clean / remove them
 // TODO: add information about board status (battery) in SD log files
+// go through watchdogs
 
 // TODO: attach a serial port for debugging
 // TODO: interaction with Raspberry Pi

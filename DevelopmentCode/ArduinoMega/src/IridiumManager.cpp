@@ -13,8 +13,8 @@ IridiumManager::IridiumManager(HardwareSerial *serial_port,
 
 void IridiumManager::start(void){
     #if DEBUG
-  SERIAL_DEBUG.println(F("start Iridium"));
-#endif
+        SERIAL_DEBUG.println(F("start Iridium"));
+    #endif
 
     IridiumManager::clean_reset_buffer_received();
     IridiumManager::clean_reset_buffer_transmit();
@@ -68,11 +68,13 @@ void IridiumManager::send_receive_iridium_vital_information(void)
     IridiumManager::set_GPRMC_message();
 
     #if DEBUG
-        SERIAL_DEBUG.println(F("Iridium message:"));
+        SERIAL_DEBUG.println(F("Iridium vital message:"));
         for (int i=0; i<buffer_transmit_position; i++){
             SERIAL_DEBUG.print((char)buffer_transmit[i]);
         }
         SERIAL_DEBUG.println();
+        SERIAL_DEBUG.print(F("message length: "));
+        SERIAL_DEBUG.println(buffer_transmit_position);
     #endif
 
     // try to send the Iridium feedback string ----------------------------------
@@ -151,7 +153,9 @@ bool ISBDCallback(void)
     #endif
 
     wdt_reset();
+
     delay(1000);
+
     return (true);
 }
 
