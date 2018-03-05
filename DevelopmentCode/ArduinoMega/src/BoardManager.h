@@ -4,6 +4,7 @@
 #include <avr/power.h>
 #include "EEPROM_interaction.h"
 #include "parameters.h"
+#include "DebugMacros.h"
 
 #ifndef BOARD_MANAGER
 #define BOARD_MANAGER

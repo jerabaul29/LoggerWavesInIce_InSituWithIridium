@@ -12,8 +12,9 @@ void BoardManager::start(void){
     #if DEBUG
         SERIAL_DEBUG.begin(115200);
         delay(DELAY_START_SERIAL);
-        SERIAL_DEBUG.println(F("Start debugging!"));
     #endif
+
+    PLDDEB("use debugging")
 
     // disable the LED pin to save current
     pinMode(PIN_MGA_LED, INPUT);
@@ -28,17 +29,14 @@ void BoardManager::start(void){
     // decide if should be awake
     if (BoardManager::should_wakeup())
     {
-        #if DEBUG
-        SERIAL_DEBUG.println(F("Ask to be on"));
-    #endif
+        PLDDEB("wakeup board")
 
         BoardManager::ask_to_be_on();
     }
     else
     {
-        #if DEBUG
-        SERIAL_DEBUG.println(F("Ask to be off"));
-    #endif
+        PLDDEB("switch off board")
+
         BoardManager::ask_to_be_off();
         // make it stop here: TODO: make it sleep instead
         while(true){
@@ -48,10 +46,12 @@ void BoardManager::start(void){
 }
 
 void BoardManager::turn_raspberry_off(void){
+    PLDDEB("switch off raspberry")
     digitalWrite(PIN_MFT_RPI, HIGH);
 }
 
 void BoardManager::turn_raspberry_on(void){
+    PLDDEB("switch on raspberry")
     digitalWrite(PIN_MFT_RPI, LOW);
 }
 
@@ -116,9 +116,8 @@ bool BoardManager::enough_battery(void){
 }
 
 void BoardManager::start_logging(unsigned long duration_ms){
-    #if DEBUG
-  SERIAL_DEBUG.println(F("start logging"));
-#endif
+    PLDDEB("start loggin")
+
     this->duration_ms = duration_ms;
     time_start_logging_ms = millis();
     board_status = BOARD_LOGGING;

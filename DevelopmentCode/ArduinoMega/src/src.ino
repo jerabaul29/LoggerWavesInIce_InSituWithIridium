@@ -1,3 +1,5 @@
+// TODO: Avoid #define for constant
+// TODO: function macros use () around
 // TODO: rationalize debug messages
 // TODO: macro define a debugprint and debugprintln function
 // TODO: implement RPi interface

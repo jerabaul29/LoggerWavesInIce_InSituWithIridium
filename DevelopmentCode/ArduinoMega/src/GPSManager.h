@@ -5,6 +5,7 @@
 #include <SoftwareSerial.h>
 #include "SDManager.h"
 #include <avr/wdt.h>
+#include "DebugMacros.h"
 
 
 #ifndef GPS_CONTROLLER

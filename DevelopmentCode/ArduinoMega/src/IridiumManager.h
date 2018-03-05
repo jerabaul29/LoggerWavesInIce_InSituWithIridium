@@ -4,6 +4,7 @@
 #include "GPSManager.h"
 #include "BoardManager.h"
 #include "SDManager.h"
+#include "DebugMacros.h"
 
 // information can be found at: http://arduiniana.org/libraries/iridiumsbd/
 // The maximum size of a transmitted packet (including header and checksum) is 340 bytes.
