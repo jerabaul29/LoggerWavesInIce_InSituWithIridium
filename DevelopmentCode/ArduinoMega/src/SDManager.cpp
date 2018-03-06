@@ -17,18 +17,6 @@ void SDManager::start_sd(void)
   }
   current_file_name[NBR_ZEROS_FILENAME + 1] = '\0';
 
-/*   #if DEBUG
-  SERIAL_DEBUG.print(F("Filename initialized:"));
-  delay(10);
-  for (int i = 0; i < NBR_ZEROS_FILENAME + 2; i++)
-  {
-    SERIAL_DEBUG.print(this->current_file_name[i]);
-    delay(5);
-  }
-  SERIAL_DEBUG.println();
-  #endif 
- */
-
   PDEBVAR(current_file_name)
 
   while (!SD.begin(PIN_SELECT_SD))
@@ -38,17 +26,6 @@ void SDManager::start_sd(void)
   is_started = true;
 
   SDManager::update_current_file();
-
-/*   #if DEBUG
-  SERIAL_DEBUG.print(F("Filename set:"));
-  delay(10);
-  for (int i = 0; i < NBR_ZEROS_FILENAME + 2; i++)
-  {
-    SERIAL_DEBUG.print(this->current_file_name[i]);
-    delay(5);
-  }
-  SERIAL_DEBUG.println();
-  #endif */
 
   PDEBVAR(this->current_file_name)
 }
@@ -80,22 +57,10 @@ void SDManager::update_current_file(void)
   String str_index = String(new_value_fileIndex);
   int str_length = str_index.length();
 
-  #if DEBUG
-  SERIAL_DEBUG.print(F("string length: "));
-SERIAL_DEBUG.print(str_length);
-#endif
-
   // put the characters of the name at the right place
   for (int ind_rank = 0; ind_rank < min(NBR_ZEROS_FILENAME, str_length); ind_rank++)
   {
     current_file_name[NBR_ZEROS_FILENAME - ind_rank] = str_index[str_length - 1 - ind_rank];
-    #if DEBUG
-  SERIAL_DEBUG.print(F("set: "));
-SERIAL_DEBUG.print(str_index[str_length - 1 - ind_rank]);
-SERIAL_DEBUG.print(F(" at rank: "));
-SERIAL_DEBUG.print(NBR_ZEROS_FILENAME - ind_rank);
-  SERIAL_DEBUG.println();
-#endif
   }
 
   delay(5);

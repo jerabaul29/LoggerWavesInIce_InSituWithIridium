@@ -1,5 +1,18 @@
-/*
+#include <Arduino.h>
+#include "parameters.h"
+#include "DebugMacros.h"
 
+/*
+  need to interact with:
+    - SD
+    - Iridium
+*/
+
+class RaspberryManager{
+  
+}
+
+/*
 #if DEBUG
   SERIAL_DEBUG.println(F("start RPi"));
 #endif
