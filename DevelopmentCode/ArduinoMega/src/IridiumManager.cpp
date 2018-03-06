@@ -11,10 +11,7 @@ IridiumManager::IridiumManager(HardwareSerial *serial_port,
 }
 
 void IridiumManager::start(void){
-    #if DEBUG
-        SERIAL_DEBUG.println(F("start Iridium"));
-    #endif
-    PLDEB(F("start Iridium"))
+    PDEBMSG("start Iridium")
 
     IridiumManager::clean_reset_buffer_received();
     IridiumManager::clean_reset_buffer_transmit();

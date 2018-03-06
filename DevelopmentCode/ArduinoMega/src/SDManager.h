@@ -4,6 +4,7 @@
 #include "parameters.h"
 #include <stdlib.h>
 #include <Arduino.h>
+#include "DebugMacros.h"
 
 #ifndef SD_MANAGER
 #define SD_MANAGER

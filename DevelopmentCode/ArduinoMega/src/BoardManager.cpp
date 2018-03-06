@@ -1,3 +1,5 @@
+// TODO: check number of sleeps: can be a problem of 1 too much / little
+
 #include "BoardManager.h"
 
 BoardManager::BoardManager(void)
@@ -14,7 +16,7 @@ void BoardManager::start(void){
         delay(DELAY_START_SERIAL);
     #endif
 
-    PLDDEB("use debugging")
+    PDEBMSG("use debugging")
 
     // disable the LED pin to save current
     pinMode(PIN_MGA_LED, INPUT);
@@ -29,13 +31,13 @@ void BoardManager::start(void){
     // decide if should be awake
     if (BoardManager::should_wakeup())
     {
-        PLDDEB("wakeup board")
+        PDEBMSG("wakeup board")
 
         BoardManager::ask_to_be_on();
     }
     else
     {
-        PLDDEB("switch off board")
+        PDEBMSG("switch off board")
 
         BoardManager::ask_to_be_off();
         // make it stop here: TODO: make it sleep instead
@@ -46,20 +48,23 @@ void BoardManager::start(void){
 }
 
 void BoardManager::turn_raspberry_off(void){
-    PLDDEB("switch off raspberry")
+    PDEBMSG("switch off raspberry")
     digitalWrite(PIN_MFT_RPI, HIGH);
 }
 
 void BoardManager::turn_raspberry_on(void){
-    PLDDEB("switch on raspberry")
+    PDEBMSG("switch on raspberry")
     digitalWrite(PIN_MFT_RPI, LOW);
 }
 
 bool BoardManager::should_wakeup(void)
 {
     // read the EEPROM values
-    total_number_sleeps_before_wakeup = EEPROMReadlong(ADDRESS_TOTAL_NBR_SLEEPS);
-    number_sleeps_left = EEPROMReadlong(ADDRESS_SLEEPS_LEFT);
+    total_number_sleeps_before_wakeup = EEPROM.read(ADDRESS_TOTAL_NBR_SLEEPS);
+    number_sleeps_left = EEPROM.read(ADDRESS_SLEEPS_LEFT);
+
+    PDEBVAR(total_number_sleeps_before_wakeup)
+    PDEBVAR(number_sleeps_left)
 
     BoardManager::check_sleep_status();
 
@@ -94,6 +99,17 @@ void BoardManager::check_sleep_status(void)
     if (number_sleeps_left > total_number_sleeps_before_wakeup)
     {
         EEPROM.write(ADDRESS_SLEEPS_LEFT, total_number_sleeps_before_wakeup);
+
+        number_sleeps_left = total_number_sleeps_before_wakeup;
+    }
+
+    if (number_sleeps_left > MAX_NBR_SLEEPS_BEFORE_WAKEUP)
+    {
+        EEPROM.write(ADDRESS_TOTAL_NBR_SLEEPS, MAX_NBR_SLEEPS_BEFORE_WAKEUP);
+        EEPROM.write(ADDRESS_SLEEPS_LEFT, MAX_NBR_SLEEPS_BEFORE_WAKEUP);
+
+        total_number_sleeps_before_wakeup = MAX_NBR_SLEEPS_BEFORE_WAKEUP;
+        number_sleeps_left = MAX_NBR_SLEEPS_BEFORE_WAKEUP;
     }
 
     // negative value should not arise because from uint8
@@ -116,7 +132,7 @@ bool BoardManager::enough_battery(void){
 }
 
 void BoardManager::start_logging(unsigned long duration_ms){
-    PLDDEB("start loggin")
+    PDEBMSG("start loggin")
 
     this->duration_ms = duration_ms;
     time_start_logging_ms = millis();

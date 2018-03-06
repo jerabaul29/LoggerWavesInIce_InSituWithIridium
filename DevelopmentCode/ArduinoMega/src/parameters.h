@@ -50,6 +50,9 @@ SOFTWARE.
 #define SIZE_GPS_BUFFER 128
 #define MAX_NUMBER_ATTEMPTS_GPRMC 10  // GPS works at 1Hz
 
+// constraints on max number of sleep cycles between wakeups
+#define MAX_NBR_SLEEPS_BEFORE_WAKEUP 5
+
 // Iridium
 #define IRIDIUM_TRANSMIT_PACKET_SIZE 340
 #define IRIDIUM_RECEIVED_PACKET_SIZE 270

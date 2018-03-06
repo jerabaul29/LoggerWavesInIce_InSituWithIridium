@@ -7,9 +7,7 @@ SDManager::SDManager(void) : is_started(false)
 void SDManager::start_sd(void)
 {
 
-#if DEBUG
-  SERIAL_DEBUG.println(F("start SD"));
-#endif
+  PDEBMSG("start SD")
 
   // intialise the filename
   this->current_file_name[0] = 'F';
@@ -19,7 +17,7 @@ void SDManager::start_sd(void)
   }
   current_file_name[NBR_ZEROS_FILENAME + 1] = '\0';
 
-#if DEBUG
+/*   #if DEBUG
   SERIAL_DEBUG.print(F("Filename initialized:"));
   delay(10);
   for (int i = 0; i < NBR_ZEROS_FILENAME + 2; i++)
@@ -28,7 +26,10 @@ void SDManager::start_sd(void)
     delay(5);
   }
   SERIAL_DEBUG.println();
-#endif
+  #endif 
+ */
+
+  PDEBVAR(current_file_name)
 
   while (!SD.begin(PIN_SELECT_SD))
   {
@@ -38,7 +39,7 @@ void SDManager::start_sd(void)
 
   SDManager::update_current_file();
 
-#if DEBUG
+/*   #if DEBUG
   SERIAL_DEBUG.print(F("Filename set:"));
   delay(10);
   for (int i = 0; i < NBR_ZEROS_FILENAME + 2; i++)
@@ -47,7 +48,9 @@ void SDManager::start_sd(void)
     delay(5);
   }
   SERIAL_DEBUG.println();
-#endif
+  #endif */
+
+  PDEBVAR(this->current_file_name)
 }
 
 // TODO: break this in several methods: update the name, and close / open the datafile

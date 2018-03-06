@@ -14,7 +14,7 @@ GPSManager::GPSManager(HardwareSerial * serial_port_gps, SDManager * sd_manager)
 }
 
 void GPSManager::start(void){
-    PLDEB("GPS start")
+    PDEBMSG("GPS start")
 
     delay(250);
 
