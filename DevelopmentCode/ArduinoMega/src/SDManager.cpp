@@ -31,7 +31,7 @@ void SDManager::start_sd(void)
 }
 
 // TODO: break this in several methods: update the name, and close / open the datafile
-void SDManager::update_current_file(void)
+void SDManager::update_current_file(char file_prefix = 'F')
 {
   if (!is_started)
   {
@@ -47,15 +47,26 @@ void SDManager::update_current_file(void)
 
   // read the current file number in EEPROM
   long value_before_fileIndex = EEPROMReadlong(address_number_file);
-
-  // update it by increasing by 1. This is the new file number to write on
-  long new_value_fileIndex = value_before_fileIndex + 1L;
-  filenumber = new_value_fileIndex;
-  EEPROMWritelong(address_number_file, new_value_fileIndex);
+  long new_value_fileIndex;
+  
+  // update it by increasing by 1 if a 'F' prefix. This is the new file number to write on
+  if (file_prefix == 'F'){
+    new_value_fileIndex = value_before_fileIndex + 1L;
+    filenumber = new_value_fileIndex;
+    EEPROMWritelong(address_number_file, new_value_fileIndex);
+  }
+  // otherwise, not a new case, just some additional data
+  else{
+    new_value_fileIndex = value_before_fileIndex;
+    filenumber = new_value_fileIndex;
+  }
 
   // generate the string to put as the file numbering
   String str_index = String(new_value_fileIndex);
   int str_length = str_index.length();
+
+  // put the prefix in the filename
+  current_file_name[0] = file_prefix;
 
   // put the characters of the name at the right place
   for (int ind_rank = 0; ind_rank < min(NBR_ZEROS_FILENAME, str_length); ind_rank++)

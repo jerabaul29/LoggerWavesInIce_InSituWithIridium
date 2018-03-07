@@ -21,8 +21,11 @@ class SDManager{
         /*
          * Update the current file, based on the values stored in EEPROM memory, update the EEPROM,
          * and open the new current file.
+         * If the file_prefix is 'F', then the number of the file will be increased
+         * If the file prefix is other than F, consider it is just additional data,
+         * no file number increase.
          */
-        void update_current_file(void);
+        void update_current_file(char file_prefix = 'F');
 
         /*
          * Post a string on the SD card.

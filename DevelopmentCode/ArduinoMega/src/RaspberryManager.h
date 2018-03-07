@@ -1,16 +1,47 @@
 #include <Arduino.h>
 #include "parameters.h"
 #include "DebugMacros.h"
+#include "SDManager.h"
+#include "IridiumManager.h"
+#include "BoardManager.h"
 
-/*
-  need to interact with:
-    - SD
-    - Iridium
-*/
+#ifndef RASPBERRY_MANAGER
+#define RASPBERRY_MANAGER
 
 class RaspberryManager{
-  
-}
+  public:
+    RaspberryManager(BoardManager *, SDManager *, IridiumManager *, HardwareSerial *);
+
+    void start(void);
+
+    void file_content_to_raspberry(void);
+
+    void receive_processed_data(void);
+
+    void transmit_by_Iridium(void);
+
+    void shutdown(void);
+
+  private:
+
+    BoardManager board_manager;
+
+    SDManager sd_manager;
+
+    IridiumManager iridium_manager;
+
+    HardwareSerial serial_port;
+
+    void flush_buffer_in(void);
+
+    void wait_some_time_ms(unsigned long time_wait);
+
+    bool ask_acknowledge_raspberry(char to_rpi, char expected_answer);
+
+    bool acknowledge_to_raspberry(char from_raspberry, char answer_to_raspberry);
+};
+
+#endif //RASPBERRY_MANAGER
 
 /*
 #if DEBUG
