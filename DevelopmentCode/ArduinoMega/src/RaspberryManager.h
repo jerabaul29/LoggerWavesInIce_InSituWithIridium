@@ -12,6 +12,10 @@ class RaspberryManager{
   public:
     RaspberryManager(BoardManager *, SDManager *, IridiumManager *, HardwareSerial *);
 
+    /*
+      to call before using other methods; make the RPi ready for
+      communications / work.
+    */
     void start(void);
 
     void file_content_to_raspberry(void);
@@ -24,20 +28,43 @@ class RaspberryManager{
 
   private:
 
-    BoardManager board_manager;
+    BoardManager * board_manager;
 
-    SDManager sd_manager;
+    SDManager * sd_manager;
 
-    IridiumManager iridium_manager;
+    IridiumManager * iridium_manager;
 
-    HardwareSerial serial_port;
+    HardwareSerial * serial_port;
 
+    /*
+      flush the buffer of chars received from the RPi
+    */
     void flush_buffer_in(void);
 
+    /*
+      wait.
+    */
     void wait_some_time_ms(unsigned long time_wait);
 
+    /*
+      save to the currently opened SD card file the message received
+      from the RPi between the two acknowledgement_message s (one at
+      the beginning and one at the end)
+    */
+    bool receive_between_acknowledgement_messages(const char * acknowledgement_message, char answer);
+
+    bool detect_message(const char * message);
+
+    /*
+      Ask the raspberry Pi to acknowledge. For this, send the
+      to_rpi byte, and expect the expected_answer.
+    */
     bool ask_acknowledge_raspberry(char to_rpi, char expected_answer);
 
+    /*
+      Wait for the from_raspberry char, and acknowledge it back
+      with the answer_to_raspberry char.
+    */
     bool acknowledge_to_raspberry(char from_raspberry, char answer_to_raspberry);
 };
 
