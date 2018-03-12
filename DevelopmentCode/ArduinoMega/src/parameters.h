@@ -38,7 +38,6 @@ SOFTWARE.
 
 // Debug
 #define DEBUG true
-#define DEBUG_SLOW false  // careful: debug slow can make things break, in particular VN100 logging
 #define SERIAL_DEBUG Serial
 
 // SD
@@ -66,6 +65,7 @@ SOFTWARE.
 // Raspberry
 #define DELAY_ANSWER_RPI 500
 #define TIMEOUT_ACKNOWLEDGEMENT_RPI_MS 4000
+#define TIMEOUT_PROCESSING_RPI 10000
 
 // VN 100
 #define SERIAL_VN100 Serial3

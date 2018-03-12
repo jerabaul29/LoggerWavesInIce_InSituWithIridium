@@ -21,6 +21,20 @@ public:
 
     void send_receive_iridium_vital_information(void);
 
+    // TODO: make the following public to allow filling with the Iridum message;
+    // this is not too good a solution
+    unsigned char buffer_received[IRIDIUM_RECEIVED_PACKET_SIZE];
+    unsigned char buffer_transmit[IRIDIUM_TRANSMIT_PACKET_SIZE];
+    size_t buffer_received_position;
+    size_t buffer_transmit_position;
+
+    /*
+      send the content of the transmit buffer. Note that, at the
+      lowest level, always send and receive a message (so this is
+      why called send_receive, and maybe some information in receive).
+    */
+    void send_receive(void);
+
 private:
     HardwareSerial * serial_port;
 
@@ -31,12 +45,6 @@ private:
     SDManager * sd_manager;
 
     IridiumSBD iridium_sbd;
-
-    unsigned char buffer_received[IRIDIUM_RECEIVED_PACKET_SIZE];
-    unsigned char buffer_transmit[IRIDIUM_TRANSMIT_PACKET_SIZE];
-
-    size_t buffer_received_position;
-    size_t buffer_transmit_position;
 
     /*
       Clean the received buffer and reset pointer

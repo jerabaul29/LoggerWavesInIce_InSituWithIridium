@@ -106,10 +106,4 @@ void loop(){
       // put to deep sleep: TODO: implement in board_manager
       break;
   }
-
-  #if DEBUG_SLOW
-    delay(500);
-  #endif
-
-  // act in consequence.
 }

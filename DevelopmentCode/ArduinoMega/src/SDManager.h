@@ -9,6 +9,8 @@
 #ifndef SD_MANAGER
 #define SD_MANAGER
 
+// TODO: the interface used with the RaspberryPi is not very good; modify
+
 class SDManager{
     public:
         SDManager(void);
@@ -54,11 +56,37 @@ class SDManager{
         */
         void close_datafile(void);
 
+        /*
+          open the current file number prefixed with file_prefix
+        */
+        void open_current_filenumber(char file_prefix);
+
+        /*
+          true if more to read, false otherwise
+        */
+        bool more_to_read(void);
+
+        /*
+          read one byte from the file
+        */
+        char read_char(void);
+
+        /*
+          write a char to the currently opened file
+        */
+        void write_char(char);
+
+
     private:
         /*
          Post the current millis timestamp.
          */
         void post_timestamp(void);
+
+        /*
+          set the filename.
+        */
+        void set_filename(char file_prefix, long number_value);
 
         /*
          Check if the SD card is available, if not let the watchdog reboot.

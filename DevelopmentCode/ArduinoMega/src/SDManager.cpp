@@ -52,17 +52,24 @@ void SDManager::update_current_file(char file_prefix = 'F')
   // update it by increasing by 1 if a 'F' prefix. This is the new file number to write on
   if (file_prefix == 'F'){
     new_value_fileIndex = value_before_fileIndex + 1L;
-    filenumber = new_value_fileIndex;
     EEPROMWritelong(address_number_file, new_value_fileIndex);
   }
   // otherwise, not a new case, just some additional data
   else{
     new_value_fileIndex = value_before_fileIndex;
-    filenumber = new_value_fileIndex;
   }
 
+  this->set_filename(file_prefix, new_value_fileIndex);
+
+  delay(5);
+  // open the file. only one file can be open at a time,
+  dataFile = SD.open(current_file_name, FILE_WRITE);
+  delay(5);
+}
+
+void SDManager::set_filename(char file_prefix, long number_value){
   // generate the string to put as the file numbering
-  String str_index = String(new_value_fileIndex);
+  String str_index = String(number_value);
   int str_length = str_index.length();
 
   // put the prefix in the filename
@@ -73,11 +80,44 @@ void SDManager::update_current_file(char file_prefix = 'F')
   {
     current_file_name[NBR_ZEROS_FILENAME - ind_rank] = str_index[str_length - 1 - ind_rank];
   }
+}
+
+void SDManager::open_current_filenumber(char file_prefix){
+  // close currently opened file
+  delay(5);
+  dataFile.close();
+  delay(5);
+
+  // the current filenumber is the one saved on EEPROM
+  long value_fileIndex = EEPROMReadlong(address_number_file);
+
+  this->set_filename(file_prefix, value_fileIndex);
 
   delay(5);
-  // open the file. only one file can be open at a time,
-  dataFile = SD.open(current_file_name, FILE_WRITE);
+  dataFile = SD.open(current_file_name);
   delay(5);
+}
+
+bool SDManager::more_to_read(void){
+  // can open file
+  if (dataFile) {
+    // more to read
+    if (dataFile.available()) {
+      return(true);
+    }
+    // nothing more to read
+    else{
+      return(false);
+    }
+  }
+  // cannot open file
+  else{
+    return(false);
+  }
+}
+
+char SDManager::read_char(void){
+  return(dataFile.read());
 }
 
 void SDManager::check_SD_available()
@@ -94,6 +134,10 @@ void SDManager::check_SD_available()
 void SDManager::close_datafile(void)
 {
   dataFile.close();
+}
+
+void SDManager::write_char(char crrt_char){
+  dataFile.print(crrt_char);
 }
 
 void SDManager::post_timestamp(void)

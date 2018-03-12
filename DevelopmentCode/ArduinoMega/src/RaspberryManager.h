@@ -8,6 +8,8 @@
 #ifndef RASPBERRY_MANAGER
 #define RASPBERRY_MANAGER
 
+// TODO: protect with watchdog the maximum duration of Rpi being awake
+
 class RaspberryManager{
   public:
     RaspberryManager(BoardManager *, SDManager *, IridiumManager *, HardwareSerial *);
@@ -26,6 +28,8 @@ class RaspberryManager{
 
     void shutdown(void);
 
+    void transmit_through_iridium(char filename_prefix = 'I');
+
   private:
 
     BoardManager * board_manager;
@@ -35,6 +39,10 @@ class RaspberryManager{
     IridiumManager * iridium_manager;
 
     HardwareSerial * serial_port;
+
+    const String message_from_raspberry_processing_ok;
+
+    const int length_message_from_raspberry_processing_ok;
 
     /*
       flush the buffer of chars received from the RPi
@@ -47,13 +55,18 @@ class RaspberryManager{
     void wait_some_time_ms(unsigned long time_wait);
 
     /*
+      wait until the raspberry has processed data
+    */
+    void wait_for_raspberry_has_processed(void);
+
+    /*
       save to the currently opened SD card file the message received
       from the RPi between the two acknowledgement_message s (one at
       the beginning and one at the end)
     */
     bool receive_between_acknowledgement_messages(const char * acknowledgement_message, char answer);
 
-    bool detect_message(const char * message);
+    bool detect_message(const String & message);
 
     /*
       Ask the raspberry Pi to acknowledge. For this, send the

@@ -51,6 +51,15 @@ void IridiumManager::clean_reset_buffers(void)
     IridiumManager::clean_reset_buffer_transmit();
 }
 
+void IridiumManager::send_receive(void){
+    int ird_feedback;
+    ird_feedback = iridium_sbd.sendReceiveSBDBinary(
+        (uint8_t *)buffer_transmit, buffer_transmit_position,
+        (uint8_t *)buffer_received, buffer_received_position);
+
+    // TODO: take care of feedback values
+}
+
 void IridiumManager::send_receive_iridium_vital_information(void)
 {
     iridium_sbd.begin(); // wake up
@@ -77,10 +86,7 @@ void IridiumManager::send_receive_iridium_vital_information(void)
     // note: retries the operation for up to 300 seconds by default; put watchdog
     // reset in
     // ISBDCallback.
-    int ird_feedback;
-    ird_feedback = iridium_sbd.sendReceiveSBDBinary(
-        (uint8_t *)buffer_transmit, buffer_transmit_position,
-        (uint8_t *)buffer_received, buffer_received_position);
+    this->send_receive();
 
     // TODO: take care of command received through Iridium to change the state of the logger
 }
