@@ -1,12 +1,11 @@
 import numpy as np
 from compute_statistics import WaveStatistics
-from compute_statistics import global_fs
 import os
 
 
-#synthetic_signal = False
+# synthetic_signal = False
 #
-#if synthetic_signal:
+# if synthetic_signal:
 #
 #    ################################################################################
 #    # parameters to generate the synthetic signal
@@ -51,7 +50,7 @@ home = os.path.expanduser("~")
 
 dataDir = home + '/Data/WOICE/SvalbardPolarsyssel2017/Data_IMU_20170424_parsed/1/'
 inDir = home + '/Data/WOICE/pi_logger/ResultAnalyzis/'
-f1 = 488
+f1 = 470
 f2 = f1 + 1
 file1 = 'F{:05d}_B'.format(f1)
 file2 = 'F{:05d}_B'.format(f2)
