@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "SDManager.h"
+#include "DebugMacros.h"
 
 #ifndef VN100_MANAGER
 #define VN100_MANAGER

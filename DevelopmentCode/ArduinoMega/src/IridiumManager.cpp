@@ -60,12 +60,14 @@ void IridiumManager::send_receive(void){
     PDEBMSG("call IridiumManager::send_receive")
     
     #if DEBUG
+        SERIAL_DEBUG.println();
         SERIAL_DEBUG.print(F("length buffer transmit: "));
         SERIAL_DEBUG.println(buffer_transmit_position);
         SERIAL_DEBUG.println(F("buffer_transmit:"));
         for (unsigned int i=0; i<buffer_transmit_position; i++){
             SERIAL_DEBUG.print((char)buffer_transmit[i]);
         }
+        SERIAL_DEBUG.println();
     #endif
 
     #if USE_IRIDUIUM

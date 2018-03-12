@@ -19,6 +19,8 @@
 // TODO: could use struct(char *, str_length) instead of plain char *. I do not want to use strings
 // as dynamically allocated, ok on computers, bad on mC.
 
+// TODO: could put the VN100, GPS, SD and Iridium on a MOSFET (physical change to board)
+
 // NOTE: cut the capacitor that prevents reboot when RPi opens serial
 
 #include "parameters.h"
@@ -119,6 +121,7 @@ void loop(){
   }
 }
 
+// TODO: put in raspberry_manager class
 void perform_raspberry_interaction(void){
   raspberry_manager.start();
   raspberry_manager.send_filename();

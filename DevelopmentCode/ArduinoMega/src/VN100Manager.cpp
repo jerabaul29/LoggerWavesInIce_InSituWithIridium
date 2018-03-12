@@ -6,9 +6,7 @@ VN100Manager::VN100Manager(HardwareSerial * serial_port, SDManager * sd_manager)
     {}
 
 void VN100Manager::start(void){
-    #if DEBUG
-  SERIAL_DEBUG.println(F("VN100 start"));
-#endif
+    PDEBMSG("VN100 start")
 
 // set the fixed bytes corresponding to header
     for(int i = 0; i < SIZE_VN100_HEADER; i++){
@@ -18,18 +16,12 @@ void VN100Manager::start(void){
     serial_port->begin(57600);
     delay(DELAY_START_SERIAL);
 
-    #if DEBUG
-  SERIAL_DEBUG.println(F("VN100 opened serial"));
-#endif
-
     this->reset_buffer_header();
     this->flush_serial_buffer();
 }
 
 void VN100Manager::flush_serial_buffer(void){
-    #if DEBUG
-  SERIAL_DEBUG.println(F("VN100 flush"));
-#endif
+   PDEBMSG("VN100 flush")
 
     // flush all
     while (serial_port->available() > 0){
