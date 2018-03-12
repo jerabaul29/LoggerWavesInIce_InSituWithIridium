@@ -156,20 +156,33 @@ bool RaspberryManager::detect_message(const String & message){
 void RaspberryManager::receive_processed_data(void){
     PDEBMSG("call RaspberryManager::receive_processed_data")
 
+    StreamAnalyzer stream_analyzer1{"PROCESSING_OK"};
+
     // wait for the message from Raspberry Pi about processing OK
     PDEBMSG("wait for PROCESSING_OK")
+
     unsigned long time_start = millis();
-    while (serial_port->available() < length_message_from_raspberry_processing_ok){
+
+    while(true){
+        // if not timed out
         if (millis() - time_start < TIMEOUT_PROCESSING_RPI){
-            wdt_reset();
+            if (serial_port->available() > 0){
+                char crrt_char = serial_port->read();
+                if (stream_analyzer1.load_char(crrt_char)){
+                    break;
+                }
+            }
         }
+        // if timed out
         else{
-            // problem, whould have received acknowledgement
+            PDEBMSG("erro: timeout, no PROCESSING_OK")
+            // reboot
+            while (true){
+                // nothing
+            }
         }
     }
 
-    // check thar it is well what to be expected: raspberry Pi ok
-    if (this->detect_message(message_from_raspberry_processing_ok)){
         PDEBMSG("fine: receive and save from RPi")
 
         // open the file where to save the data
@@ -182,34 +195,42 @@ void RaspberryManager::receive_processed_data(void){
         // NOTE: this approach may be slow (write character per character to SD card)
         // should be ok for short messages, potentially dangerous for large messages.
         
-        unsigned long time_start =  millis();
+        time_start =  millis();
 
         PDEBMSG("wait for PROCESSED_END")
-        StreamAnalyzer stream_analyzer{"PROCESSED_END"};
+        StreamAnalyzer stream_analyzer2{"PROCESSED_END"};
 
-        // TODO: improve here...
+        // ad hoc, to have only the content of the buffer in the file; this is the
+        // length of PROCESSED_END
+        char latest_chars[13];
+        int left_to_receive = 13 - 1;
+        int position_in_buffer = 0;
+
+        // TODO: improve here... this is a hacky ring buffer adapted to this
+        // specific message length (13 hard coded)
         while (millis() - time_start < TIMEOUT_RECEIVED_TO_TRANSMIT_FROM_PI){
             if (serial_port->available() > 0){
                 char crrt_char;
                 crrt_char = serial_port->read();
-                sd_manager->write_char(crrt_char);
-                if (stream_analyzer.load_char(crrt_char)){
+
+                left_to_receive -= 1;
+                latest_chars[position_in_buffer] = crrt_char;
+                position_in_buffer = (position_in_buffer + 1) % 13;
+
+                if (stream_analyzer2.load_char(crrt_char)){
                     break;
                 }
+
+                if (left_to_receive < 0){
+                    sd_manager->write_char(latest_chars[position_in_buffer]);
+                }
+
                 wdt_reset();
             }
         }
 
         // let some time for writing on SD card
         delay(100);
-    }
-
-    else{
-        PDEBMSG("error: reboot")
-        while(true){
-            // reboot
-        }
-    }
 }
 
 void RaspberryManager::send_filename(void){
