@@ -17,8 +17,6 @@ void SDManager::start_sd(void)
   }
   current_file_name[NBR_ZEROS_FILENAME + 1] = '\0';
 
-  PDEBVAR(current_file_name)
-
   while (!SD.begin(PIN_SELECT_SD))
   {
   }
@@ -26,13 +24,12 @@ void SDManager::start_sd(void)
   is_started = true;
 
   SDManager::update_current_file();
-
-  PDEBVAR(this->current_file_name)
 }
 
 // TODO: break this in several methods: update the name, and close / open the datafile
-void SDManager::update_current_file(char file_prefix = 'F')
-{
+void SDManager::update_current_file(char file_prefix = 'F'){
+  PDEBMSG("call to update_current_file")
+
   if (!is_started)
   {
     this->start_sd();
@@ -65,9 +62,13 @@ void SDManager::update_current_file(char file_prefix = 'F')
   // open the file. only one file can be open at a time,
   dataFile = SD.open(current_file_name, FILE_WRITE);
   delay(5);
+
+  PDEBVAR(this->current_file_name)
 }
 
 void SDManager::set_filename(char file_prefix, long number_value){
+  PDEBMSG("call to set_filename")
+
   // generate the string to put as the file numbering
   String str_index = String(number_value);
   int str_length = str_index.length();

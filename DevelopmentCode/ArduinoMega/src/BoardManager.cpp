@@ -12,7 +12,7 @@ void BoardManager::start(void){
     board_status = BOARD_STARTING;
 
     #if DEBUG
-        SERIAL_DEBUG.begin(115200);
+        SERIAL_DEBUG.begin(SERIAL_DEBUG_BAUDRATE);
         delay(DELAY_START_SERIAL);
     #endif
 
@@ -39,11 +39,8 @@ void BoardManager::start(void){
     {
         PDEBMSG("switch off board")
 
-        BoardManager::ask_to_be_off();
-        // make it stop here: TODO: make it sleep instead
-        while(true){
-            wdt_reset();
-        }
+        this->ask_to_be_off();
+        this->deep_sleep();
     }
 }
 
@@ -79,6 +76,7 @@ bool BoardManager::should_wakeup(void)
     {
         // TODO: add battery check
         EEPROM.write(ADDRESS_SLEEPS_LEFT, total_number_sleeps_before_wakeup);
+        number_sleeps_left = total_number_sleeps_before_wakeup; // important for the sleep or reboot function
         return (true);
     }
 }
@@ -117,6 +115,7 @@ void BoardManager::check_sleep_status(void)
 
 float BoardManager::measure_battery_level(void){
     battery_level_V =  float(analogRead(PIN_MSR_BATTERY)) * 5.0 / 1024.0;
+    PDEBVAR(battery_level_V)
     return(battery_level_V);
 }
 
@@ -131,8 +130,38 @@ bool BoardManager::enough_battery(void){
     }
 }
 
+void BoardManager::sleep_or_reboot(void){
+    PDEBMSG("call BoardManager::sleep_or_reboot")
+
+    if (number_sleeps_left == 0){
+        this->reboot();
+    }
+    else{
+        this->deep_sleep();
+    }
+
+}
+
+void BoardManager::reboot(void){
+    PDEBMSG("call BoardManager::reboot")
+    wdt_enable(WDTO_15MS);
+    while (true){
+        // nothing
+    }
+}
+
+void BoardManager::deep_sleep(void){
+    PDEBMSG("call BoardManager::deep_sleep")
+    delay(100);  // a bit of time to let time to finish
+
+    wdt_disable();
+    power_adc_disable();
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+    sleep_mode();
+}
+
 void BoardManager::start_logging(unsigned long duration_ms){
-    PDEBMSG("start loggin")
+    PDEBMSG("call BoardManager::start_logging")
 
     this->duration_ms = duration_ms;
     time_start_logging_ms = millis();
@@ -140,13 +169,10 @@ void BoardManager::start_logging(unsigned long duration_ms){
 }
 
 int BoardManager::check_status(void){
-    #if DEBUG && DEBUG_SLOW
-  SERIAL_DEBUG.print(F("status: "));
-  SERIAL_DEBUG.println(board_status);
-#endif
 
     switch(board_status){
         case BOARD_STARTING:
+            PDEBMSG("Board starting")
             return(BOARD_STARTING);
 
         case BOARD_LOGGING:
@@ -154,12 +180,16 @@ int BoardManager::check_status(void){
                 return(BOARD_LOGGING);
             }
             else{
+                PDEBMSG("Board just done logging")
                 board_status = BOARD_DONE_LOGGING;
                 return(BOARD_DONE_LOGGING);
             }
         case BOARD_DONE_LOGGING:
+            PDEBMSG("Board already done logging")
             return(BOARD_DONE_LOGGING);
     }
+
+    PDEBMSG("Board status error")
     return(BOARD_STATUS_ERROR);
 }
 

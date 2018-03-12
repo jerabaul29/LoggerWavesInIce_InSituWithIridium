@@ -73,6 +73,7 @@ public:
    Make sleep for a long time
   */
   // TODO: add some sleeping possibilities similar to the power control in the Arduino Uno
+  void sleep_or_reboot(void);
 
   /*
     Start logging
@@ -92,6 +93,10 @@ private:
     Check if the sleep status is Ok; if not, correct it
   */
   void check_sleep_status(void);
+
+  void deep_sleep(void);
+
+  void reboot(void);
 
   /*
     The battery level in volts

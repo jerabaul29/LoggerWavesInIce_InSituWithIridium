@@ -56,6 +56,8 @@ void setup(){
    board_manager.start();
    wdt_reset();
 
+   print_debug_status();
+
   // make SD card ready
   sd_manager.start_sd();
   wdt_reset();
@@ -100,10 +102,11 @@ void loop(){
       // go through Iridium vital messages
       iridium_manager.send_receive_iridium_vital_information();
       // go through Raspberry Pi interaction
-      // go through send data by Iridium
+
       // ask to be put off
       board_manager.ask_to_be_off();
       // put to deep sleep: TODO: implement in board_manager
+      board_manager.sleep_or_reboot();
       break;
   }
 }

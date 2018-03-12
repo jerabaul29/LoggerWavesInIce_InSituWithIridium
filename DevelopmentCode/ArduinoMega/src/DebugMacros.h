@@ -7,12 +7,16 @@
 #if DEBUG
 #  define PDEBMSG(x) debug_print_string(F("D ")); debug_println_string(F(x));
 #  define PDEBVAR(x) debug_print_string(F("D "#x" ")); debug_println(x);
+#  define SHOW_VAR_NAME(x) SHOW_VAR_NAME_(x)
 #else
 #  define PDEBMSG(x) // nothing
 #  define PDEBVAR(x) // nothing
+#  define SHOW_VAR_NAME(x) // nothing
 #endif
 
-// a few template designed functions, so that do not need to remember
+#define SHOW_VAR_NAME_(x) #x
+
+// a few template designed functons, so that do not need to remember
 // if needs the F() or not
 
 void debug_println_string(const __FlashStringHelper * string_in);
@@ -48,5 +52,7 @@ inline void debug_print(T data){
 template <>
 void debug_print<const char *>(const char * data);
 */
+
+void print_debug_status(void);
 
 #endif

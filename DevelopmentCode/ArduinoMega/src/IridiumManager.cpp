@@ -11,7 +11,7 @@ IridiumManager::IridiumManager(HardwareSerial *serial_port,
 }
 
 void IridiumManager::start(void){
-    PDEBMSG("start Iridium")
+    PDEBMSG("call IridiumManager::start")
 
     IridiumManager::clean_reset_buffer_received();
     IridiumManager::clean_reset_buffer_transmit();
@@ -23,10 +23,13 @@ void IridiumManager::start(void){
 
     iridium_sbd.begin();
     iridium_sbd.sleep(); // go to sleep: will not be needed in quite some time.
+
+    PDEBMSG("Iridium started")
 }
 
 void IridiumManager::clean_reset_buffer_received(void)
 {
+    PDEBMSG("call IridiumManager::clean_reset_buffer_received")
     for (int i = 0; i < IRIDIUM_RECEIVED_PACKET_SIZE; i++)
     {
         buffer_received[i] = '0';
@@ -37,6 +40,7 @@ void IridiumManager::clean_reset_buffer_received(void)
 
 void IridiumManager::clean_reset_buffer_transmit(void)
 {
+    PDEBMSG("call IridiumManager::clean_reset_buffer_transmit")
     for (int i = 0; i < IRIDIUM_TRANSMIT_PACKET_SIZE; i++)
     {
         buffer_transmit[i] = '0';
@@ -47,21 +51,40 @@ void IridiumManager::clean_reset_buffer_transmit(void)
 
 void IridiumManager::clean_reset_buffers(void)
 {
+    PDEBMSG("call IridiumManager::clean_reset_buffers")
     IridiumManager::clean_reset_buffer_received();
     IridiumManager::clean_reset_buffer_transmit();
 }
 
 void IridiumManager::send_receive(void){
-    int ird_feedback;
-    ird_feedback = iridium_sbd.sendReceiveSBDBinary(
-        (uint8_t *)buffer_transmit, buffer_transmit_position,
-        (uint8_t *)buffer_received, buffer_received_position);
+    PDEBMSG("call IridiumManager::send_receive")
+    
+    #if DEBUG
+        SERIAL_DEBUG.print(F("length buffer transmit: "));
+        SERIAL_DEBUG.println(buffer_transmit_position);
+        SERIAL_DEBUG.println(F("buffer_transmit:"));
+        for (unsigned int i=0; i<buffer_transmit_position; i++){
+            SERIAL_DEBUG.print((char)buffer_transmit[i]);
+        }
+    #endif
 
-    // TODO: take care of feedback values
+    #if USE_IRIDUIUM
+        PDEBMSG("True iridium")
+        int ird_feedback;
+        ird_feedback = iridium_sbd.sendReceiveSBDBinary(
+            (uint8_t *)buffer_transmit, buffer_transmit_position,
+            (uint8_t *)buffer_received, buffer_received_position);
+
+        // TODO: take care of feedback values
+    #else
+        PDEBMSG("Iridium mockup")
+    #endif
 }
 
 void IridiumManager::send_receive_iridium_vital_information(void)
 {
+    PDEBMSG("call IridiumManager::send_receive_iridium_vital_information")
+
     iridium_sbd.begin(); // wake up
 
     // start with clean buffers
@@ -72,15 +95,6 @@ void IridiumManager::send_receive_iridium_vital_information(void)
     IridiumManager::set_battery_message();
     IridiumManager::set_filename_message();
     IridiumManager::set_GPRMC_message();
-
-    #if DEBUG
-        SERIAL_DEBUG.println(F("Iridium vital message:"));
-        for (int i=0; i<buffer_transmit_position; i++){
-            SERIAL_DEBUG.print((char)buffer_transmit[i]);
-        }
-        SERIAL_DEBUG.print(F("message length: "));
-        SERIAL_DEBUG.println(buffer_transmit_position);
-    #endif
 
     // try to send the Iridium feedback string ----------------------------------
     // note: retries the operation for up to 300 seconds by default; put watchdog
@@ -94,9 +108,7 @@ void IridiumManager::send_receive_iridium_vital_information(void)
 // TODO: on all set methods, put condition to check no buffer overflow
 
 void IridiumManager::set_battery_message(void){
-    #if DEBUG
-        SERIAL_DEBUG.println(F("set battery messsage"));
-    #endif
+    PDEBMSG("call IridiumManager::set_battery_message")
 
     // get the message
     float battery_level_V = board_manager->measure_battery_level();
@@ -111,9 +123,7 @@ void IridiumManager::set_battery_message(void){
 }
 
 void IridiumManager::set_filename_message(void){
-    #if DEBUG
-        SERIAL_DEBUG.println(F("set filename messsage"));
-    #endif
+    PDEBMSG("call IridiumManager::set_filename_message")
 
     // get the filename
     const char * filename = sd_manager->get_filename();
@@ -126,9 +136,7 @@ void IridiumManager::set_filename_message(void){
 }
 
 void IridiumManager::set_GPRMC_message(void){
-    #if DEBUG
-        SERIAL_DEBUG.println(F("set gprmc messsage"));
-    #endif
+    PDEBMSG("call IridiumManager::set_GPRMC_message")
 
     // get the GPRMC message
     int GPRMC_length = gps_controller->load_gprmc_message();
@@ -148,12 +156,6 @@ void IridiumManager::set_GPRMC_message(void){
 */
 bool ISBDCallback(void)
 {
-
-    #if DEBUG
-        SERIAL_DEBUG.println(F("call ISBDCallback"));  // this indicates that
-            // the Iridium library is trying to do something
-    #endif
-
     wdt_reset();
 
     delay(1000);
