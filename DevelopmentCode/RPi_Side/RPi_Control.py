@@ -7,6 +7,7 @@ from compute_statistics import WaveStatistics
 from time import sleep
 import os
 from analyze_stream import AnalyzeStream
+from compute_statistics import WaveStatistics
 
 """
 TODO: do not tranmit reduced spectrum if no signal
@@ -118,8 +119,6 @@ class RPi_control(object):
         if self.verbose > 0:
             printi("Receive data")
 
-        wait_for_data = True
-
         data_list = []
         message_start = "START_TRANSMIT_FILE"
         message_end = "END_TRANSMIT_FILE"
@@ -176,19 +175,17 @@ class RPi_control(object):
     def processing(self):
         """Launch the processing of data"""
 
-        # NOTE: this is here I should rather use the code from Graig!!
-
-        # do the parsing of the file from the Mega
+        # do the parsing of the file from the Mega -----------------------------
         path_in = self.main_path + 'Data/'
         path_out = self.main_path + 'ResultAnalyzis/'
         parser_instance = Parser_logger(path_in, path_out, self.filename, self.verbose)
         parser_instance.process_file()
 
-        # do the analysis of the data
+        # do the analyzis of the data ------------------------------------------
         path_in_processing = self.main_path + 'ResultAnalyzis/'
         instance_compute_statistics = WaveStatistics(path_in=path_in_processing, filename=self.filename)
         instance_compute_statistics.perform_all_processing()
-        instance_compute_statistics.save_all_results()
+        instance_compute_statistics.writeData()
 
     def wait_for_arduino_acknowledgement(self):
         while True:
