@@ -28,6 +28,7 @@
 #include "BoardManager.h"
 #include "IridiumManager.h"
 #include "VN100Manager.h"
+#include "RaspberryManager.h"
 
 // board manager
 BoardManager board_manager{};
@@ -44,6 +45,8 @@ GPSManager gps_controller{&SERIAL_GPS, &sd_manager};
 // Iridium
 IridiumManager iridium_manager{&SERIAL_IRIDIUM, &gps_controller, &board_manager, &sd_manager};
 
+// RPi
+RaspberryManager raspberry_manager{&board_manager, &sd_manager, &iridium_manager, &SERIAL_RASPBERRY};
 
 // TODO: class for the VN100
 // TODO: class for interaction with RaspberryPi
@@ -76,6 +79,7 @@ void setup(){
 
   // raspberry Pi
 
+
   // start logging!
   board_manager.start_logging(DURATION_LOGGING_MS);
 }
@@ -99,14 +103,26 @@ void loop(){
     case BOARD_DONE_LOGGING:
       // close SD card
       sd_manager.close_datafile();
+
       // go through Iridium vital messages
       iridium_manager.send_receive_iridium_vital_information();
+
       // go through Raspberry Pi interaction
+      perform_raspberry_interaction();
 
       // ask to be put off
       board_manager.ask_to_be_off();
+
       // put to deep sleep: TODO: implement in board_manager
       board_manager.sleep_or_reboot();
       break;
   }
+}
+
+void perform_raspberry_interaction(void){
+  raspberry_manager.start();
+  raspberry_manager.send_filename();
+  raspberry_manager.file_content_to_raspberry();
+  raspberry_manager.receive_processed_data();
+  raspberry_manager.transmit_through_iridium();
 }

@@ -4,6 +4,7 @@
 #include "SDManager.h"
 #include "IridiumManager.h"
 #include "BoardManager.h"
+#include "StreamAnalyzer.h"
 
 #ifndef RASPBERRY_MANAGER
 #define RASPBERRY_MANAGER
@@ -29,6 +30,8 @@ class RaspberryManager{
     void shutdown(void);
 
     void transmit_through_iridium(char filename_prefix = 'I');
+
+    void send_filename(void);
 
   private:
 

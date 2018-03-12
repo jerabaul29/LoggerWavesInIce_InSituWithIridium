@@ -76,7 +76,6 @@ class SDManager{
         */
         void write_char(char);
 
-
     private:
         /*
          Post the current millis timestamp.

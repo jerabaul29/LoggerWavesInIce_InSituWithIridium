@@ -35,6 +35,16 @@ public:
     */
     void send_receive(void);
 
+    /*
+      Clean the received buffer and reset pointer
+    */
+    void clean_reset_buffer_received(void);
+
+    /*
+      Clean the transmitted buffer and reset pointer
+    */
+    void clean_reset_buffer_transmit(void);
+
 private:
     HardwareSerial * serial_port;
 
@@ -45,16 +55,6 @@ private:
     SDManager * sd_manager;
 
     IridiumSBD iridium_sbd;
-
-    /*
-      Clean the received buffer and reset pointer
-    */
-    void clean_reset_buffer_received(void);
-
-    /*
-      Clean the transmitted buffer and reset pointer
-    */
-    void clean_reset_buffer_transmit(void);
 
     /*
       Clean both buffers

@@ -5,8 +5,8 @@
 #define DEBUG_MACROS
 
 #if DEBUG
-#  define PDEBMSG(x) debug_print_string(F("D ")); debug_println_string(F(x));
-#  define PDEBVAR(x) debug_print_string(F("D "#x" ")); debug_println(x);
+#  define PDEBMSG(x) SERIAL_DEBUG.println(); debug_print_string(F("D ")); debug_println_string(F(x));
+#  define PDEBVAR(x) SERIAL_DEBUG.println(); debug_print_string(F("D "#x" ")); debug_println(x);
 #  define SHOW_VAR_NAME(x) SHOW_VAR_NAME_(x)
 #else
 #  define PDEBMSG(x) // nothing

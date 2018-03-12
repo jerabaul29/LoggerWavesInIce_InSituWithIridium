@@ -63,7 +63,6 @@ void SDManager::update_current_file(char file_prefix = 'F'){
   dataFile = SD.open(current_file_name, FILE_WRITE);
   delay(5);
 
-  PDEBVAR(this->current_file_name)
 }
 
 void SDManager::set_filename(char file_prefix, long number_value){
@@ -81,9 +80,13 @@ void SDManager::set_filename(char file_prefix, long number_value){
   {
     current_file_name[NBR_ZEROS_FILENAME - ind_rank] = str_index[str_length - 1 - ind_rank];
   }
+
+  PDEBVAR(this->current_file_name)
 }
 
 void SDManager::open_current_filenumber(char file_prefix){
+  PDEBMSG("call SDManager::open_current_filenumber")
+
   // close currently opened file
   delay(5);
   dataFile.close();
@@ -97,6 +100,7 @@ void SDManager::open_current_filenumber(char file_prefix){
   delay(5);
   dataFile = SD.open(current_file_name);
   delay(5);
+
 }
 
 bool SDManager::more_to_read(void){
@@ -108,11 +112,13 @@ bool SDManager::more_to_read(void){
     }
     // nothing more to read
     else{
+      PDEBMSG("SDManager::more_to_read end of file")
       return(false);
     }
   }
   // cannot open file
   else{
+    PDEBMSG("SDManager::more_to_read no opened file")
     return(false);
   }
 }
