@@ -26,6 +26,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <Stream.h> // for Stream
 #include "Arduino.h"
 
+#ifndef IRIDIUM_SBD
+#define IRIDIUM_SBD
+
 #define ISBD_LIBRARY_REVISION           2
 
 #define ISBD_DIAGS                      1
@@ -177,3 +180,5 @@ private:
 
    bool cancelled();
 };
+
+#endif
