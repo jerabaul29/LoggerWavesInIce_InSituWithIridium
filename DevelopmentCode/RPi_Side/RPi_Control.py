@@ -6,6 +6,7 @@ from parser import Parser_logger
 from compute_statistics import WaveStatistics
 from time import sleep
 import os
+from analyze_stream import AnalyzeStream
 
 """
 TODO: do not tranmit reduced spectrum if no signal
@@ -58,22 +59,12 @@ class RPi_control(object):
             printi("Connection Acknowledged")
 
     def receive_from_Arduino(self):
-        """Receive commands, filename and data from Arduino in this order.
-
-        -- The commands from Arduino should be in format: C [COMMAND] .
-        The [COMMAND] sequence should not contain the character 'C' nor 'N'.
-
-        -- The filename should be transmitted as: N CCCCCC . The C should all
-        be different from 'N'
-
-        -- The data in the file should be transmitted as: N [DATA] FINISHED
-        """
 
         self.list_of_commands = []
         self.filename = ""
         self.data = ""
 
-        # received commands
+        # received commands ----------------------------------------------------
         if self.verbose > 0:
             printi("Receive commands")
 
@@ -98,9 +89,11 @@ class RPi_control(object):
                 else:
                     current_command.append(crrt_char)
 
-        # receive filename
+        # receive filename ----------------------------------------------------
         if self.verbose > 0:
             printi("Receive Filename")
+
+        self.serial_port.write('N')
 
         wait_for_filename = True
         filename_list = []
@@ -114,82 +107,42 @@ class RPi_control(object):
 
                 if crrt_char == 'N':
                     wait_for_filename = False
+                    self.serial_port.write('N')
 
                 else:
                     filename_list.append(crrt_char)
 
         self.filename = ''.join(filename_list)
 
-        # receive data
+        # receive data ---------------------------------------------------------
         if self.verbose > 0:
             printi("Receive data")
 
         wait_for_data = True
 
         data_list = []
-        remaining_finish = 8
+        message_start = "START_TRANSMIT_FILE"
+        message_end = "END_TRANSMIT_FILE"
 
-        while wait_for_data:
+        # receive the start message
+        analyze_stream = AnalyzeStream(message_start)
+
+        while not analyze_stream.found_message():
             if self.serial_port.in_waiting > 0:
                 crrt_char = self.serial_port.read()
+                analyze_stream.read_char(crrt_char)
 
-                if self.verbose > 1:
-                    printi('Received char: ' + str(crrt_char))
+        # receive the data including the end message
+        analyze_stream = AnalyzeStream(message_end)
 
+        while not analyze_stream.found_message():
+            if self.serial_port.in_waiting > 0:
+                crrt_char = self.serial_port.read()
                 data_list.append(crrt_char)
+                analyze_stream.read_char(crrt_char)
 
-                if (remaining_finish == 8) and (crrt_char == 'F'):
-                    remaining_finish -= 1
-
-                    if self.verbose > 1:
-                        printi('FINISHED 8')
-
-                elif (remaining_finish == 7) and (crrt_char == 'I'):
-                    remaining_finish -= 1
-
-                    if self.verbose > 1:
-                        printi('FINISHED 7')
-
-                elif (remaining_finish == 6) and (crrt_char == 'N'):
-                    remaining_finish -= 1
-
-                    if self.verbose > 1:
-                        printi('FINISHED 6')
-
-                elif (remaining_finish == 5) and (crrt_char == 'I'):
-                    remaining_finish -= 1
-
-                    if self.verbose > 1:
-                        printi('FINISHED 5')
-
-                elif (remaining_finish == 4) and (crrt_char == 'S'):
-                    remaining_finish -= 1
-
-                    if self.verbose > 1:
-                        printi('FINISHED 4')
-
-                elif (remaining_finish == 3) and (crrt_char == 'H'):
-                    remaining_finish -= 1
-
-                    if self.verbose > 1:
-                        printi('FINISHED 3')
-
-                elif (remaining_finish == 2) and (crrt_char == 'E'):
-                    remaining_finish -= 1
-
-                    if self.verbose > 1:
-                        printi('FINISHED 2')
-
-                elif (remaining_finish == 1) and (crrt_char == 'D'):
-                    wait_for_data = False
-
-                    if self.verbose > 1:
-                        printi('FINISHED 1')
-
-                else:
-                    remaining_finish = 8
-
-        self.data = ''.join(data_list[:-8])
+        # generate the data, taking away end message
+        self.data = ''.join(data_list[:-len(message_end)])
 
     def save_all(self):
         """Save received commands and data, and append the filename list."""
@@ -244,7 +197,7 @@ class RPi_control(object):
                 if crrt_char == 'R':
                     break
 
-    def send_over_Iridium(self):
+    def send_over_Iridium(self):  # TODO: change from here
         """Send the processed data over Iridium"""
 
         # when should send through Iridium, ask it to the Mega as:
