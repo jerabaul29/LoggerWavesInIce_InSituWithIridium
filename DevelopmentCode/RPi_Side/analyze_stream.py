@@ -18,5 +18,5 @@ class AnalyzeStream(object):
         else:
             return(False)
 
-    def found_message(self):
+    def has_found_message(self):
         return(self.found_message)

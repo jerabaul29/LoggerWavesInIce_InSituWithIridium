@@ -1,11 +1,10 @@
-from crcmod import mkCrcFun
+from __future__ import print_function
 import numpy as np
 from binascii import hexlify, unhexlify
 from struct import unpack
 import os
 import fnmatch
-from printind.printind_function import printi
-
+from crcmod import mkCrcFun
 crc16 = mkCrcFun(0x11021, 0x0000, False, 0x0000)
 
 # length of one binary dataframe
@@ -50,16 +49,16 @@ def parse_frame_vn100(data_frame, verbose=0):
         ind_float_final = ind_float_start + 4 * 2
         current_binary_bytes = data_frame[ind_float_start:ind_float_final]
 
-        if verbose > 1:
-            print "Parsing bytes:"
+        if verbose > 5:
+            print("Parsing bytes:")
             display_binary_data(current_binary_bytes)
 
         current_value = np.float(unpack('<f', unhexlify(current_binary_bytes))[0])
         output[ind_data] = current_value
 
-    if verbose > 1:
-        print "Parsed VN100 data frame"
-        print output
+    if verbose > 5:
+        print("Parsed VN100 data frame")
+        print(output)
 
     return output
 
@@ -70,23 +69,23 @@ def print_parsed_frame_vn100(output):
     """
 
     # Mag
-    print output[0:3]
+    print(output[0:3])
     # Accel
-    print output[3:6]
+    print(output[3:6])
     # Gyro
-    print output[6:9]
+    print(output[6:9])
     # Temp
-    print output[9]
+    print(output[9])
     # Pres
-    print output[10]
+    print(output[10])
     # YawPitchRoll
-    print output[11:14]
+    print(output[11:14])
     # DCM
-    print output[14:23].reshape((3, 3))
+    print(output[14:23].reshape((3, 3)))
     # MagNed
-    print output[23:26]
+    print(output[23:26])
     # AccNed
-    print output[26:29]
+    print(output[26:29])
 
 
 def convert_numpy_to_scientific_string(numpy_array):
@@ -110,10 +109,10 @@ def display_binary_data(binary_data):
     Display some binary data in hex format
     """
 
-    print "Print binary data"
+    print("Print binary data")
 
     length_data = len(binary_data)
-    print "Length of binary data as ASCII: " + str(length_data)
+    print("Length of binary data as ASCII: " + str(length_data))
 
     str_print = ""
 
@@ -121,7 +120,7 @@ def display_binary_data(binary_data):
         str_print += binary_data[2 * ind:2 * ind + 2]
         str_print += " "
 
-    print str_print
+    print(str_print)
 
 
 def load_until_end_line(data, start_index):
@@ -138,7 +137,7 @@ def load_until_end_line(data, start_index):
         try:
             current_char = data[current_index]
         except IndexError:
-            print "bad end of line at the end of the file; probably due to power disconnect"
+            print("bad end of line at the end of the file; probably due to power disconnect")
             return (accumulator, current_index - 1)
             break
 
@@ -151,86 +150,47 @@ def load_until_end_line(data, start_index):
             accumulator.append(current_char)
 
 
-def generate_list_IMU_IDs(path_root_IMU_data):
-    """Generate the list of IMUs present in the path_root_IMU_data folder.
-    """
-
-    return os.listdir(path_root_IMU_data)
-
-
 class Parser_logger():
     """
-    A class for helping to parse output from the Waves in ice loggers. The path
-    should be the one to the root of the folder structure containing the logger
-    files. The folders structure should be the following:
-
-    - IMU_data (location of the root_path)
-    |
-    |--- IMU_ID_1
-    |        |
-    |        |--- F000458
-    |        |--- F000459
-    |        |--- etc...
-    |
-    |--- IMU_ID_2
-    |        |
-    |        |--- etc...
-    |
-    |--- etc...
+    A class for helping to parse output from the Waves in ice loggers
     """
 
-    def __init__(self, path=None, path_output=None):
-        """Parse all data in the folder structure (should agree with the definition
-        in the docstring of the class).
-
-        path: path to the root of the folder structure
-        path_output: where to save the data
-        """
+    def __init__(self, path=None, path_output=None, verbose=0):
         self.path = path
         self.path_output = path_output
-        self.process_from_root()
+        self.verbose = verbose
 
-    def process_from_root(self):
-        list_IMU_IDs = generate_list_IMU_IDs(self.path)
-
-        if not os.path.exists(self.path_output):
-            os.makedirs(self.path_output)
-
-        for crrt_IMU_ID in list_IMU_IDs:
-
-            printi("Processing IMU_ID: " + crrt_IMU_ID)
-
-            current_path_in = self.path + '/' + crrt_IMU_ID + '/'
-            current_path_out = self.path_output + '/' + crrt_IMU_ID + '/'
-            if not os.path.exists(current_path_out):
-                os.makedirs(current_path_out)
-
-            self.process_folder(current_path_in, current_path_out)
-
-    def process_folder(self, path_in, path_out, verbose=0):
+    def process_folder(self):
         """
         Process all the files in the self.path folder
         """
 
-        for file_crrt in os.listdir(path_in):
+        verbose = self.verbose
+
+        for file_crrt in os.listdir(self.path):
             if fnmatch.fnmatch(file_crrt, 'F*'):
 
-                printi("Processing file: " + str(file_crrt))
+                if self.verbose > 0:
+                    print("Processing file: " + str(file_crrt))
 
-                self.load_file(path_in + file_crrt, verbose=verbose)
+                self.load_file(self.path + file_crrt, verbose=verbose)
 
-                self.parse_current_data(path_out + file_crrt, verbose=verbose)
+                self.parse_current_data(self.path_output + file_crrt, verbose=verbose)
 
-    def load_file(self, path_to_file, verbose=0):
+    def load_file(self, path_to_file):
+        verbose = self.verbose
+
         with open(path_to_file, 'r') as file:
             self.current_data = file.read()
 
         self.current_data_length = len(self.current_data)
 
         if verbose > 0:
-            print "Total data length: " + str(self.current_data_length)
+            print("Total data length: " + str(self.current_data_length))
 
-    def parse_current_data(self, path_output, verbose=0):
+    def parse_current_data(self, path_output):
+        verbose = self.verbose
+
         current_data_index = 0
 
         list_strings_log_S = []
@@ -257,38 +217,38 @@ class Parser_logger():
         # while some data to analyse in the file, go through it
         while current_data_index < self.current_data_length:
 
-            if verbose > 1:
-                print "Current index: " + str(current_data_index)
+            if verbose > 5:
+                print("Current index: " + str(current_data_index))
 
             # coming next may be just an empty line
             if self.current_data[current_data_index] == '\n' or self.current_data[current_data_index] == '\r':
                 current_data_index += 1
 
-                if verbose > 0:
-                    print "Newline char"
+                if verbose > 5:
+                    print("Newline char")
 
             else:
                 # at this point, look for the indication of which type of data to expect
                 next_two_chars = self.current_data[current_data_index:current_data_index + 2]
                 current_data_index += 2
 
-                if verbose > 1:
-                    print "Current next two chars: " + str(next_two_chars)
+                if verbose > 5:
+                    print("Current next two chars: " + str(next_two_chars))
 
                 # case information about timestamp in milliseconds
                 if next_two_chars == 'M,':
 
-                    if verbose > 0:
-                        print "Hit start of a milliseconds timestamp"
+                    if verbose > 5:
+                        print("Hit start of a milliseconds timestamp")
 
                     (message, current_data_index) = load_until_end_line(self.current_data, current_data_index)
                     message_string = ''.join(message)
 
-                    if verbose > 0:
-                        print "Message: " + message_string
+                    if verbose > 5:
+                        print("Message: " + message_string)
 
                     if expected_next_timestamp == 0:
-                        print "Expected no timestamp!"
+                        print("Expected no timestamp!")
 
                     elif expected_next_timestamp == 2:
                         list_strings_log_R_time = add_entry_list_strings(list_strings_log_R_time, message_string)
@@ -307,13 +267,13 @@ class Parser_logger():
                 elif next_two_chars == 'S,':
 
                     if verbose > 0:
-                        print "Hit start of a file"
+                        print("Hit start of a file")
 
                     (message, current_data_index) = load_until_end_line(self.current_data, current_data_index)
                     message_string = ''.join(message)
 
-                    if verbose > 0:
-                        print "Message: " + message_string
+                    if verbose > 5:
+                        print("Message: " + message_string)
 
                     expected_next_timestamp = 0
                     list_strings_log_S = add_entry_list_strings(list_strings_log_S, message_string)
@@ -322,13 +282,13 @@ class Parser_logger():
                 elif next_two_chars == 'R,':
 
                     if verbose > 0:
-                        print "Hit start of a raw reading battery message"
+                        print("Hit start of a raw reading battery message")
 
                     (message, current_data_index) = load_until_end_line(self.current_data, current_data_index)
                     message_string = ''.join(message)
 
-                    if verbose > 0:
-                        print "Message: " + message_string
+                    if verbose > 5:
+                        print("Message: " + message_string)
 
                     expected_next_timestamp = 0
                     list_strings_log_R = add_entry_list_strings(list_strings_log_R, message_string)
@@ -337,13 +297,13 @@ class Parser_logger():
                 elif next_two_chars == 'C,':
 
                     if verbose > 0:
-                        print "Hit start of a converted level battery message"
+                        print("Hit start of a converted level battery message")
 
                     (message, current_data_index) = load_until_end_line(self.current_data, current_data_index)
                     message_string = ''.join(message)
 
-                    if verbose > 0:
-                        print "Message: " + message_string
+                    if verbose > 5:
+                        print("Message: " + message_string)
 
                     expected_next_timestamp = 2
                     list_strings_log_C = add_entry_list_strings(list_strings_log_C, message_string)
@@ -351,14 +311,14 @@ class Parser_logger():
                 # case GPS data
                 elif next_two_chars == '$G':
 
-                    if verbose > 0:
-                        print "Hit start of a GPS data string"
+                    if verbose > 5:
+                        print("Hit start of a GPS data string")
 
                     (message, current_data_index) = load_until_end_line(self.current_data, current_data_index)
                     message_string = ''.join(message)
 
-                    if verbose > 0:
-                        print "Message: G" + message_string
+                    if verbose > 5:
+                        print("Message: G" + message_string)
 
                     expected_next_timestamp = 3
                     list_strings_log_G.append('G')
@@ -367,25 +327,25 @@ class Parser_logger():
                 # case binary data
                 elif next_two_chars == 'B,':
 
-                    if verbose > 0:
-                        print "Hit start of a binary data frame"
+                    if verbose > 5:
+                        print("Hit start of a binary data frame")
 
                     current_data_index += 3
                     current_binary_data = hexlify(self.current_data[current_data_index:current_data_index + length_binary_frame])
                     current_data_index += length_binary_frame
 
-                    if verbose > 0:
+                    if verbose > 5:
                         display_binary_data(current_binary_data)
 
                     validity_checksum = checksum_vn100(current_binary_data)
 
-                    if verbose > 0:
-                        print "Validity checksum " + str(validity_checksum)
+                    if verbose > 5:
+                        print("Validity checksum " + str(validity_checksum))
 
                     if validity_checksum:
                         output = parse_frame_vn100(current_binary_data, verbose=verbose)
 
-                        if verbose > 0:
+                        if verbose > 5:
                             print_parsed_frame_vn100(output)
 
                     else:
@@ -398,13 +358,13 @@ class Parser_logger():
                 else:
 
                     if verbose > 0:
-                        print "Broken message, read until next line break"
+                        print("Broken message, read until next line break")
 
                     (message, current_data_index) = load_until_end_line(self.current_data, current_data_index)
                     message_string = ''.join(message)
 
-                    if verbose > 0:
-                        print "Message: " + message_string
+                    if verbose > 5:
+                        print("Message: " + message_string)
 
                     expected_next_timestamp = 5
                     list_strings_log_broken = add_entry_list_strings(list_strings_log_broken, message_string)

@@ -107,8 +107,6 @@ bool RaspberryManager::acknowledge_to_raspberry(char from_raspberry, char answer
 }
 
 void RaspberryManager::file_content_to_raspberry(void){
-    // transmit? -> transmit
-    this->ask_acknowledge_raspberry('T', 'T');
 
     // send the start message
     serial_port->print(F("START_TRANSMIT_FILE"));
@@ -243,7 +241,7 @@ void RaspberryManager::send_filename(void){
     }
 
     // done? -> done!
-    this->ask_acknowledge_raspberry('D', 'D');
+    this->ask_acknowledge_raspberry('N', 'N');
 }
 
 void RaspberryManager::shutdown(void){

@@ -2,12 +2,11 @@ from __future__ import print_function
 import serial
 import glob
 from printind.printind_function import printi
-from parser import Parser_logger
+from parser_logger import Parser_logger
 from compute_statistics import WaveStatistics
 from time import sleep
 import os
 from analyze_stream import AnalyzeStream
-from compute_statistics import WaveStatistics
 
 """
 TODO: do not tranmit reduced spectrum if no signal
@@ -19,9 +18,10 @@ Iridium buffer size.
 
 
 class RPi_control(object):
-    def __init__(self, verbose=0, main_path='/home/pi/Logger/'):
+    def __init__(self, verbose=0, main_path='/home/pi/Logger/', debug=False):
         self.verbose = verbose
         self.main_path = main_path
+        self.debug = debug
 
     def open_serial_to_arduino(self):
         '''Find available serial ports to Arduino
@@ -48,7 +48,7 @@ class RPi_control(object):
             if self.serial_port.in_waiting > 0:
                 crrt_char = self.serial_port.read()
 
-                if self.verbose > 1:
+                if self.verbose > 5:
                     printi('Received char: ' + str(crrt_char))
 
                 if crrt_char == 'B':
@@ -56,7 +56,7 @@ class RPi_control(object):
 
                 wait_for_acknowledged_connection = False
 
-        if self.verbose > 0:
+        if self.verbose > 5:
             printi("Connection Acknowledged")
 
     def receive_from_Arduino(self):
@@ -76,7 +76,7 @@ class RPi_control(object):
             if self.serial_port.in_waiting > 0:
                 crrt_char = self.serial_port.read()
 
-                if self.verbose > 1:
+                if self.verbose > 5:
                     printi('Received char: ' + str(crrt_char))
 
                 if crrt_char == 'C':
@@ -91,7 +91,7 @@ class RPi_control(object):
                     current_command.append(crrt_char)
 
         # receive filename ----------------------------------------------------
-        if self.verbose > 0:
+        if self.verbose > 5:
             printi("Receive Filename")
 
         self.serial_port.write('N')
@@ -103,7 +103,7 @@ class RPi_control(object):
             if self.serial_port.in_waiting > 0:
                 crrt_char = self.serial_port.read()
 
-                if self.verbose > 1:
+                if self.verbose > 5:
                     printi('Received char: ' + str(crrt_char))
 
                 if crrt_char == 'N':
@@ -114,6 +114,9 @@ class RPi_control(object):
                     filename_list.append(crrt_char)
 
         self.filename = ''.join(filename_list)
+
+        if self.verbose > 0:
+            print("filename received: " + self.filename)
 
         # receive data ---------------------------------------------------------
         if self.verbose > 0:
@@ -126,19 +129,25 @@ class RPi_control(object):
         # receive the start message
         analyze_stream = AnalyzeStream(message_start)
 
-        while not analyze_stream.found_message():
+        while not analyze_stream.has_found_message():
             if self.serial_port.in_waiting > 0:
                 crrt_char = self.serial_port.read()
                 analyze_stream.read_char(crrt_char)
+
+        if self.verbose > 0:
+            print("received " + message_start)
 
         # receive the data including the end message
         analyze_stream = AnalyzeStream(message_end)
 
-        while not analyze_stream.found_message():
+        while not analyze_stream.has_found_message():
             if self.serial_port.in_waiting > 0:
                 crrt_char = self.serial_port.read()
                 data_list.append(crrt_char)
                 analyze_stream.read_char(crrt_char)
+
+        if self.verbose > 0:
+            print("received " + message_end)
 
         # generate the data, taking away end message
         self.data = ''.join(data_list[:-len(message_end)])
@@ -152,6 +161,7 @@ class RPi_control(object):
         with open(self.main_path + 'filename_list.txt', "a") as myfile:
             myfile.write(self.filename)
             myfile.write('\n')
+            myfile.write("\n")
 
         if self.verbose > 0:
             printi("Add entry in Commands")
@@ -175,17 +185,31 @@ class RPi_control(object):
     def processing(self):
         """Launch the processing of data"""
 
+        # NOTE: can be some problems with paths here...
+
         # do the parsing of the file from the Mega -----------------------------
-        path_in = self.main_path + 'Data/'
-        path_out = self.main_path + 'ResultAnalyzis/'
-        parser_instance = Parser_logger(path_in, path_out, self.filename, self.verbose)
-        parser_instance.process_file()
+        path_in = self.main_path + '/Data/'
+        path_out_logger = self.main_path + '/ResultAnalyzis/'
+
+        data_parser = Parser_logger(verbose=1)
+        data_parser.load_file(path_in + self.filename)
+        data_parser.parse_current_data(path_out_logger + self.filename)
 
         # do the analyzis of the data ------------------------------------------
-        path_in_processing = self.main_path + 'ResultAnalyzis/'
-        instance_compute_statistics = WaveStatistics(path_in=path_in_processing, filename=self.filename)
+        if self.debug:
+            print("CAREFUL: IN DEBUG MODE! USE DUMMY DATA")
+            path_in_processing = '/home/jrlab/Data/WOICE/pi_logger/ResultAnalyzis/'
+            instance_compute_statistics = WaveStatistics(path_in=path_in_processing, filename='test_00470_00471.csv', verbose=self.verbose)
+        else:
+            path_in_processing = path_out_logger
+            instance_compute_statistics = WaveStatistics(path_in=path_in_processing, filename=self.filename + "_B", verbose=self.verbose)
+
         instance_compute_statistics.perform_all_processing()
-        instance_compute_statistics.writeData()
+
+        if self.debug:
+            instance_compute_statistics.writeData(path_output="/home/jrlab/Desktop/Current/Logger/ResultAnalyzis/" + "/" + self.filename + ".bin")
+        else:
+            instance_compute_statistics.writeData()
 
     def wait_for_arduino_acknowledgement(self):
         while True:
@@ -206,81 +230,19 @@ class RPi_control(object):
         for current_command in self.list_of_commands:
 
             # default
+            # NOTE: could transmit as an answer to a request by Iridium by
+            # applying controls here
             if current_command == 'DEFAULT':
-                # send back SWH ------------------------------------------------
-                self.serial_port.write('I')
+                current_binary_file = path_in_processing + self.filename + ".bin"
 
-                self.serial_port.write(3 + 2)
+                if self.verbose > 0:
+                    print("sending the content of file: {}".format(current_binary_file))
 
-                self.serial_port.write('S')
+                self.serial_port.write("PROCESSING_OK")
 
-                # identifier for the receiving side of the Iridium message
-                self.serial_port.write('S')
-                self.serial_port.write('W')
-                self.serial_port.write('H')
+                self.send_content_binary_file(current_binary_file)
 
-                self.send_content_binary_file(path_in_processing + '_SWH.bdat')
-
-                # wait for transmission by Iridium done
-                self.wait_for_arduino_acknowledgement()
-
-                # send back spectral_properties --------------------------------
-                self.serial_port.write('I')
-
-                self.serial_port.write(3 + 6)
-
-                self.serial_port.write('S')
-
-                # identifier for the receiving side of the Iridium message
-                self.serial_port.write('S')
-                self.serial_port.write('P')
-                self.serial_port.write('P')
-
-                self.send_content_binary_file(path_in_processing + '_spectral_properties.bdat')
-
-                # wait for transmission by Iridium done
-                self.wait_for_arduino_acknowledgement()
-
-                # send back max_value_limited_spectrum -------------------------
-                self.serial_port.write('I')
-
-                self.serial_port.write(3 + 2)
-
-                self.serial_port.write('S')
-
-                # identifier for the receiving side of the Iridium message
-                self.serial_port.write('M')
-                self.serial_port.write('V')
-                self.serial_port.write('L')
-
-                self.send_content_binary_file(path_in_processing + '_max_value_limited_spectrum.bdat')
-
-                # wait for transmission by Iridium done
-                self.wait_for_arduino_acknowledgement()
-
-                # send back binary_red_spectrum --------------------------------
-                self.serial_port.write('I')
-
-                path_to_BRS = path_in_processing + '_spectral_properties.bdat'
-                size_in_bytes = int(os.path.getsize(path_to_BRS))
-                self.serial_port.write(3 + size_in_bytes)
-
-                self.serial_port.write('S')
-
-                # identifier for the receiving side of the Iridium message
-                self.serial_port.write('B')
-                self.serial_port.write('R')
-                self.serial_port.write('S')
-
-                self.send_content_binary_file(path_to_BRS)
-
-                # wait for transmission by Iridium done
-                self.wait_for_arduino_acknowledgement()
-
-            # transmit all data in a file (at least part of it)
-            if current_command[0:3] == 'TRT':
-                filename_to_transmit = current_command[3:]
-                # TODO
+                self.serial_port.write("PROCESSED_END")
 
     def send_content_binary_file(self, path_to_file):
         """Send by serial the content of a binary file to the Arduino Mega."""

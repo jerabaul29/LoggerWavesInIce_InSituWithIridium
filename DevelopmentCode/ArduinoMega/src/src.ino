@@ -80,7 +80,7 @@ void setup(){
   wdt_reset();
 
   // raspberry Pi
-
+  // will be started when needed
 
   // start logging!
   board_manager.start_logging(DURATION_LOGGING_MS);

@@ -5,6 +5,7 @@ from scipy.signal import butter, lfilter
 from scipy import signal
 from scipy.interpolate import interp1d
 from matplotlib.mlab import find
+import matplotlib.pyplot as plt
 import sys
 import os
 import struct
@@ -18,10 +19,6 @@ NOTES / TODO
 
 ################################################################################
 # some global parameters #######################################################
-plot_diag = True
-
-if plot_diag:
-    import matplotlib.pyplot as plt
 
 # parameters for the band pass filtering
 global_fs = 10.0
@@ -384,7 +381,7 @@ class WaveStatistics(object):
             printi("max b2 reduced = " + str(self.b2_reduc_max))
             printi('Hs reduced = {}'.format(Hs_reduc))
 
-        if plot_diag:
+        if self.verbose > 3:
             plt.figure()
             plt.plot(self.freq, self.a0)
             plt.plot(self.freq_reduc, self.a0_reduc * self.a0_reduc_max / norm_val, '-ro')
@@ -430,11 +427,19 @@ class WaveStatistics(object):
 
             plt.show()
 
-    def writeData(self):
+    def writeData(self, path_output=None):
         '''write the data to a data structure file'''
-        basename = os.path.splitext(self.filename)[0]
 
-        with open(self.path_in + '/' + basename + '.bin', 'wb') as f:
+        if path_output is None:
+            basename = os.path.splitext(self.filename)[0]
+            total_path = self.path_in + '/' + basename + '.bin'
+        else:
+            total_path = path_output
+
+        if self.verbose > 0:
+            print("save binary data as {}".format(total_path))
+
+        with open(total_path, 'wb') as f:
             fmt_hdr = '<' + 'f' * 10
             f.write(struct.pack(fmt_hdr, self.SWH, self.T_z0, self.Hs, self.T_z,
                                 self.a0_reduc_max, self.a1_reduc_max, self.b1_reduc_max,
