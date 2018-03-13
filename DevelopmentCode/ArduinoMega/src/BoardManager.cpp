@@ -4,6 +4,9 @@
 
 BoardManager::BoardManager(void)
 {
+    pinMode(PIN_FBK_MGA, INPUT);
+    pinMode(PIN_MFT_RPI, OUTPUT);
+    // digitalWrite(PIN_MFT_RPI, HIGH);
 }
 
 void BoardManager::start(void){
@@ -51,6 +54,7 @@ void BoardManager::turn_raspberry_off(void){
 
 void BoardManager::turn_raspberry_on(void){
     PDEBMSG("switch on raspberry")
+    pinMode(PIN_FBK_MGA, OUTPUT);
     digitalWrite(PIN_MFT_RPI, LOW);
 }
 

@@ -38,7 +38,7 @@ SOFTWARE.
 #define BAT_EMPTY_V 2.8     // threshold for empty battery
 
 // Debug
-#define DEBUG false
+#define DEBUG true
 #define SERIAL_DEBUG Serial
 #define SERIAL_DEBUG_BAUDRATE 115200
 

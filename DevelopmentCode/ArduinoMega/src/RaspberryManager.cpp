@@ -13,14 +13,23 @@ RaspberryManager::RaspberryManager(BoardManager * board_manager,
     message_from_raspberry_processing_ok("PROCESSING_OK"),
     length_message_from_raspberry_processing_ok(message_from_raspberry_processing_ok.length())
     {
-        
+
     }
 
 void RaspberryManager::start(){
     PDEBMSG("call RaspberryManager::start")
 
+    #if DEBUG
+        delay(100);
+    #endif
+
     board_manager->turn_raspberry_on();
     wdt_reset();
+
+    // let the time to boot; should be unnecessary if no issue with serial port
+    // beginning without the RPi connected.
+
+    this->wait_some_time_ms(20000);  // TODO: take away or reduce!
 
     // start serial while maybe no computer listening; should not be a problem.
     serial_port->begin(115200);
