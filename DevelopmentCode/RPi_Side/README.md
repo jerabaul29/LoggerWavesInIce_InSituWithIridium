@@ -37,7 +37,7 @@ The following should be added to the sudo crontab (sudo crontab -e):
 - Connect to the RPi: ssh pi@IP_RPi
 - There may be a warning because of SSH fingerprint; follow instructions to ignore
 - Default RPi password: raspberry
-- Change password on the RPi using the *passwd* command, for example to: user: pi password: RPi_WavesIce+
+- Change password on the RPi using the *passwd* command, for example to: user: pi password: 55732gg88j
 - Enable internet on main computer to share connection to RPi
 - Update RPI: *sudo apt-get update* and *sudo apt-get upgrade*
 - Install some base packages: *sudo apt-get install vim* and *sudo apt-get install python-pip* 
@@ -46,7 +46,8 @@ The following should be added to the sudo crontab (sudo crontab -e):
 - Copy the code to the Code folder: *scp *.py pi@IP_Pi:/home/pi/Logger/Code/* and *scp *.sh pi@IP_Pi:/home/pi/Logger/Code/*
 - change the parameters in the logger code: in **launch_processing_debugging.py** use *main_path=/home/pi/Logger* , if necessary make the *debug=True* or *False*. Debug indicates if use the true data or the dummy data for testing the processing code. path is dependent on my laptop vs RPi. verbosity is controlled by the verbose parameter.
 - Run tests to check that everything ok.
-- Once the system is working and communicating with the logger, reduce boot time following https://folk.uio.no/jeanra/Informatics/GettingStartedRaspberryPi.html
+- Once the system is working and communicating with the logger, reduce boot time following https://folk.uio.no/jeanra/Informatics/GettingStartedRaspberryPi.html : *sudo update-rc.d networking remove* *sudo update-rc.d dhcpcd remove* *sudo systemctl disable dphys-swapfile*
+- Prepare the script (*chmod +x script_RPi.sh*) and set up the crontab for automatically starting processing and then shutting off: *sudo crontab -e* and then add the script: *@reboot sh /home/pi/Logger/Code/script_RPi.sh* .
 - Do last test with RPi reduced booting time.
 
 ## Reminders
