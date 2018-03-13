@@ -86,9 +86,6 @@ void setup(){
 
   // start logging!
   board_manager.start_logging(DURATION_LOGGING_MS);
-
-  // TODO: remove! for debug!
-  raspberry_manager.start();
 }
 
 void loop(){
@@ -120,7 +117,7 @@ void loop(){
       // ask to be put off
       board_manager.ask_to_be_off();
 
-      // put to deep sleep: TODO: implement in board_manager
+      // put to deep sleep
       board_manager.sleep_or_reboot();
       break;
   }
