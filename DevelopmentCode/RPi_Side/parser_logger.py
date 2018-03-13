@@ -348,11 +348,27 @@ class Parser_logger():
                         if verbose > 5:
                             print_parsed_frame_vn100(output)
 
-                    else:
-                        output = np.array([0])
+                        expected_next_timestamp = 4
+                        list_strings_log_B = add_entry_list_strings(list_strings_log_B, convert_numpy_to_scientific_string(output))
 
-                    expected_next_timestamp = 4
-                    list_strings_log_B = add_entry_list_strings(list_strings_log_B, convert_numpy_to_scientific_string(output))
+                    else:
+                        # output = np.array([0])
+                        # make no output
+                        if self.verbose > 0:
+                            print("warning, bad binary data!")
+
+                        # BAD!!! COPY FROM NEXT LINE...
+                        if verbose > 0:
+                            print("Broken message, read until next line break")
+
+                        (message, current_data_index) = load_until_end_line(self.current_data, current_data_index)
+                        message_string = ''.join(message)
+
+                        if verbose > 5:
+                            print("Message: " + message_string)
+
+                        expected_next_timestamp = 5
+                        list_strings_log_broken = add_entry_list_strings(list_strings_log_broken, message_string)
 
                 # or broken message
                 else:

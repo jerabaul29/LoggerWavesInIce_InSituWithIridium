@@ -22,6 +22,7 @@ void RaspberryManager::start(){
     board_manager->turn_raspberry_on();
     wdt_reset();
 
+    // TODO: change this: ask the RPi for acknowlegement in a maximum time duration
     this->wait_some_time_ms(10000UL);
     wdt_reset();
 

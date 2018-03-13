@@ -45,7 +45,7 @@ The following should be added to the sudo crontab (sudo crontab -e):
 - Copy the logger files to the RPi and setup the tree structure: go to *example_structure_on_Pi* and *scp -r * pi@IP_Pi:/home/pi/*
 - Copy the code to the Code folder: *scp *.py pi@IP_Pi:/home/pi/Logger/Code/* and *scp *.sh pi@IP_Pi:/home/pi/Logger/Code/*
 - Once the system is working and communicating with the logger, reduce boot time following https://folk.uio.no/jeanra/Informatics/GettingStartedRaspberryPi.html
-- change the parameters in the logger code: in **launch_processing_debugging.py** use *main_path=/home/pi/Logger* , if necessary make the *debug=True* 
+- change the parameters in the logger code: in **launch_processing_debugging.py** use *main_path=/home/pi/Logger* , if necessary make the *debug=True* or *False*.
 - Run tests to check that everything ok.
 
 ## Reminders

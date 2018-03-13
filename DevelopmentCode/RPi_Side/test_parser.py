@@ -1,8 +1,14 @@
-from parser import *
+import parser_logger
 
-path_in = '/media/jrlab/673b8ab6-6426-474b-87d3-71bff0fcebc3/home/pi/Logger/Data/'
-path_out = '/media/jrlab/673b8ab6-6426-474b-87d3-71bff0fcebc3/home/pi/Logger/ResultAnalyzis/'
-filename = 'F00249'
-verbose = 0
+path_in = '/media/jrlab/3DAE-4639/'
+path_out = '/media/jrlab/3DAE-4639/'
+filename = 'F00397'
+verbose = 1
 
-parser_instance = Parser_logger(path_in, path_out, filename, verbose)
+parser_instance = parser_logger.Parser_logger(path_in, path_out, verbose)
+parser_instance.load_file(path_in + filename)
+parser_instance.parse_current_data(path_out + filename)
+
+import numpy as np
+
+np.genfromtxt(path_out + filename + '_B', delimiter=',', skip_header=1)

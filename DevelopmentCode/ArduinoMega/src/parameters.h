@@ -20,12 +20,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-  *
-  * The parameters for the power controlling mController
-  * Should make sure all the parameters are good, in particular number of cycles
-  * before uploading.
-  *
+*/
 
+/*
+  crucial for good functionning:
+    - check DEBUG parameter: should be false for use with RPi
+    - check USE_IRIDIUM: should be true for use of real iridium and not dummy
+    - check DURATION_LOGGING_MS
 */
 
 #ifndef PARAMETERS_LOGGER_MEGA
@@ -78,8 +79,8 @@ SOFTWARE.
 #define PIN_FBK_MGA 48
 
 // how long should log
-// #define DURATION_LOGGING_MS 1500000UL
-#define DURATION_LOGGING_MS 5000UL  // for tests
+#define DURATION_LOGGING_MS 1500000UL
+// #define DURATION_LOGGING_MS 5000UL  // for tests
 
 // Mosfet power Raspberry Pi
 #define PIN_MFT_RPI 46
