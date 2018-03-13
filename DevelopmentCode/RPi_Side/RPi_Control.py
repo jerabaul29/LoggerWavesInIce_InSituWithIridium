@@ -206,10 +206,7 @@ class RPi_control(object):
 
         instance_compute_statistics.perform_all_processing()
 
-        if self.debug:
-            instance_compute_statistics.writeData(path_output=path_out_logger + self.filename + ".bin")
-        else:
-            instance_compute_statistics.writeData()
+        instance_compute_statistics.writeData(path_output=path_out_logger + self.filename + ".bin")
 
     def wait_for_arduino_acknowledgement(self):
         while True:

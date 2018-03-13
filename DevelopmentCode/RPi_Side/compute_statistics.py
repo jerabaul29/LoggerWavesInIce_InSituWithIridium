@@ -432,7 +432,7 @@ class WaveStatistics(object):
 
         if path_output is None:
             basename = os.path.splitext(self.filename)[0]
-            total_path = self.path_in + '/' + basename + '.bin'
+            total_path = self.path_in + '/' + basename[:-2] + '.bin'
         else:
             total_path = path_output
 
