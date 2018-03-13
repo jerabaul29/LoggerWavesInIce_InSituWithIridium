@@ -130,4 +130,5 @@ void perform_raspberry_interaction(void){
   raspberry_manager.file_content_to_raspberry();
   raspberry_manager.receive_processed_data();
   raspberry_manager.transmit_through_iridium();
+  // note: crontab gets raspberry to automatically stop
 }

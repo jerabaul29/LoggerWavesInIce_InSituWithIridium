@@ -251,6 +251,8 @@ void RaspberryManager::receive_processed_data(void){
 
 void RaspberryManager::send_filename(void){
     // name? -> name!
+
+    wdt_reset();
     this->ask_acknowledge_raspberry('N', 'N');
 
     for (int ind = 0; ind < NBR_ZEROS_FILENAME + 1; ind++){
