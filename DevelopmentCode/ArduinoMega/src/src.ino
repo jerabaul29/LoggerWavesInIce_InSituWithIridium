@@ -7,6 +7,8 @@
 // TODO: add information about board status (battery) in SD log files
 // go through watchdogs
 
+// TODO: add a SD manager keeper, that erases old files to avoid to fill the memory
+
 // TODO: attach a serial port for debugging
 // TODO: interaction with Raspberry Pi
 // TODO: Arduino board manager (sleeps, wake up, feedback)

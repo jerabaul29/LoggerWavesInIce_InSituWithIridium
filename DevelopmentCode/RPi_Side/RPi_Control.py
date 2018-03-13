@@ -9,6 +9,7 @@ import os
 from analyze_stream import AnalyzeStream
 
 """
+TODO: add a manager that erases old files, to avoid filling the memory
 TODO: do not tranmit reduced spectrum if no signal
 TODO: test processing and sending back through Iridium together with the Mega
 TODO: command for sending back whole parts of a file (TRT command)
@@ -196,18 +197,17 @@ class RPi_control(object):
         data_parser.parse_current_data(path_out_logger + self.filename)
 
         # do the analyzis of the data ------------------------------------------
+        path_in_processing = path_out_logger
         if self.debug:
             print("CAREFUL: IN DEBUG MODE! USE DUMMY DATA")
-            path_in_processing = '/home/jrlab/Data/WOICE/pi_logger/ResultAnalyzis/'
             instance_compute_statistics = WaveStatistics(path_in=path_in_processing, filename='test_00470_00471.csv', verbose=self.verbose)
         else:
-            path_in_processing = path_out_logger
             instance_compute_statistics = WaveStatistics(path_in=path_in_processing, filename=self.filename + "_B", verbose=self.verbose)
 
         instance_compute_statistics.perform_all_processing()
 
         if self.debug:
-            instance_compute_statistics.writeData(path_output="/home/jrlab/Desktop/Current/Logger/ResultAnalyzis/" + "/" + self.filename + ".bin")
+            instance_compute_statistics.writeData(path_output=path_out_logger + self.filename + ".bin")
         else:
             instance_compute_statistics.writeData()
 
