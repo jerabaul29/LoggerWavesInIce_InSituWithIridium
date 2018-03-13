@@ -80,6 +80,22 @@ def DownSampleNbit(freq_all, sig_all, freq_red, downsample=global_downsample_len
     sig_red_16bit = nbit_convert[nbit](max_val * sig_red_int / sig_red_max)
     return sig_red_16bit, sig_red_max
 
+def nan_helper(y):
+    """Helper to handle indices and logical indices of NaNs.
+
+    Input:
+        - y, 1d numpy array with possible NaNs
+    Output:
+        - nans, logical indices of NaNs
+        - index, a function, with signature indices= index(logical_indices),
+          to convert logical indices of NaNs to 'equivalent' indices
+    Example:
+        >>> # linear interpolation of NaNs
+        >>> nans, x= nan_helper(y)
+        >>> y[nans]= np.interp(x(nans), x(~nans), y[~nans])
+    """
+
+    return np.isnan(y), lambda z: z.nonzero()[0]
 
 class BandPass(object):
     """A class to perform bandpass filtering using Butter filter."""
@@ -158,35 +174,65 @@ class WaveStatistics(object):
         DCM1, DCM2, DCM3, DCM4, DCM5, DCM6, DCM7, DCM8, DCM9,
         MagNED1, MagNED2, MagNED3, AccNED1, AccNED2, ACCNED3"""
 
-        self.data_I = np.genfromtxt(self.path_in + '/' + self.filename, skip_header=1, delimiter=',')
+        # read line by line and detect errors
+        bad_rec = 0
+        good_rec = 0
+        pitch = np.empty([last_IMU_point_to_use+global_fs+1,])
+        roll = np.empty_like(pitch)
+        accz = np.empty_like(pitch)
 
+        # open file
+        with open(self.path_in + '/' + self.filename, 'r') as f:
+            f.readline() # read header
+            ind = 0
+            for line in f:
+                dat = np.fromstring(line, sep=",")
+                if len(dat) == 30:
+                    pitch[ind] = dat[12]
+                    roll[ind] = dat[13]
+                    accz[ind] = dat[28]
+                    ind = ind + 1
+                    good_rec = good_rec + 1
+                else:
+                    pitch[ind] = np.NaN
+                    roll[ind] = np.NaN
+                    accz[ind] = np.NaN
+                    ind = ind + 1
+                    bad_rec = bad_rec + 1
+                if ind >= last_IMU_point_to_use+global_fs+1:
+                    print "index is {}".format(ind)
+                    break
         if self.verbose > 3:
-            printi('Shape of input data is {}'.format(self.data_I.shape))
-            printi('Time duration of record is {} minutes'.format(len(self.data_I) / self.fs / 60))
+            printi('Number of good records are {}'.format(good_rec))
+            printi('Number of bad records are {}'.format(bad_rec))
 
-        self.PITCH = np.deg2rad(self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 12])
-        self.ROLL = np.deg2rad(self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 13])
-        self.YAW = np.deg2rad(self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 11])
-        self.ACCZ = self.data_I[first_IMU_point_to_use:last_IMU_point_to_use, 28]
+        # if NaNs exist then linearly interpolate
+        if bad_rec > 0:
+            nans, x = nan_helper(pitch)
+            pitch[nans] = np.interp(x(nans), x(~nans), pitch[~nans])
+            roll[nans] = np.interp(x(nans), x(~nans), roll[~nans])
+            accz[nans] = np.interp(x(nans), x(~nans), accz[~nans])
+            
+        self.PITCH = np.deg2rad(pitch[first_IMU_point_to_use:last_IMU_point_to_use])
+        self.ROLL = np.deg2rad(roll[first_IMU_point_to_use:last_IMU_point_to_use])
+        self.ACCZ = accz[first_IMU_point_to_use:last_IMU_point_to_use]
 
         self.pitch_det = signal.detrend(self.PITCH)
         self.roll_det = signal.detrend(self.ROLL)
         self.accz_det = signal.detrend(self.ACCZ)
 
         # apply filter
-        # butter = BandPass(fs=self.fs)
-        # self.pitch_det = bp.filter_data(self.pitch_det)
-        # self.roll_det = bp.filter_data(self.roll_det)
-        # self.accz_det = bp.filter_data(self.accz_det)
+        ## butter = BandPass(fs=self.fs)
+        ## self.pitch_det = bp.filter_data(self.pitch_det)
+        ## self.roll_det = bp.filter_data(self.roll_det)
+        ## self.accz_det = bp.filter_data(self.accz_det)
 
         if self.verbose > 3:
             printi('Mean PITCH = {}'.format(np.mean(self.PITCH)))
             printi('Mean ROLL = {}'.format(np.mean(self.ROLL)))
-            printi('Mean YAW = {}'.format(np.mean(self.YAW)))
             printi('Mean ACCZ = {}'.format(np.mean(self.ACCZ)))
             printi('Std PITCH = {}'.format(np.std(self.PITCH)))
             printi('Std ROLL = {}'.format(np.std(self.ROLL)))
-            printi('Std YAW = {}'.format(np.std(self.YAW)))
             printi('Std ACCZ = {}'.format(np.std(self.ACCZ)))
 
     def compute_vertical_elevation(self):
