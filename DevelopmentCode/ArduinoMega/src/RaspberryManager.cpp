@@ -125,7 +125,7 @@ bool RaspberryManager::acknowledge_to_raspberry(char from_raspberry, char answer
     return(false);
 }
 
-// TODO: find a way to transmit chunks of data, otherwise too slow
+// TODO: find a way to transmit chunks of data, otherwise too slow!! works now but slow
 void RaspberryManager::file_content_to_raspberry(void){
 
     // send the start message
