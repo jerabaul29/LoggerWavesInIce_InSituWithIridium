@@ -56,15 +56,12 @@ file1 = 'F{:05d}_B'.format(f1)
 file2 = 'F{:05d}_B'.format(f2)
 inFile = 'test_{0:05d}_{1:05d}.csv'.format(f1, f2)
 
-data1 = np.genfromtxt(dataDir + file1, skip_header=1, delimiter=',')
-data2 = np.genfromtxt(dataDir + file2, skip_header=1, delimiter=',')
-data_all = np.concatenate((data1, data2), axis=0)
-# read in header
-with open(dataDir + file1) as f:
-    hdr = f.readline()
-
-# write to text file
-np.savetxt(inDir + inFile, data_all, fmt='%.6e', delimiter=',', header=hdr)
+with open(inDir + inFile, 'w') as fo:
+    with open(dataDir + file1, 'r') as f1:
+        fo.write(f1.read())
+    with open(dataDir + file2, 'r') as f2:
+        f2.readline()
+        fo.write(f2.read())
 
 # process
 instance_compute_statistics = WaveStatistics(path_in=inDir, filename=inFile, verbose=5)
