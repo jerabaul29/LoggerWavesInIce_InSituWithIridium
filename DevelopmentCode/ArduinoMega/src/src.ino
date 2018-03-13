@@ -87,7 +87,7 @@ void setup(){
   // start logging!
   board_manager.start_logging(DURATION_LOGGING_MS);
 
-  // for debug!
+  // TODO: remove! for debug!
   raspberry_manager.start();
 }
 
