@@ -2,7 +2,7 @@
 <export version="D">
   <design>
     <source>/home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/PCB_electronics/power_controller_v1/power_controller.sch</source>
-    <date>fr. 09. feb. 2018 kl. 10.08 +0100</date>
+    <date>ti. 13. mars 2018 kl. 22.07 +0100</date>
     <tool>Eeschema 4.0.2+dfsg1-stable</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -352,11 +352,11 @@
     </libpart>
   </libparts>
   <libraries>
-    <library logical="device">
-      <uri>/usr/share/kicad/library/device.lib</uri>
-    </library>
     <library logical="conn">
       <uri>/usr/share/kicad/library/conn.lib</uri>
+    </library>
+    <library logical="device">
+      <uri>/usr/share/kicad/library/device.lib</uri>
     </library>
     <library logical="atmel">
       <uri>/usr/share/kicad/library/atmel.lib</uri>

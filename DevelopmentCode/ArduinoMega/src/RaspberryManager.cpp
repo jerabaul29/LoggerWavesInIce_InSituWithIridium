@@ -29,7 +29,7 @@ void RaspberryManager::start(){
     // let the time to boot; should be unnecessary if no issue with serial port
     // beginning without the RPi connected.
 
-    this->wait_some_time_ms(30000);  // TODO: take away or reduce! shoulnd not be necessary
+    // this->wait_some_time_ms(10000);  // TODO: take away or reduce! shoulnd not be necessary
 
     // start serial while maybe no computer listening; should not be a problem.
     serial_port->begin(115200);

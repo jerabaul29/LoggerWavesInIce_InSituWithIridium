@@ -24,7 +24,7 @@ SOFTWARE.
 
 /*
   crucial for good functionning:
-    - check DEBUG parameter: should be false for use with RPi
+    - check DEBUG parameter: should be false for use with RPi, otherwise will not work!!
     - check USE_IRIDIUM: should be true for use of real iridium and not dummy
     - check DURATION_LOGGING_MS
 */
@@ -38,7 +38,7 @@ SOFTWARE.
 #define BAT_EMPTY_V 2.8     // threshold for empty battery
 
 // Debug
-#define DEBUG true
+#define DEBUG false
 #define SERIAL_DEBUG Serial
 #define SERIAL_DEBUG_BAUDRATE 115200
 
@@ -69,7 +69,7 @@ SOFTWARE.
 #define DELAY_ANSWER_RPI 500
 #define TIMEOUT_ACKNOWLEDGEMENT_RPI_MS 4000UL
 #define TIMEOUT_PROCESSING_RPI 60000UL
-#define TIMEOUT_WAKEUP_RPI 30000UL
+#define TIMEOUT_WAKEUP_RPI 40000UL
 #define TIMEOUT_RECEIVED_TO_TRANSMIT_FROM_PI 60000UL
 
 // VN 100
