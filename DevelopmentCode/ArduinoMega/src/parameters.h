@@ -65,6 +65,7 @@ SOFTWARE.
 #define NBR_SIGNIFICANT_DIGITS_BATT_LEVEL 2
 
 // Raspberry
+#define PIN_MFT_RPI 46
 #define SERIAL_RASPBERRY Serial
 #define DELAY_ANSWER_RPI 500
 #define TIMEOUT_ACKNOWLEDGEMENT_RPI_MS 4000UL
@@ -82,9 +83,6 @@ SOFTWARE.
 // how long should log
 #define DURATION_LOGGING_MS 1500000UL
 // #define DURATION_LOGGING_MS 5000UL  // for tests
-
-// Mosfet power Raspberry Pi
-#define PIN_MFT_RPI 46
 
 // LED
 #define PIN_MGA_LED 13
