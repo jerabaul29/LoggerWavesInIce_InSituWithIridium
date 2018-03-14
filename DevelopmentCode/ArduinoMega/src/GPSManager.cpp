@@ -130,6 +130,9 @@ void GPSManager::clean_incoming_buffer(void){
       }
     }
   }
+
+  // reset the GPS buffer position
+  GPS_rx_buffer_position = 0;
 }
 
 const char * GPSManager::get_rx_buffer(void) const{
