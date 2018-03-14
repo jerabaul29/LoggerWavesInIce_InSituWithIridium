@@ -1,4 +1,6 @@
 #include "sleep_and_watchdog.h"
+#include "parameters.h"
+#include "DebugMacros.h"
 
 #if ARDUINO >= 100
  #include "Arduino.h"

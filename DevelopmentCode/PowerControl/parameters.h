@@ -32,7 +32,8 @@ SOFTWARE.
 #define PARAMETERS
 
 // TODO: implement the debugging in the classes
-#define DEBUG false  // if DEBUG is true, Serial will be activated and used for logging information strings
+#define DEBUG true  // if DEBUG is true, Serial will be activated and used for logging information strings
+#define SERIAL_DEBUG Serial
 #define SHOW_LED false  // if SHOW_LED is true, the LED will be used for helping debugging
 
 #define PIN_MSR_BAT A0      // measure of battery

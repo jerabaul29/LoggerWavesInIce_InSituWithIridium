@@ -49,6 +49,7 @@
 #include "sleep_and_watchdog.h"
 #include "client_device.h"
 #include "solar_controller.h"
+#include "parameters.h"
 
 SleepWatchdog sleep_watchdog_instance{};
 BatteryController battery_controller_instance{PIN_MSR_BAT, &sleep_watchdog_instance};
@@ -58,6 +59,11 @@ SolarController solar_controller_instance{PIN_MFT_SOL, PIN_MSR_SOL, &battery_con
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void setup() {
+
+  #if DEBUG
+    Serial.begin(115200);
+    delay(500);
+  #endif
 
   // --------------------------------------------------------------
   // Configure watchdog
@@ -87,6 +93,11 @@ void setup() {
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void loop() {
+
+  #if DEBUG
+    Serial.println(F("--- loop ---"));
+    delay(10);
+  #endif
 
   // --------------------------------------------------------------
   // Start a new cycle: let the time to wake up
@@ -121,6 +132,13 @@ void loop() {
   // --------------------------------------------------------------
   // Sleep
   // --------------------------------------------------------------
+
+  #if DEBUG
+    Serial.println(F("go to sleep..."));
+    delay(10);
+  #endif
+
+  
   sleep_watchdog_instance.sleep(CYCLES_DEEP_SLEEP);
 }
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
