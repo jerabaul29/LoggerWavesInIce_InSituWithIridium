@@ -5,12 +5,12 @@ import os
 
 home = os.path.expanduser("~")
 
-dataDir = home + '/Data/WOICE/pi_logger/ResultAnalyzis/'
+dataDir = "/home/jrlab/Downloads/"
 f1 = 488
 f2 = f1+1
 file1 = 'F{:05d}_B'.format(f1)
 file2 = 'F{:05d}_B'.format(f2)
-inFile = 'test_{0:05d}_{1:05d}.bin'.format(f1,f2)
+inFile = "300234066333770-1.bin"
 
 # some frequency stuff
 fmin = 0.05
