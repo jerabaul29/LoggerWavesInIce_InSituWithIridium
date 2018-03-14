@@ -70,7 +70,7 @@ void IridiumManager::send_receive(void){
         SERIAL_DEBUG.println();
     #endif
 
-    #if USE_IRIDUIUM
+    #if USE_IRIDIUM
         PDEBMSG("True iridium")
         int ird_feedback;
         ird_feedback = iridium_sbd.sendReceiveSBDBinary(
