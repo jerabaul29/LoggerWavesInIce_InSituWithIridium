@@ -43,25 +43,29 @@ import os
 
 home = os.path.expanduser("~")
 
-# inDir = '/Users/gsutherland/Data/WOICE/LanceCruise/'
-# inDir = '/home/graigorys/Data/WOICE/pi_logger/LanceTest/'
-# inFile = 'S1_20160502T023802.txt'
-# test real data
+use_old_data = False
 
-dataDir = home + '/Data/WOICE/SvalbardPolarsyssel2017/Data_IMU_20170424_parsed/1/'
-inDir = home + '/Data/WOICE/pi_logger/ResultAnalyzis/'
-f1 = 470
-f2 = f1 + 1
-file1 = 'F{:05d}_B'.format(f1)
-file2 = 'F{:05d}_B'.format(f2)
-inFile = 'test_{0:05d}_{1:05d}.csv'.format(f1, f2)
+if use_old_data :
 
-with open(inDir + inFile, 'w') as fo:
-    with open(dataDir + file1, 'r') as f1:
-        fo.write(f1.read())
-    with open(dataDir + file2, 'r') as f2:
-        f2.readline()
-        fo.write(f2.read())
+    dataDir = home + '/Data/WOICE/SvalbardPolarsyssel2017/Data_IMU_20170424_parsed/1/'
+    inDir = home + '/Data/WOICE/pi_logger/ResultAnalyzis/'
+    f1 = 470
+    f2 = f1 + 1
+    file1 = 'F{:05d}_B'.format(f1)
+    file2 = 'F{:05d}_B'.format(f2)
+    inFile = 'test_{0:05d}_{1:05d}.csv'.format(f1, f2)
+
+    with open(inDir + inFile, 'w') as fo:
+        with open(dataDir + file1, 'r') as f1:
+            fo.write(f1.read())
+        with open(dataDir + file2, 'r') as f2:
+            f2.readline()
+            fo.write(f2.read())
+        
+else :
+
+    inDir = home + '/Data/WOICE/pi_logger/'
+    inFile = 'F00205_B'
 
 # process
 instance_compute_statistics = WaveStatistics(path_in=inDir, filename=inFile, verbose=5)
