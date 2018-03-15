@@ -9,3 +9,4 @@ sending by Iridium
 send the RPi data through Iridium
 timeout on RPi processing to avoid complete hanging
 
+- Power controller: go through code and make a website post

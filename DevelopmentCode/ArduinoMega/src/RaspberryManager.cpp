@@ -278,7 +278,7 @@ void RaspberryManager::shutdown(void){
     serial_port->write('S');
 
     // give some time for shutdown
-    this->wait_some_time_ms(10000);
+    this->wait_some_time_ms(20000);
 
     board_manager->turn_raspberry_off();
 }

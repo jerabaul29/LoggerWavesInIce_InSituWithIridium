@@ -2,6 +2,9 @@
 
  *
  * A class to help use the watchdog for both deep sleep and watchdog.
+ * 
+ * This is for Arduino UNO / ATMega328P. For other mCs, you may need to use
+ * otehr registers / register values.
  *
  * Careful: remember that once this class has been called, then the watchdog
  * is running: need to call wdt_reset at least each 8 seconds.

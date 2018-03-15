@@ -1,5 +1,11 @@
 /*
 
+  *
+  * The parameters for the power controlling mController
+  * Should make sure all the parameters are good, in particular number of cycles
+  * before uploading.
+  *
+
 Copyright (c) 2015 Jean Rabault jean.rblt@gmail.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -20,19 +26,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-  *
-  * The parameters for the power controlling mController
-  * Should make sure all the parameters are good, in particular number of cycles
-  * before uploading.
-  *
-
 */
 
 #ifndef PARAMETERS
 #define PARAMETERS
 
 // TODO: implement the debugging in the classes
-#define DEBUG true  // if DEBUG is true, Serial will be activated and used for logging information strings
+#define DEBUG false  // if DEBUG is true, Serial will be activated and used for logging information strings
 #define SERIAL_DEBUG Serial
 #define SHOW_LED false  // if SHOW_LED is true, the LED will be used for helping debugging
 
@@ -58,8 +58,8 @@ SOFTWARE.
 // take care of the Mega.
 // TEST VALUE ------------------------------
 // for tests: 2 cycles, will take care of solar power + Mega each 16 s
-// #define CYCLES_DEEP_SLEEP 5  // production value
-#define CYCLES_DEEP_SLEEP 2  // test value
+#define CYCLES_DEEP_SLEEP 5  // production value
+// #define CYCLES_DEEP_SLEEP 2  // test value
 
 // number of loop () cycles before trying to wake up the Mega after is has been set asleep
 // or refused to wake up.
@@ -72,7 +72,7 @@ SOFTWARE.
 // TEST VALUE -------------------------------------
 // for tests, with value of 2: deep sleep is 2 cycles ie 16s, the Mega will get the possibility to
 // wake up every 16s * 2 = 32s
-// #define CYCLES_BEFORE_MEGA_WAKEUP 30  // production value
-#define CYCLES_BEFORE_MEGA_WAKEUP 2 // test value
+#define CYCLES_BEFORE_MEGA_WAKEUP 30  // production value
+// #define CYCLES_BEFORE_MEGA_WAKEUP 2 // test value
 
 #endif

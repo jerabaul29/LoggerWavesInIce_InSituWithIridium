@@ -1,3 +1,5 @@
+// TODO: possible that some VN100 frames are lost; check that size of buffers is ok as set in the platformio.ini file.
+
 // TODO: Avoid #define for constant
 // TODO: function macros use () around
 // TODO: rationalize debug messages
