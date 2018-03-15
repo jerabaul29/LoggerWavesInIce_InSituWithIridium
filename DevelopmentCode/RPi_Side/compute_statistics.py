@@ -21,11 +21,12 @@ NOTES / TODO
 # some global parameters #######################################################
 
 # parameters for the band pass filtering
+
 global_fs = 10.0
 global_lowcut = 0.05
 global_highcut = 0.25
 
-global_noise_acc = (0.24 * 9.81 * 1e-3)**2
+global_noise_acc = (0.14 * 9.81 * 1e-3)**2
 
 # parameters for the part of the acceleration signal to use
 # avoid beginning and end of signal, fixed length in FFTs and Welch so
@@ -35,9 +36,10 @@ IMU_nfft = 2**13
 IMU_window = "hanning"
 IMU_nperseg = IMU_nfft / 8.0
 IMU_noverlap = IMU_nperseg / 2.0
-IMU_detrend = "linear"
+IMU_detrend = "constant"
 
 # parameters for time
+
 IMU_buffer = int(120 * global_fs)  # buffer for beginning to end
 number_of_points_to_use = int(global_fs * 20 * 60)  # 17 minutes
 first_IMU_point_to_use = int(global_fs + 1)
@@ -174,12 +176,18 @@ class WaveStatistics(object):
         DCM1, DCM2, DCM3, DCM4, DCM5, DCM6, DCM7, DCM8, DCM9,
         MagNED1, MagNED2, MagNED3, AccNED1, AccNED2, ACCNED3"""
 
+        # declare a few global variables that might need to be changed in this function
+        global last_IMU_point_to_use
+        global num_points_to_use
+
         # read line by line and detect errors
         bad_rec = 0
         good_rec = 0
-        pitch = np.empty([last_IMU_point_to_use+global_fs+1,])
-        roll = np.empty_like(pitch)
-        accz = np.empty_like(pitch)
+        pitch = np.NaN * np.ones([int(last_IMU_point_to_use + first_IMU_point_to_use),])
+        roll = np.NaN * np.ones_like(pitch)
+        accz = np.NaN * np.ones_like(pitch)
+        if self.verbose > 3:
+            printi('last IMU index is {}'.format(last_IMU_point_to_use))
 
         # open file
         with open(self.path_in + '/' + self.filename, 'r') as f:
@@ -199,15 +207,30 @@ class WaveStatistics(object):
                     accz[ind] = np.NaN
                     ind = ind + 1
                     bad_rec = bad_rec + 1
-                if ind >= last_IMU_point_to_use+global_fs+1:
-                    print "index is {}".format(ind)
+                if ind >= last_IMU_point_to_use + first_IMU_point_to_use - 1:
+                    if self.verbose > 3 :
+                        printi("index is {}".format(ind))
                     break
         if self.verbose > 3:
+            printi('Total number of records are {}'.format(ind))
             printi('Number of good records are {}'.format(good_rec))
             printi('Number of bad records are {}'.format(bad_rec))
 
+        # check that there are enough records
+        if ind < last_IMU_point_to_use + first_IMU_point_to_use - 1 :
+            if self.verbose > 3:
+                printi('Only {} records but require {}. Changing param length'.
+                        format(ind,last_IMU_point_to_use + first_IMU_point_to_use))
+            # change the parameters to fit this new length
+            last_IMU_point_to_use = int(ind)
+            num_points_to_use = last_IMU_point_to_use - 2*IMU_buffer - first_IMU_point_to_use
+            if self.verbose > 3:
+                printi('last IMU index changed to {}'.format(last_IMU_point_to_use))
+                printi('Calculating spectrum from {} minutes'.format(num_points_to_use/(global_fs*60)))
+
+
         # if NaNs exist then linearly interpolate
-        if bad_rec > 0:
+        if bad_rec > 0 :
             nans, x = nan_helper(pitch)
             pitch[nans] = np.interp(x(nans), x(~nans), pitch[~nans])
             roll[nans] = np.interp(x(nans), x(~nans), roll[~nans])
@@ -217,15 +240,16 @@ class WaveStatistics(object):
         self.ROLL = np.deg2rad(roll[first_IMU_point_to_use:last_IMU_point_to_use])
         self.ACCZ = accz[first_IMU_point_to_use:last_IMU_point_to_use]
 
-        self.pitch_det = signal.detrend(self.PITCH)
-        self.roll_det = signal.detrend(self.ROLL)
-        self.accz_det = signal.detrend(self.ACCZ)
+        # simple detrend - remove mean
+        self.pitch_det = signal.detrend(self.PITCH, type=IMU_detrend)
+        self.roll_det = signal.detrend(self.ROLL, type=IMU_detrend)
+        self.accz_det = signal.detrend(self.ACCZ, type=IMU_detrend)
 
-        # apply filter
-        ## butter = BandPass(fs=self.fs)
-        ## self.pitch_det = bp.filter_data(self.pitch_det)
-        ## self.roll_det = bp.filter_data(self.roll_det)
-        ## self.accz_det = bp.filter_data(self.accz_det)
+        ## # apply filter
+        ## butter = BandPass(fs=self.fs, lowcut=0.04, highcut=0.5)
+        ## self.pitch_det = butter.filter_data(self.PITCH)
+        ## self.roll_det = butter.filter_data(self.ROLL)
+        ## self.accz_det = butter.filter_data(self.ACCZ)
 
         if self.verbose > 3:
             printi('Mean PITCH = {}'.format(np.mean(self.PITCH)))
@@ -234,6 +258,16 @@ class WaveStatistics(object):
             printi('Std PITCH = {}'.format(np.std(self.PITCH)))
             printi('Std ROLL = {}'.format(np.std(self.ROLL)))
             printi('Std ACCZ = {}'.format(np.std(self.ACCZ)))
+            plt.figure()
+            plt.plot(self.ACCZ, label='ACCZ')
+            plt.plot(self.accz_det, label='ACCZ_det')
+            plt.legend()
+            plt.figure()
+            plt.plot(self.PITCH, label='PITCH')
+            plt.plot(self.ROLL, label='ROLL')
+            plt.plot(self.pitch_det, label='PITCH_det')
+            plt.plot(self.roll_det, label='ROLL_det')
+            plt.legend()
 
     def compute_vertical_elevation(self):
         '''integrate twice using fft and ifft'''
