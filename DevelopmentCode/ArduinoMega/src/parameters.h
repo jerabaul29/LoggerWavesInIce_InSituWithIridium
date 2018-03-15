@@ -27,6 +27,7 @@ SOFTWARE.
     - check DEBUG parameter: should be false for use with RPi, otherwise will not work!!
     - check USE_IRIDIUM: should be true for use of real iridium and not dummy
     - check DURATION_LOGGING_MS
+    - check MAX_NBR_SLEEPS_BEFORE_WAKEUP
 */
 
 #ifndef PARAMETERS_LOGGER_MEGA
@@ -53,6 +54,7 @@ SOFTWARE.
 
 // constraints on max number of sleep cycles between wakeups
 #define MAX_NBR_SLEEPS_BEFORE_WAKEUP 18
+#define MAX_NBR_SLEEPS_BEFORE_WAKEUP 1
 
 // Iridium
 #define IRIDIUM_TRANSMIT_PACKET_SIZE 340

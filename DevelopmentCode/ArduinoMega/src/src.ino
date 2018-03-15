@@ -1,4 +1,5 @@
-// TODO: try with baud rate of 800000 (?)
+// TODO: find a solution to the slow data transfer arduino / RPi.
+//       try to do by chunks of 256 bytes of data (if arduino tx is 512)
 // TODO: possible that some VN100 frames are lost; check that size of buffers is ok as set in the platformio.ini file.
 
 // TODO: go once through the code to chek all
