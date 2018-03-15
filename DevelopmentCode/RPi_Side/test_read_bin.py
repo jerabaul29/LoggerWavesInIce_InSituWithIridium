@@ -5,14 +5,24 @@ import os
 
 home = os.path.expanduser("~")
 
+use_Jean_data = True
+
 dataDir = home + '/Data/WOICE/pi_logger/'
 
-f1 = 488
-f2 = f1+1
-file1 = 'F{:05d}_B'.format(f1)
-file2 = 'F{:05d}_B'.format(f2)
-inFile = 'test_{0:05d}_{1:05d}.bin'.format(f1,f2)
-inFile = 'test1.bin'
+if use_Jean_data:
+    dataDir = '/home/jrlab/Downloads/'
+else:
+    dataDir = home + '/Data/WOICE/pi_logger/'
+
+if use_Jean_data:
+    inFile = '300234066333770-6.bin'
+else:
+    f1 = 488
+    f2 = f1+1
+    file1 = 'F{:05d}_B'.format(f1)
+    file2 = 'F{:05d}_B'.format(f2)
+    inFile = 'test_{0:05d}_{1:05d}.bin'.format(f1,f2)
+    inFile = 'test1.bin'
 
 
 # some frequency stuff

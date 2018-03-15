@@ -1,4 +1,9 @@
+// TODO: try with baud rate of 800000 (?)
 // TODO: possible that some VN100 frames are lost; check that size of buffers is ok as set in the platformio.ini file.
+
+// TODO: go once through the code to chek all
+// TODO: change the SD card code: separate update of file number and opening of files
+// TODO: add debugging to the SD card to indicate where in the process things are happening
 
 // TODO: Avoid #define for constant
 // TODO: function macros use () around
