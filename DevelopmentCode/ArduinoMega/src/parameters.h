@@ -53,8 +53,8 @@ SOFTWARE.
 #define MAX_NUMBER_ATTEMPTS_GPRMC 20  // GPS works at 1Hz
 
 // constraints on max number of sleep cycles between wakeups
-#define MAX_NBR_SLEEPS_BEFORE_WAKEUP 18
-#define MAX_NBR_SLEEPS_BEFORE_WAKEUP 1
+#define MAX_NBR_SLEEPS_BEFORE_WAKEUP 18 // 18 should be 6 hours
+// #define MAX_NBR_SLEEPS_BEFORE_WAKEUP 1
 
 // Iridium
 #define IRIDIUM_TRANSMIT_PACKET_SIZE 340

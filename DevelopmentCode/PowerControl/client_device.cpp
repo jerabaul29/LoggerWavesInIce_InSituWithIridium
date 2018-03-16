@@ -77,7 +77,7 @@ void CDV::update_asleep(void){
       // NOTE: if slow bootloader, this may not be enough?
       // NOTE: if extend the delay, be careful: the watchdog will fire after 8
       // seconds
-      delay(6000);
+      delay(1000);
 
       wdt_reset();
 

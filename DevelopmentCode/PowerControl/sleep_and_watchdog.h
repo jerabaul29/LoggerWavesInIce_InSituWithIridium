@@ -48,6 +48,8 @@ SOFTWARE.
  #include "WProgram.h"
 #endif
 
+#include "parameters.h"
+
 #include <avr/wdt.h>            // library for default watchdog functions
 #include <avr/interrupt.h>      // library for interrupts handling
 #include <avr/sleep.h>          // library for sleep

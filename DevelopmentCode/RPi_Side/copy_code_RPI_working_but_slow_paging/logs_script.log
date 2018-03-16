@@ -1,0 +1,2884 @@
+booted
+Python well started
+Start RPi processing
+  All available ports: []
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00203
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 2215276
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = 0.488583213889
+      T_z0 = 23.8223779555
+      min, max of freq is 0.042724609375, 0.257568359375
+      f shape is (177,)
+save binary data as /home/pi/Logger//ResultAnalyzis/F00203.bin
+sending the content of file: /home/pi/Logger/ResultAnalyzis/F00203.bin
+Done with everything!
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: []
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00201
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 36888
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+bad end of line at the end of the file; probably due to power disconnect
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00202
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 38101
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00203
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 40590
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+bad end of line at the end of the file; probably due to power disconnect
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00204
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 41066
+warning, bad binary data!
+Broken message, read until next line break
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00206
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 36259
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00207
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 41065
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00208
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 45673
+Broken message, read until next line break
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: []
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: []
+done with Python; shutdown
+booted
+booted
+done with Python; shutdown
+booted
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00216
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 45682
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00217
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 40856
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00218
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 38881
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00219
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00220
+Traceback (most recent call last):
+  File "/home/pi/Logger/Code/launch_processing_debugging.py", line 17, in <module>
+    RPi_instance.launch_RPi_command()
+  File "/home/pi/Logger/Code/RPi_Control.py", line 277, in launch_RPi_command
+    self.receive_from_Arduino()
+  File "/home/pi/Logger/Code/RPi_Control.py", line 129, in receive_from_Arduino
+    array_data = np.zeros(MAX_SIZE_FILE, dtype=np.byte)
+TypeError: 'float' object cannot be interpreted as an index
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00221
+  Receive data
+received START_TRANSMIT_FILE
+Traceback (most recent call last):
+  File "/home/pi/Logger/Code/launch_processing_debugging.py", line 17, in <module>
+    RPi_instance.launch_RPi_command()
+  File "/home/pi/Logger/Code/RPi_Control.py", line 277, in launch_RPi_command
+    self.receive_from_Arduino()
+  File "/home/pi/Logger/Code/RPi_Control.py", line 155, in receive_from_Arduino
+    array_data[index_data] = crrt_char
+ValueError: invalid literal for long() with base 10: '$'
+done with Python; shutdown
+booted
+/usr/lib/python2.7/dist-packages/numpy/core/_methods.py:135: RuntimeWarning: Degrees of freedom <= 0 for slice
+  keepdims=keepdims)
+/usr/lib/python2.7/dist-packages/numpy/core/_methods.py:105: RuntimeWarning: invalid value encountered in true_divide
+  arrmean, rcount, out=arrmean, casting='unsafe', subok=False)
+/usr/lib/python2.7/dist-packages/numpy/core/_methods.py:127: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+/usr/lib/python2.7/dist-packages/numpy/core/fromnumeric.py:2889: RuntimeWarning: Mean of empty slice.
+  out=out, **kwargs)
+/usr/lib/python2.7/dist-packages/numpy/core/_methods.py:80: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+Python well started
+Start RPi processing
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00222
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 35948
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = nan
+      T_z0 = nan
+Traceback (most recent call last):
+  File "/home/pi/Logger/Code/launch_processing_debugging.py", line 17, in <module>
+    RPi_instance.launch_RPi_command()
+  File "/home/pi/Logger/Code/RPi_Control.py", line 279, in launch_RPi_command
+    self.processing()
+  File "/home/pi/Logger/Code/RPi_Control.py", line 219, in processing
+    instance_compute_statistics.perform_all_processing()
+  File "/home/pi/Logger/Code/compute_statistics.py", line 120, in perform_all_processing
+    self.compute_wave_spectrum_moments()
+  File "/home/pi/Logger/Code/compute_statistics.py", line 321, in compute_wave_spectrum_moments
+    printi('min, max of freq is {}, {}'.format(self.freq.min(), self.freq.max()))
+  File "/usr/lib/python2.7/dist-packages/numpy/core/_methods.py", line 29, in _amin
+    return umr_minimum(a, axis, None, out, keepdims)
+ValueError: zero-size array to reduction operation minimum which has no identity
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00223
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 37461
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+bad end of line at the end of the file; probably due to power disconnect
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00224
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 41584
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00225
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 45271
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00226
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 182905
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = nan
+      T_z0 = nan
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00227
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 2817101
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = 0.590246486337
+      T_z0 = 14.7891371443
+      min, max of freq is 0.042724609375, 0.257568359375
+      f shape is (177,)
+save binary data as /home/pi/Logger//ResultAnalyzis/F00227.bin
+Done with everything!
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00228
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 2852031
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+      SWH = 0.0181828751988
+      T_z0 = 16.9461386252
+      min, max of freq is 0.042724609375, 0.257568359375
+      f shape is (177,)
+save binary data as /home/pi/Logger//ResultAnalyzis/F00228.bin
+sending the content of file: /home/pi/Logger/ResultAnalyzis/F00228.bin
+Done with everything!
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00230
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 2867338
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = 0.0165445726117
+      T_z0 = 15.7094786321
+      min, max of freq is 0.042724609375, 0.257568359375
+      f shape is (177,)
+save binary data as /home/pi/Logger//ResultAnalyzis/F00230.bin
+sending the content of file: /home/pi/Logger/ResultAnalyzis/F00230.bin
+Done with everything!
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00231
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 2865411
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = 0.0187402835726
+      T_z0 = 17.8492151518
+      min, max of freq is 0.042724609375, 0.257568359375
+      f shape is (177,)
+save binary data as /home/pi/Logger//ResultAnalyzis/F00231.bin
+sending the content of file: /home/pi/Logger/ResultAnalyzis/F00231.bin
+Done with everything!
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00232
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 2855691
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+      SWH = 0.0183557014157
+      T_z0 = 15.6630848908
+      min, max of freq is 0.042724609375, 0.257568359375
+      f shape is (177,)
+save binary data as /home/pi/Logger//ResultAnalyzis/F00232.bin
+Done with everything!
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00233
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 2853973
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = 0.0198506919275
+      T_z0 = 17.1389712383
+      min, max of freq is 0.042724609375, 0.257568359375
+      f shape is (177,)
+save binary data as /home/pi/Logger//ResultAnalyzis/F00233.bin
+sending the content of file: /home/pi/Logger/ResultAnalyzis/F00233.bin
+Done with everything!
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00234
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 2867523
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = 0.017326282304
+      T_z0 = 16.0958982548
+      min, max of freq is 0.042724609375, 0.257568359375
+      f shape is (177,)
+save binary data as /home/pi/Logger//ResultAnalyzis/F00234.bin
+sending the content of file: /home/pi/Logger/ResultAnalyzis/F00234.bin
+Done with everything!
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00235
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 2867326
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = 0.0175876603789
+      T_z0 = 15.8615622846
+      min, max of freq is 0.042724609375, 0.257568359375
+      f shape is (177,)
+save binary data as /home/pi/Logger//ResultAnalyzis/F00235.bin
+sending the content of file: /home/pi/Logger/ResultAnalyzis/F00235.bin
+Done with everything!
+done with Python; shutdown
+booted
+Python well started
+Start RPi processing
+  All available ports: ['/dev/ttyACM0']
+  Using port: /dev/ttyACM0
+  Receive commands
+filename received: F00236
+  Receive data
+received START_TRANSMIT_FILE
+received END_TRANSMIT_FILE
+  Append filename_list.txt
+  Add entry in Commands
+  Add entry in Data
+Total data length: 2868983
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+warning, bad binary data!
+Broken message, read until next line break
+Broken message, read until next line break
+Broken message, read until next line break
+      SWH = 0.0183514077293
+      T_z0 = 16.6777511634
+      min, max of freq is 0.042724609375, 0.257568359375
+      f shape is (177,)
+save binary data as /home/pi/Logger//ResultAnalyzis/F00236.bin
+sending the content of file: /home/pi/Logger/ResultAnalyzis/F00236.bin
+Done with everything!
+done with Python; shutdown

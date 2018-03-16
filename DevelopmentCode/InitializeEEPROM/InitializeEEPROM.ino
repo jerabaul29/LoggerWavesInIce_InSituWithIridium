@@ -21,10 +21,19 @@ int address_sleeps_left = 5;
 int address_total_sleeps = 6;
 
 void setup(){
+  Serial.begin(115200);
+  delay(100);
+
+  Serial.println("start write EEPROM");
+  delay(100);
+  
   EEPROMWritelong(address_numberReset, 200);
   EEPROM.write(address_sleeps_left, 1);
   EEPROM.write(address_total_sleeps, 8); // number of times sleeps before waking up; 1 sleep is around 20 minutes with the default real world data.
   // EEPROM.write(address_total_sleeps, 1); // for tests
+
+  Serial.println("wrote EEPROM");
+  delay(100);
 }
 
 void loop(){
