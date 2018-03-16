@@ -7,21 +7,19 @@ home = os.path.expanduser("~")
 
 use_Jean_data = True
 
-dataDir = home + '/Data/WOICE/pi_logger/'
-
 if use_Jean_data:
     dataDir = '/home/jrlab/Downloads/'
 else:
     dataDir = home + '/Data/WOICE/pi_logger/'
 
 if use_Jean_data:
-    inFile = '300234066333770-6.bin'
+    inFile = '300234066333770-22.bin'
 else:
     f1 = 488
-    f2 = f1+1
+    f2 = f1 + 1
     file1 = 'F{:05d}_B'.format(f1)
     file2 = 'F{:05d}_B'.format(f2)
-    inFile = 'test_{0:05d}_{1:05d}.bin'.format(f1,f2)
+    inFile = 'test_{0:05d}_{1:05d}.bin'.format(f1, f2)
     inFile = 'test1.bin'
 
 
@@ -32,11 +30,11 @@ nfreq = 25
 freq = np.exp(np.linspace(np.log(fmin), np.log(fmax), nfreq))
 
 # some format stuff
-fmt_hdr = '<' + 'f'*10
-fmt_array = '<' + 'h'*nfreq
-fmt_all = '<' + 'f'*10 + 'h'*nfreq*6
+fmt_hdr = '<' + 'f' * 10
+fmt_array = '<' + 'h' * nfreq
+fmt_all = '<' + 'f' * 10 + 'h' * nfreq * 6
 
-#read in data
+# read in data
 
 with open(dataDir + inFile, 'rb') as f:
     bin_data = f.read()
@@ -64,7 +62,7 @@ print 'a0_max is {} type'.format(type(a0_max))
 print 'a0 is {} type'.format(type(a0))
 print a0
 
-print 'SWH = {0:.3f} m and Hs = {1:.3f} m'.format(SWH,Hs)
+print 'SWH = {0:.3f} m and Hs = {1:.3f} m'.format(SWH, Hs)
 print 'T_z0 = {0:.2f} s and T_z = {1:.2f} s'.format(T_z0, T_z)
 
 max_val = 2**15 - 1.0
@@ -76,7 +74,7 @@ a2_proc = a2 * a2_max / max_val
 b2_proc = b2 * b2_max / max_val
 R_proc = R * R_max / max_val
 
-noise = (0.14*9.81e-3)**2 * ( (2*np.pi*freq)**(-4) )
+noise = (0.14 * 9.81e-3)**2 * ((2 * np.pi * freq)**(-4))
 
 plt.figure()
 plt.plot(freq, a0_proc, '-o')
@@ -105,4 +103,5 @@ plt.plot(freq, R_proc, '-o')
 plt.xlim([fmin, fmax])
 plt.ylabel(r'$ \mathrm{R}$')
 plt.xlabel(r'$\mathrm{f} \, / \, \mathrm{Hz}$')
+
 plt.show()

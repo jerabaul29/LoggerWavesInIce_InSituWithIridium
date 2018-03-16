@@ -116,5 +116,5 @@ void CDV::switch_off(void){
 
   pinMode(pin_control, INPUT);
 
-  cycles_counter = cycles_sleep;
+  cycles_counter = cycles_sleep - 1;
 }
