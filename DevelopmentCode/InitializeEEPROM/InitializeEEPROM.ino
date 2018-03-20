@@ -29,7 +29,8 @@ void setup(){
   
   EEPROMWritelong(address_numberReset, 200);
   EEPROM.write(address_sleeps_left, 1);
-  EEPROM.write(address_total_sleeps, 8); // number of times sleeps before waking up; 1 sleep is around 20 minutes with the default real world data.
+  // EEPROM.write(address_total_sleeps, 8); // number of times sleeps before waking up; 1 sleep is around 20 minutes with the default real world data.
+  EEPROM.write(address_total_sleeps, 4); // number of times sleeps before waking up; 1 sleep is around 20 minutes with the default real world data.
   // EEPROM.write(address_total_sleeps, 1); // for tests
 
   Serial.println("wrote EEPROM");

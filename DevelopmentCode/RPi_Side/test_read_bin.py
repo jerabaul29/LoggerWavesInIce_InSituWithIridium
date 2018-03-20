@@ -13,7 +13,7 @@ else:
     dataDir = home + '/Data/WOICE/pi_logger/'
 
 if use_Jean_data:
-    inFile = '300234066333770-22.bin'
+    inFile = '300234066333770-40.bin'
 else:
     f1 = 488
     f2 = f1 + 1

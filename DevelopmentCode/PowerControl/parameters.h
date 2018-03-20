@@ -58,6 +58,7 @@ SOFTWARE.
 // take care of the Mega.
 // TEST VALUE ------------------------------
 // for tests: 2 cycles, will take care of solar power + Mega each 16 s
+// 
 #define CYCLES_DEEP_SLEEP 5  // production value
 // #define CYCLES_DEEP_SLEEP 2  // test value
 
@@ -72,6 +73,7 @@ SOFTWARE.
 // TEST VALUE -------------------------------------
 // for tests, with value of 2: deep sleep is 2 cycles ie 16s, the Mega will get the possibility to
 // wake up every 16s * 2 = 32s
+// 
 #define CYCLES_BEFORE_MEGA_WAKEUP 30  // production value
 // #define CYCLES_BEFORE_MEGA_WAKEUP 2 // test value
 
