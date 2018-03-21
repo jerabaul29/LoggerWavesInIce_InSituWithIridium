@@ -55,8 +55,6 @@ def analyze_incoming_data(inFile='300234066333770-40.bin', dataDir='/home/jrlab/
     b2_proc = b2 * b2_max / max_val
     R_proc = R * R_max / max_val
 
-    noise = (0.14 * 9.81e-3)**2 * ((2 * np.pi * freq)**(-4))
-
     if show_plots > 0:
         plt.figure()
         plt.plot(freq, a0_proc, '-o')
