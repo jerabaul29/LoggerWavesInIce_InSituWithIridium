@@ -93,6 +93,11 @@ def analyze_incoming_data(inFile='300234066333770-40.bin', dataDir='/home/jrlab/
 
     return(SWH, T_z0, Hs, T_z, a0_proc, a1_proc, a2_proc, b1_proc, b2_proc, R_proc)
 
+analyze_incoming_data(inFile='300234066333770-50.bin', outpout_fig='/home/jrlab/Desktop/Current/fig_21032018_0706am')
+
+analyze_incoming_data(inFile='300234066333770-48.bin', outpout_fig='/home/jrlab/Desktop/Current/fig_0648pm')
+
+analyze_incoming_data(inFile='300234066333770-46.bin', outpout_fig='/home/jrlab/Desktop/Current/fig_0648pm')
 
 analyze_incoming_data(inFile='300234066333770-44.bin', outpout_fig='/home/jrlab/Desktop/Current/fig_0648pm')
 
