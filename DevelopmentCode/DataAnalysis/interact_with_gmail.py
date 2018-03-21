@@ -1,11 +1,13 @@
 from __future__ import print_function
 import poplib
 from email import parser
+import os
+from execute_bash_command import subprocess_cmd
 
 
 def download_message_attachment(message_in):
     attachment = message_in.get_payload()[1]
-    attachment_string = attachment.get_payload(decode=False)
+    attachment_string = attachment.get_payload(decode=True)
     return(attachment_string)
 
 
@@ -22,6 +24,17 @@ def parse_message(message_in):
     return(parsed_message)
 
 
+def extract_infos_message(parsed_message, verbose=0):
+    information_from = parsed_message['From']
+    information_date = parsed_message['Date']
+
+    if verbose > 0:
+        print("From {}".format(information_from))
+        print("Date {}".format(information_date))
+
+    return(information_from, information_date)
+
+
 """
 TODO:
 when read data, save it to disk on the location of a github repo, and then push the repo
@@ -29,6 +42,7 @@ organize the repo by sensor ID (from the from field)
 name messages from dates of arrival
 in a separate, highler level class: bundle together GPS and spectra data
 """
+
 
 class IridiumEmailReader(object):
     def __init__(self, username, password, path_repo, verbose=0):
@@ -46,13 +60,43 @@ class IridiumEmailReader(object):
         # read messages
         self.messages = [pop_conn.retr(i) for i in range(1, len(pop_conn.list()[1]) + 1)]
 
+        if self.verbose > 0:
+            print("Loaded {} messages".format(len(self.messages)))
+
         # disconnect
         pop_conn.quit()
 
     def generate_data_all_incoming_messages(self):
-        """todo: generate the data and save it"""
-        pass
+        self.parsed_messages = []
+
+        crrt_message_index = 0
+
+        for crrt_message in self.messages:
+
+            crrt_message_index += 1
+            if self.verbose > 0:
+                print("generate data for message number {}".format(crrt_message_index))
+
+            parsed_message = parse_message(crrt_message)
+            self.parsed_messages.append(parsed_message)
+            (information_from, information_date) = extract_infos_message(parsed_message)
+            iridium_id = information_from.rsplit(' ', 1)[0]
+            message_name = information_date.replace(" ", "_").replace(",", "")
+            attachment_string = download_message_attachment(parsed_message)
+
+            path_data = self.path_repo + '/' + iridium_id + '/'
+
+            if not os.path.exists(path_data):
+                os.makedirs(path_data)
+
+            if self.verbose > 0:
+                print("save data for message number {}".format(crrt_message_index))
+
+            with open(path_data + message_name + '.bin', 'wb') as crrt_file:
+                crrt_file.write(attachment_string)
 
     def push_data(self):
-        """todo: push to github"""
-        pass
+        if self.verbose > 0:
+            print("Commit and push to github")
+
+        subprocess_cmd("cd {} && git add . && git commit -m 'automatic commit' && git push".format(self.path_repo))

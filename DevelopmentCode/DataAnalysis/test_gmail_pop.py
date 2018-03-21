@@ -36,14 +36,16 @@ messages = ["\n".join(mssg[1]) for mssg in messages]
 messages = [parser.Parser().parsestr(mssg) for mssg in messages]
 """
 
-messages[0]
+messages[0][1]
 
-"\n".join(messages[0][1])
+for crrt_message in messages:
+    current_message = parser.Parser().parsestr("\n".join(crrt_message[1]))
+    print(current_message['To'])
 
-current_message = parser.Parser().parsestr("\n".join(messages[0][1]))
+current_message = parser.Parser().parsestr("\n".join(messages[2][1]))
 current_message['To']
-current_message['Date']
-current_message['From']
+current_message['Date'].replace(" ", "_").replace(",", "")
+current_message['From'].rsplit(' ', 1)[0]
 print(current_message)
 
 current_message['From']
