@@ -35,15 +35,6 @@ def extract_infos_message(parsed_message, verbose=0):
     return(information_from, information_date)
 
 
-"""
-TODO:
-when read data, save it to disk on the location of a github repo, and then push the repo
-organize the repo by sensor ID (from the from field)
-name messages from dates of arrival
-in a separate, highler level class: bundle together GPS and spectra data
-"""
-
-
 class IridiumEmailReader(object):
     def __init__(self, username, password, path_repo, verbose=0):
         self.username = username

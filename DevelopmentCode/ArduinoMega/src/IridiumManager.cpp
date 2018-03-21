@@ -157,7 +157,7 @@ void IridiumManager::set_GPRMC_message(void){
   Callback to avoid watchdog reset.
 */
 bool ISBDCallback(void)
-{
+{ 
     wdt_reset();
 
     delay(1000);
