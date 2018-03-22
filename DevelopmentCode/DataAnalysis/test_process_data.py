@@ -16,6 +16,9 @@ date_3 = datetime.datetime.utcnow()
 date_1
 date_2
 
+date_1 < date_2
+date_2 < date_1
+
 date_1 - date_2
 date_2 - date_1
 

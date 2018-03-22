@@ -99,6 +99,16 @@ def associate(dict_non_associated, verbose=0):
     return(list_newly_associated, dict_new_associations)
 
 
+def is_binary_data():
+    # when only 1 binary data, easy: size is 340 bytes
+    pass
+
+
+def is_status_string():
+    pass
+    # use features that repeat: V, ., F, GPRMC, others.
+
+
 class DataManager(object):
     def __init__(self, path_to_repo, verbose=0):
         self.path_to_repo = path_to_repo
@@ -170,14 +180,55 @@ class DataManager(object):
         with open(filename_pickled_information, 'wb') as crrt_file:
             pickle.dump(information, crrt_file, protocol=pickle.HIGHEST_PROTOCOL)
 
-    def show_spectrum_one_instrument(self, time_start, time_end, folder):
+    def associated_to_use(self, folder, time_start=None, time_end=None, min_delay=None):
+        information = self.load_information_folder(folder)
+
+        associated = information["association_tables"]
+
+        keys_to_use = associated.keys()
+
+        if self.verbose > 2:
+            print("all keys: {}".format(keys_to_use))
+
+        if time_start is not None:
+            keys_to_use = [crrt_key for crrt_key in keys_to_use if timestamp_from_filename(crrt_key) > time_start]
+
+        if time_end is not None:
+            keys_to_use = [crrt_key for crrt_key in keys_to_use if timestamp_from_filename(crrt_key) < time_end]
+
+        if self.verbose > 2:
+            print("keys_to_use after time constraints: {}".format(keys_to_use))
+
+        keys_to_use = sorted(keys_to_use, key=timestamp_from_filename)
+
+        if self.verbose > 2:
+            print("list_sorted_keys: {}".format(keys_to_use))
+
+        if min_delay is not None:
+            all_possible_keys = list(keys_to_use)
+            keys_to_use = []
+            crrt_key = keys_to_use[0]
+
+
+            for
+
+        return(list_sorted_keys)
+
+    def show_spectrum(self, time_start=None, time_end=None, min_delay=None, folder=None):
+        if folder is not None:
+
+            # find list of keys that are valid
+            list_keys = self.associated_to_use(folder, time_start, time_end)
+
+            pass
+
+        else:
+            print("plot for all folders simultaneously not yet implemented")
         pass
 
-    def show_spectrum_all_instruments(self, time_start, time_end):
+    def show_battery(self, time_start=None, time_end=None, folder=None):
+        """None arguments: no limitations; shows either all folders, or unlimited time."""
         pass
 
-    def show_battery_one_instrument(self, time_start, time_end, folder):
-        pass
-
-    def show_position_one_instrument(self, time_start, time_end, background_image, folder):
+    def show_positino(self, time_start=None, time_end=None, folder=None, background_image=None):
         pass

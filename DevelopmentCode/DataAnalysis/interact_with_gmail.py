@@ -43,6 +43,9 @@ class IridiumEmailReader(object):
         self.verbose = verbose
 
     def read_all_incoming_messages(self):
+        if self.verbose > 0:
+            print("Read all incoming messages")
+
         # connect
         pop_conn = poplib.POP3_SSL('pop.gmail.com')
         pop_conn.user(self.username)
@@ -58,6 +61,9 @@ class IridiumEmailReader(object):
         pop_conn.quit()
 
     def generate_data_all_incoming_messages(self):
+        if self.verbose > 0:
+            print("Fenerate data associated with all incoming messages")
+
         self.parsed_messages = []
 
         crrt_message_index = 0
@@ -65,7 +71,7 @@ class IridiumEmailReader(object):
         for crrt_message in self.messages:
 
             crrt_message_index += 1
-            if self.verbose > 0:
+            if self.verbose > 2:
                 print("generate data for message number {}".format(crrt_message_index))
 
             parsed_message = parse_message(crrt_message)
@@ -80,14 +86,29 @@ class IridiumEmailReader(object):
             if not os.path.exists(path_data):
                 os.makedirs(path_data)
 
-            if self.verbose > 0:
+            if self.verbose > 2:
                 print("save data for message number {}".format(crrt_message_index))
 
             with open(path_data + message_name + '.bin', 'wb') as crrt_file:
                 crrt_file.write(attachment_string)
+
+    def pull_data(self):
+        if self.verbose > 0:
+            print("Pull from github")
+
+        subprocess_cmd("cd {} && git add . && git pull".format(self.path_repo))
 
     def push_data(self):
         if self.verbose > 0:
             print("Commit and push to github")
 
         subprocess_cmd("cd {} && git add . && git commit -m 'automatic commit' && git push".format(self.path_repo))
+
+    def automatic_interaction(self):
+        self.pull_data()
+
+        self.read_all_incoming_messages()
+
+        self.generate_data_all_incoming_messages()
+
+        self.push_data()
