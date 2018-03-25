@@ -238,6 +238,7 @@ class DataManager(object):
 
         return(keys_to_use)
 
+    # note: this is an example of how to retrieve some specific spectra, can be used in future works
     def show_spectrum(self, time_start=None, time_end=None, min_delay=None, folder=None, save_fig=False):
         information = self.load_information_folder(folder)
         associated = information["association_tables"]
