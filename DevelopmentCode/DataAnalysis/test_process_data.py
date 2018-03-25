@@ -1,31 +1,25 @@
 import process_data
+from datetime import datetime
+from datetime import timedelta
 
 path_to_repo = '/home/jrlab/Desktop/Git/IridiumData_Svalbard2018/'
 folder_test = '300234066333770'
 
-data_manager = process_data.DataManager(path_to_repo=path_to_repo, verbose=5)
+data_manager = process_data.DataManager(path_to_repo=path_to_repo, verbose=0)
 
+# bundle new data that may have been uploaded on the repor
 data_manager.bundle_data_folder(folder_test)
 
-import datetime
+# some example of how to show a number of spectra
+data_manager.show_spectrum(folder=folder_test,
+                           time_start=datetime(year=2018, month=03, day=21, hour=12, tzinfo=None),
+                           time_end=datetime(year=2018, month=03, day=25, hour=12, tzinfo=None),
+                           min_delay=timedelta(hours=12),
+                           save_fig=True)
 
-date_1 = datetime.datetime.utcnow()
-date_2 = datetime.datetime.utcnow()
-date_3 = datetime.datetime.utcnow()
-
-date_1
-date_2
-
-date_1 < date_2
-date_2 < date_1
-
-date_1 - date_2
-date_2 - date_1
-
-abs((date_1 - date_2).total_seconds())
-(date_2 - date_1).total_seconds()
-
-str(min(date_1, date_2, date_3))
-
-abs(1)
-abs(-3.4)
+data_manager.show_spectrogram(folder=folder_test,
+                              time_start=datetime(year=2018, month=03, day=21, hour=12, tzinfo=None),
+                              time_end=datetime(year=2018, month=03, day=25, hour=12, tzinfo=None),
+                              save_fig=True,
+                              #noise_normalize=False
+                              )

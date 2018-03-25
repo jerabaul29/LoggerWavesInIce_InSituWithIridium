@@ -29,17 +29,22 @@ from dateutil import parser
 import fnmatch
 import matplotlib.pyplot as plt
 import numpy as np
+import pytz
+
+now_utc = datetime.now(pytz.utc)
+today_utc = now_utc.date()
 
 # max duration between different files that should be bundled together
 MAX_DURATION_BETWEEN_FILES_S = 15 * 60
 SIZE_FILE_DATA_BITS = 340
+MAX_VALUE_SPECTRUM = 0.001
 
 
 def timestamp_from_filename(filename, verbose=0):
     filename_modified = filename.replace("_", " ")[0:-4]
-    datetime_object = parser.parse(filename_modified)
+    datetime_object = parser.parse(filename_modified, ignoretz=True)
 
-    if verbose > 0:
+    if verbose > 1:
         print("filename: {}".format(filename))
         print("timestamp: {}".format(datetime_object))
 
@@ -82,6 +87,8 @@ def associate(dict_non_associated, verbose=0):
 
             crrt_list_associated = list(set(crrt_list_associated))
             list_newly_associated = list(set(list_newly_associated))
+
+            crrt_list_associated = sorted(crrt_list_associated, key=timestamp_from_filename)
 
             if verbose > 2:
                 print("crrt_list_associated after going through files: {}".format(crrt_list_associated))
@@ -148,7 +155,7 @@ class DataManager(object):
         # get all timestamps of arrival for non associated files
         dict_non_associated = {}
         for crrt_file in not_associated:
-            dict_non_associated[crrt_file + "_timestamp"] = timestamp_from_filename(crrt_file, verbose=self.verbose)
+            dict_non_associated[crrt_file] = timestamp_from_filename(crrt_file, verbose=self.verbose)
 
         # apply rules for associating files
         (list_newly_associated, dict_new_associations) = associate(dict_non_associated, verbose=self.verbose)
@@ -223,7 +230,10 @@ class DataManager(object):
 
         return(keys_to_use)
 
-    def show_spectrum(self, time_start=None, time_end=None, min_delay=None, folder=None):
+    def show_spectrum(self, time_start=None, time_end=None, min_delay=None, folder=None, save_fig=False):
+        information = self.load_information_folder(folder)
+        associated = information["association_tables"]
+
         if folder is not None:
 
             # find list of keys that are valid
@@ -232,18 +242,88 @@ class DataManager(object):
             plt.figure()
 
             for crrt_key in list_keys:
-                crrt_dict = load_Iridium_wave_data.load_data(folder + "/" + crrt_key)
+                if self.verbose > 2:
+                    print("using crrt_key {}".format(crrt_key))
+                    print("value: {}".format(associated[crrt_key]))
+
+                file_to_load = self.path_to_repo + folder + "/" + associated[crrt_key][1]
+
+                if self.verbose > 0:
+                    print("loading file: {}".format(file_to_load))
+
+                crrt_dict = load_Iridium_wave_data.load_data(file_to_load)
                 (SWH, T_z0, Hs, T_z, freq, fmin, fmax, nfreq, a0_proc, a1_proc, a2_proc, b1_proc, b2_proc, R_proc) = load_Iridium_wave_data.expand_raw_variables(crrt_dict)
                 plt.plot(freq, a0_proc, label=crrt_key)
 
             noise = (0.24 * 9.81e-3)**2 * ((2 * np.pi * freq)**(-4))
-            plt.plot(freq, noise, label='noise')
-            plt.xlabel("frq (Hz)")
+            plt.plot(freq, noise, label='noise', color='k', linestyle='--', linewidth=2)
+            plt.xlabel(r'$\mathrm{f} \, / \, \mathrm{Hz}$')
             plt.ylabel(r'$S \, / \,\mathrm{m}^2 \mathrm{Hz}^{-1}$')
-            plt.legend(r'$\mathrm{f} \, / \, \mathrm{Hz}$')
+            plt.legend()
             # plt.yscale('log')
             plt.yscale('linear')
             plt.xlim([fmin, fmax])
+            plt.ylim([0, MAX_VALUE_SPECTRUM])
+            plt.tight_layout()
+
+            if save_fig:
+                figure_path = self.path_to_repo + folder + "/Figures/"
+
+                if not os.path.exists(figure_path):
+                    os.makedirs(figure_path)
+
+                fig_name = "spectra_" + str(time_start) + "_" + str(time_end) + "_" + str(min_delay) + ".pdf"
+                plt.savefig(figure_path + fig_name, format="pdf")
+
+            plt.show()
+
+        else:
+            print("plot for all folders simultaneously not yet implemented")
+        pass
+
+    def show_spectrogram(self, time_start=None, time_end=None, folder=None, save_fig=False):
+        information = self.load_information_folder(folder)
+        associated = information["association_tables"]
+
+        if folder is not None:
+
+            # find list of keys that are valid
+            list_keys = self.associated_to_use(folder, time_start, time_end)
+
+            list_data_to_plot = []
+            X_axis = []
+
+            for crrt_key in list_keys:
+                if self.verbose > 2:
+                    print("using crrt_key {}".format(crrt_key))
+                    print("value: {}".format(associated[crrt_key]))
+
+                file_to_load = self.path_to_repo + folder + "/" + associated[crrt_key][1]
+
+                if self.verbose > 0:
+                    print("loading file: {}".format(file_to_load))
+
+                crrt_dict = load_Iridium_wave_data.load_data(file_to_load)
+                (SWH, T_z0, Hs, T_z, freq, fmin, fmax, nfreq, a0_proc, a1_proc, a2_proc, b1_proc, b2_proc, R_proc) = load_Iridium_wave_data.expand_raw_variables(crrt_dict)
+                list_data_to_plot.append(a0_proc)
+                X_axis.append(timestamp_from_filename(associated[crrt_key][1]))
+
+            plt.figure()
+            plt.pcolor(X_axis, freq, np.transpose(np.array(list_data_to_plot)), vmin=0, vmax=MAX_VALUE_SPECTRUM)
+            plt.colorbar()
+            plt.tight_layout()
+            plt.xticks(rotation=90)
+            # plt.locator_params(axis='x', nticks=10)
+
+            if save_fig:
+                figure_path = self.path_to_repo + folder + "/Figures/"
+
+                if not os.path.exists(figure_path):
+                    os.makedirs(figure_path)
+
+                fig_name = "spectrogram_" + str(time_start) + "_" + str(time_end) + ".pdf"
+                plt.savefig(figure_path + fig_name, format="pdf")
+
             plt.show()
 
         else:
@@ -254,5 +334,5 @@ class DataManager(object):
         """None arguments: no limitations; shows either all folders, or unlimited time."""
         pass
 
-    def show_positino(self, time_start=None, time_end=None, folder=None, background_image=None):
+    def show_position(self, time_start=None, time_end=None, folder=None, background_image=None):
         pass
