@@ -18,8 +18,14 @@ data_manager.show_spectrum(folder=folder_test,
                            save_fig=True)
 
 data_manager.show_spectrogram(folder=folder_test,
-                              time_start=datetime(year=2018, month=03, day=21, hour=12, tzinfo=None),
+                              time_start=datetime(year=2018, month=03, day=19, hour=12, tzinfo=None),
                               time_end=datetime(year=2018, month=03, day=25, hour=12, tzinfo=None),
                               save_fig=True,
-                              #noise_normalize=False
+                              noise_normalize=False
                               )
+
+data_manager.show_battery(folder=folder_test,
+                          time_start=datetime(year=2018, month=03, day=19, hour=12, tzinfo=None),
+                          time_end=datetime(year=2018, month=03, day=25, hour=20, tzinfo=None),
+                          save_fig=True,
+                          )
