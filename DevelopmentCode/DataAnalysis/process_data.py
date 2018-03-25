@@ -23,9 +23,12 @@ keep a bookkeeping of what information received etc.
 from __future__ import print_function
 import os
 import pickle
+import load_Iridium_wave_data
 from datetime import datetime
 from dateutil import parser
 import fnmatch
+import matplotlib.pyplot as plt
+import numpy as np
 
 # max duration between different files that should be bundled together
 MAX_DURATION_BETWEEN_FILES_S = 15 * 60
@@ -205,22 +208,43 @@ class DataManager(object):
             print("list_sorted_keys: {}".format(keys_to_use))
 
         if min_delay is not None:
-            all_possible_keys = list(keys_to_use)
+            all_possible_keys = list(keys_to_use)  # make a copy
             keys_to_use = []
-            crrt_key = keys_to_use[0]
+            crrt_key = all_possible_keys[0]
+            keys_to_use.append(crrt_key)
 
+            for next_key in all_possible_keys:
+                if (timestamp_from_filename(next_key) - timestamp_from_filename(crrt_key) > min_delay):
+                    crrt_key = next_key
+                    keys_to_use.append(crrt_key)
 
-            for
+                    if self.verbose > 0:
+                        print("adding key {}".format(crrt_key))
 
-        return(list_sorted_keys)
+        return(keys_to_use)
 
     def show_spectrum(self, time_start=None, time_end=None, min_delay=None, folder=None):
         if folder is not None:
 
             # find list of keys that are valid
-            list_keys = self.associated_to_use(folder, time_start, time_end)
+            list_keys = self.associated_to_use(folder, time_start, time_end, min_delay)
 
-            pass
+            plt.figure()
+
+            for crrt_key in list_keys:
+                crrt_dict = load_Iridium_wave_data.load_data(folder + "/" + crrt_key)
+                (SWH, T_z0, Hs, T_z, freq, fmin, fmax, nfreq, a0_proc, a1_proc, a2_proc, b1_proc, b2_proc, R_proc) = load_Iridium_wave_data.expand_raw_variables(crrt_dict)
+                plt.plot(freq, a0_proc, label=crrt_key)
+
+            noise = (0.24 * 9.81e-3)**2 * ((2 * np.pi * freq)**(-4))
+            plt.plot(freq, noise, label='noise')
+            plt.xlabel("frq (Hz)")
+            plt.ylabel(r'$S \, / \,\mathrm{m}^2 \mathrm{Hz}^{-1}$')
+            plt.legend(r'$\mathrm{f} \, / \, \mathrm{Hz}$')
+            # plt.yscale('log')
+            plt.yscale('linear')
+            plt.xlim([fmin, fmax])
+            plt.show()
 
         else:
             print("plot for all folders simultaneously not yet implemented")
