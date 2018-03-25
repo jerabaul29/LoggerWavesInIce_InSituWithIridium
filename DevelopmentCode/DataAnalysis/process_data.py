@@ -264,7 +264,7 @@ class DataManager(object):
                 plt.plot(freq, a0_proc, label=crrt_key)
 
             noise = (0.24 * 9.81e-3)**2 * ((2 * np.pi * freq)**(-4))
-            plt.plot(freq, noise, label='noise', color='k', linestyle='--', linewidth=2)
+            plt.plot(freq, noise, label='noise level', color='k', linestyle='--', linewidth=2)
             plt.xlabel(r'$\mathrm{f} \, / \, \mathrm{Hz}$')
             plt.ylabel(r'$S \, / \,\mathrm{m}^2 \mathrm{Hz}^{-1}$')
             plt.legend()
@@ -329,8 +329,8 @@ class DataManager(object):
                 MAX_VALUE_SPECTRUM = MAX_VALUE_SPECTRUM_REAL
             plt.pcolor(X_axis, freq, np.transpose(np.array(list_data_to_plot)), vmin=0, vmax=MAX_VALUE_SPECTRUM)
             plt.colorbar()
-            plt.tight_layout()
             plt.xticks(rotation=90)
+            plt.tight_layout()
             # plt.locator_params(axis='x', nticks=10)
 
             if save_fig:
@@ -421,6 +421,7 @@ class DataManager(object):
             plt.ylabel("battery (V)")
             plt.xlim(X_axis[0], X_axis[-1])
             plt.ylim(min(list_battery_levels) - 0.05, max(list_battery_levels) + 0.05)
+            plt.tight_layout()
 
             if save_fig:
                 figure_path = self.path_to_repo + folder + "/Figures/"
