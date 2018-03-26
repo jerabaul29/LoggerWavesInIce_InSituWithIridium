@@ -1,23 +1,6 @@
 """TODO: automatically:
 
-- dictionary at root of each folder about the metadata and bundling
-
-- automatic bundling of data
-
-- automatic processing
-- automatic plotting if needed
-
-- generate dicts:
--- for bookkeeping
--- for bundled data
-NOTE: for the generated dicts: use key corresponding to the time of start of recording
-
-- bundle together status strings and binary messages
-- generate dictionaries with the data
-- add on github and push
-
-TODO other files: get a list of new pushed messages and things to update
-keep a bookkeeping of what information received etc.
+TODO: automatic gestion of several folders
 """
 
 from __future__ import print_function
@@ -42,6 +25,27 @@ today_utc = now_utc.date()
 MAX_DURATION_BETWEEN_FILES_S = 15 * 60
 SIZE_FILE_DATA_BITS = 340
 MAX_VALUE_SPECTRUM_REAL = 0.001
+
+
+def remove_noise_PSD(PSD, PSD_noise):
+    """remove the noise out of a PSD.
+
+    Idea:
+
+    - PSD(f) = E [ |FFT(f)|**2 ] = E [ (FFT(f)) * conj(FFT(f)) ]
+    - but some noise: FFT(f) = FFTsignal(f) + FFTnoise(f)
+    - ie PSD(f) = E [ (FFTsignal(f) + FFTnoise(f)) * conj(FFTsignal(f) + FFTnoise(f)) ]
+                = E [ FFTsignal(f) * conj(FFTsignal(f)) + FFTnoise(f) * conj(FFTnoise(f)) + 2 * Re( FFTsignal(f) * conj( FFTnoise(f) ) ) ]
+    - then have to make some hypothesis: - noise and signal uncorrelated
+         PSD(f) =         PSDsignal(f)              +          PSDnoise(f)            + 2 * Re( E[ FFTsignal(f) * conj( FFTnoise(f) ) ] )
+                =         PSDsignal(f)              +          PSDnoise(f)            + 2 * Re( E[FFTsignal(f)] * E[ conj( FFTnoise ) ] )
+                                         - the phase of the signals is random, ie E(Im) = E(Re) = 0, ie:
+                =         PSDsignal(f)              +          PSDnoise(f)
+    """
+
+    # TODO: check with tests!!
+
+    return(PSD - PSD_noise)
 
 
 def timestamp_from_filename(filename, verbose=0):
@@ -123,6 +127,14 @@ def is_status_string():
     # use features that repeat: V, ., F, GPRMC, others.
 
 
+def check_valid_data(spectrum_data):
+    if np.max(spectrum_data) > 10.0 * MAX_VALUE_SPECTRUM_REAL:
+        # print("WARNING: seems that bad data!")
+        return(False)
+
+    return(True)
+
+
 class DataManager(object):
     def __init__(self, path_to_repo, verbose=0):
         self.path_to_repo = path_to_repo
@@ -170,6 +182,27 @@ class DataManager(object):
 
         # write information
         self.write_information_folder(folder, information)
+
+        # display statistics
+        self.print_data_statistics(folder)
+
+    def print_data_statistics(self, folder):
+        information = self.load_information_folder(folder)
+
+        list_associated = information["associated_files"]
+        number_associated = len(list_associated)
+
+        total_number_files = 0
+        for crrt_file in os.listdir(self.path_to_repo + '/' + folder):
+            if fnmatch.fnmatch(crrt_file, '*.bin'):
+                total_number_files += 1
+
+        print("------ FILE ASSOCIATION STATS ------")
+        print("Total number of files: {}".format(total_number_files))
+        print("Number of associated files: {}".format(number_associated))
+        print("Number of valid transmitted pairs: {}".format(number_associated / 2))
+        print("Percent of badly transmitted pairs: {}".format(100.0 * (total_number_files - number_associated) / (number_associated / 2)))
+        print("------------------------------------")
 
     def load_information_folder(self, folder):
         filename_pickled_information = self.generate_pickled_information_name(folder)
@@ -239,7 +272,7 @@ class DataManager(object):
         return(keys_to_use)
 
     # note: this is an example of how to retrieve some specific spectra, can be used in future works
-    def show_spectrum(self, time_start=None, time_end=None, min_delay=None, folder=None, save_fig=False):
+    def show_spectrum(self, time_start=None, time_end=None, min_delay=None, folder=None, save_fig=False, remove_noise=False):
         information = self.load_information_folder(folder)
         associated = information["association_tables"]
 
@@ -262,10 +295,17 @@ class DataManager(object):
 
                 crrt_dict = load_Iridium_wave_data.load_data(file_to_load)
                 (SWH, T_z0, Hs, T_z, freq, fmin, fmax, nfreq, a0_proc, a1_proc, a2_proc, b1_proc, b2_proc, R_proc) = load_Iridium_wave_data.expand_raw_variables(crrt_dict)
-                plt.plot(freq, a0_proc, label=crrt_key)
 
-            noise = (0.24 * 9.81e-3)**2 * ((2 * np.pi * freq)**(-4))
-            plt.plot(freq, noise, label='noise level', color='k', linestyle='--', linewidth=2)
+                noise = (0.24 * 9.81e-3)**2 * ((2 * np.pi * freq)**(-4))
+                if remove_noise:
+                    a0_proc = remove_noise_PSD(a0_proc, noise)
+
+                if check_valid_data(a0_proc):
+                    plt.plot(freq, a0_proc, label=crrt_key)
+
+            if not remove_noise:
+                plt.plot(freq, noise, label='noise level', color='k', linestyle='--', linewidth=2)
+
             plt.xlabel(r'$\mathrm{f} \, / \, \mathrm{Hz}$')
             plt.ylabel(r'$S \, / \,\mathrm{m}^2 \mathrm{Hz}^{-1}$')
             plt.legend()
@@ -290,7 +330,9 @@ class DataManager(object):
             print("plot for all folders simultaneously not yet implemented")
         pass
 
-    def show_spectrogram(self, time_start=None, time_end=None, folder=None, save_fig=False, noise_normalize=False):
+    def show_spectrogram(self, time_start=None, time_end=None, folder=None, save_fig=False, noise_normalize=False, peak_frequency='T_z', remove_noise=False):
+        """peak_frequency is 'T_z' or 'T_z0'"""
+
         information = self.load_information_folder(folder)
         associated = information["association_tables"]
 
@@ -301,6 +343,7 @@ class DataManager(object):
 
             list_data_to_plot = []
             X_axis = []
+            list_peak_frequency = []
 
             for crrt_key in list_keys:
                 if self.verbose > 2:
@@ -315,13 +358,26 @@ class DataManager(object):
                 crrt_dict = load_Iridium_wave_data.load_data(file_to_load)
                 (SWH, T_z0, Hs, T_z, freq, fmin, fmax, nfreq, a0_proc, a1_proc, a2_proc, b1_proc, b2_proc, R_proc) = load_Iridium_wave_data.expand_raw_variables(crrt_dict)
 
-                if noise_normalize:
-                    noise = (0.24 * 9.81e-3)**2 * ((2 * np.pi * freq)**(-4))
-                    list_data_to_plot.append(np.array(a0_proc) / np.array(noise))
-                else:
-                    list_data_to_plot.append(a0_proc)
+                if check_valid_data(a0_proc):
 
-                X_axis.append(timestamp_from_filename(associated[crrt_key][1]))
+                    if remove_noise:
+                        noise = (0.24 * 9.81e-3)**2 * ((2 * np.pi * freq)**(-4))
+                        a0_proc = remove_noise_PSD(a0_proc, noise)
+                        list_data_to_plot.append(a0_proc)
+                    elif noise_normalize:
+                        noise = (0.24 * 9.81e-3)**2 * ((2 * np.pi * freq)**(-4))
+                        list_data_to_plot.append(np.array(a0_proc) / np.array(noise))
+                    else:
+                        list_data_to_plot.append(a0_proc)
+
+                    if peak_frequency == 'T_z':
+                        list_peak_frequency.append(1.0 / T_z)
+                    elif peak_frequency == 'T_z0':
+                        list_peak_frequency.append(1.0 / T_z0)
+                    else:
+                        pass
+
+                    X_axis.append(timestamp_from_filename(associated[crrt_key][1]))
 
             plt.figure()
             if noise_normalize:
@@ -330,9 +386,16 @@ class DataManager(object):
                 MAX_VALUE_SPECTRUM = MAX_VALUE_SPECTRUM_REAL
             plt.pcolor(X_axis, freq, np.transpose(np.array(list_data_to_plot)), vmin=0, vmax=MAX_VALUE_SPECTRUM)
             plt.colorbar()
+
+            if peak_frequency == 'T_z' or peak_frequency == 'T_z0':
+                plt.plot(X_axis, list_peak_frequency, color='red', marker='*', linestyle='-', linewidth=2, label=peak_frequency)
+                plt.legend()
+
             plt.xticks(rotation=90)
-            plt.tight_layout()
+            plt.ylabel(r'$\mathrm{f} \, / \, \mathrm{Hz}$')
             # plt.locator_params(axis='x', nticks=10)
+
+            plt.tight_layout()
 
             if save_fig:
                 figure_path = self.path_to_repo + folder + "/Figures/"
@@ -417,7 +480,7 @@ class DataManager(object):
                 rect = Rectangle((start, 0), width, 100, color='gray')
                 ax.add_patch(rect)
 
-            plt.plot(X_axis, list_battery_levels, color='red', linewidth=2)
+            plt.plot(X_axis, list_battery_levels, color='red', marker='*', linestyle='-', linewidth=2)
             plt.xticks(rotation=90)
             plt.ylabel("battery (V)")
             plt.xlim(X_axis[0], X_axis[-1])
