@@ -43,8 +43,6 @@ def remove_noise_PSD(PSD, PSD_noise):
                 =         PSDsignal(f)              +          PSDnoise(f)
     """
 
-    # TODO: check with tests!!
-
     return(PSD - PSD_noise)
 
 
@@ -321,7 +319,11 @@ class DataManager(object):
                 if not os.path.exists(figure_path):
                     os.makedirs(figure_path)
 
-                fig_name = "spectra_" + str(time_start) + "_" + str(time_end) + "_" + str(min_delay) + ".pdf"
+                if remove_noise:
+                    fig_name = "spectra_" + str(time_start) + "_" + str(time_end) + "_" + str(min_delay) + "_denoising.pdf"
+                else:
+                    fig_name = "spectra_" + str(time_start) + "_" + str(time_end) + ".pdf"
+
                 plt.savefig(figure_path + fig_name, format="pdf")
 
             plt.show()
@@ -403,7 +405,11 @@ class DataManager(object):
                 if not os.path.exists(figure_path):
                     os.makedirs(figure_path)
 
-                fig_name = "spectrogram_" + str(time_start) + "_" + str(time_end) + ".pdf"
+                if remove_noise:
+                    fig_name = "spectrogram_" + str(time_start) + "_" + str(time_end) + "_denoising.pdf"
+                else:
+                    fig_name = "spectrogram_" + str(time_start) + "_" + str(time_end) + ".pdf"
+
                 plt.savefig(figure_path + fig_name, format="pdf")
 
             plt.show()
@@ -484,7 +490,7 @@ class DataManager(object):
             plt.xticks(rotation=90)
             plt.ylabel("battery (V)")
             plt.xlim(X_axis[0], X_axis[-1])
-            plt.ylim(min(list_battery_levels) - 0.05, max(list_battery_levels) + 0.05)
+            plt.ylim(min(list_battery_levels) - 0.02, max(list_battery_levels) + 0.02)
             plt.tight_layout()
 
             if save_fig:

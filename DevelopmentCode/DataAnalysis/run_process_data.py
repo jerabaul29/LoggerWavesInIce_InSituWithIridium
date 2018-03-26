@@ -53,5 +53,5 @@ data_manager.show_spectrogram(folder=folder_test,
                               save_fig=True,
                               noise_normalize=False,
                               remove_noise=True,
-                              peak_frequency=None
+                              peak_frequency='T_z'
                               )
