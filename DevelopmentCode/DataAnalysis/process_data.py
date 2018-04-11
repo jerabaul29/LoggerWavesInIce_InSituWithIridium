@@ -1,6 +1,8 @@
-"""TODO: automatically:
+"""
 
+TODO: compute statistics (Hs, Tz, etc) from the denoised integrated spectra
 TODO: automatic gestion of several folders
+
 """
 
 from __future__ import print_function
