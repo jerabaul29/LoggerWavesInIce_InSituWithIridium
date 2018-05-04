@@ -1,0 +1,19 @@
+- add the library for the Mega shield: https://github.com/Alarm-Siren/arduino-kicad-library
+Must be added to EEschema, CvPcb and PcbNew independantly
+
+- add the library for MOSFET
+
+- to create my own good MOSFET (to be ok with the pins):
+-- Eeschema
+-- Library Editor
+-- Create a new component
+-- Component name: FQP27P06
+-- Default designator: U
+-- Ok
+-- Add the pins:
+--- Gate: G, passive
+--- Drain: D, passive
+--- Source: S, passive
+--- build the graphics
+--- save the component
+--- 
