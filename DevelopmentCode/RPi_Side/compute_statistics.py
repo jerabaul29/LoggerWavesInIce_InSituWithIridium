@@ -74,8 +74,10 @@ def DownSampleNbit(freq_all, sig_all, freq_red, downsample=global_downsample_len
 
     # for a signed nbit integer so make it plus/minus 2**(nbit-1) -1
     max_val = 2**(nbit - 1) - 1
-    sig_red1, freq_red1 = signal.resample(sig_all, int(downsample * 1.3), t=freq_all)
-    f_int = interp1d(freq_red1, sig_red1)
+    #sig_red1, freq_red1 = signal.resample(sig_all, int(downsample * 1.3), t=freq_all)
+    #f_int = interp1d(freq_red1, sig_red1, kind='slinear')
+    ### Don't use resample but use a linear interpolation instead
+    f_int = interp1d(freq_all, sig_all, kind='slinear')
     sig_red_int = f_int(freq_red)
     sig_red_max = np.max([sig_red_int.max(), -sig_red_int.min()])
 
