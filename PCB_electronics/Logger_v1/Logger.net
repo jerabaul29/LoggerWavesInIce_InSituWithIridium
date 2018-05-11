@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source /home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/PCB_electronics/Logger_v1/Logger.sch)
-    (date "on. 09. mai 2018 kl. 18.31 +0200")
+    (date "fr. 11. mai 2018 kl. 16.23 +0200")
     (tool "Eeschema 4.0.2+dfsg1-stable")
     (sheet (number 1) (name /) (tstamps /)
       (title_block

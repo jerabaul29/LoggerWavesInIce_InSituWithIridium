@@ -3,7 +3,7 @@
   (general
     (links 39)
     (no_connects 0)
-    (area 63.000001 37 147.000001 129.200001)
+    (area 79.949999 38.449999 140.050001 120.050001)
     (thickness 1.6)
     (drawings 20)
     (tracks 134)
@@ -21,8 +21,8 @@
   )
 
   (layers
-    (0 F.Cu signal)
-    (31 B.Cu signal)
+    (0 F.Cu signal hide)
+    (31 B.Cu signal hide)
     (32 B.Adhes user hide)
     (33 F.Adhes user hide)
     (34 B.Paste user hide)
@@ -1224,7 +1224,7 @@
     )
   )
 
-  (module TO_SOT_Packages_THT:TO-220_Neutral123_Vertical (layer F.Cu) (tedit 5A2FEC58) (tstamp 5A1EB0BA)
+  (module TO_SOT_Packages_THT:TO-220_Neutral123_Vertical (layer F.Cu) (tedit 0) (tstamp 5A1EB0BA)
     (at 99.5 52.5)
     (descr "TO-220, Neutral, Vertical,")
     (tags "TO-220, Neutral, Vertical,")
