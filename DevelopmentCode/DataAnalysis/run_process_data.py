@@ -33,9 +33,8 @@ data_manager.show_directional_spectrum(folder=folder_test,
                                        time_end=datetime(year=2018, month=03, day=30, hour=12, tzinfo=None),
                                        min_delay=timedelta(hours=12),
                                        save_fig=True,
-                                       remove_noise=False,
                                        max_number=20,
-                                       show_all=True)
+                                       show_all=False)
 
 # an example of how to show a number of spectra
 data_manager.show_spectrum(folder=folder_test,

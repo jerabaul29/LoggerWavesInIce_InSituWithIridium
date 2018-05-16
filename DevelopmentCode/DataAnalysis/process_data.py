@@ -360,6 +360,20 @@ class DataManager(object):
                 ax.set_theta_zero_location("N")
                 ax.set_theta_direction(-1)
                 cbar = plt.colorbar(p1, ax=ax)
+
+                if save_fig:
+                    figure_path = self.path_to_repo_Irdium_data + folder + "/Figures/"
+
+                    if not os.path.exists(figure_path):
+                        os.makedirs(figure_path)
+
+                    if remove_noise:
+                        fig_name = "directional_spectra_" + str(crrt_key) + "_denoising.pdf"
+                    else:
+                        fig_name = "directional_spectra_" + str(crrt_key) + ".pdf"
+
+                    plt.savefig(figure_path + fig_name, format="pdf")
+
                 plt.show()
 
     # note: this is an example of how to retrieve some specific spectra, can be used in future works
