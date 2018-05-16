@@ -19,6 +19,8 @@ import pytz
 import load_status_information
 import matplotlib.dates as mdates
 from matplotlib.patches import Rectangle
+from printind.printind_function import printi
+from compute_wave_spectrum_HPR import DirectionalSpectra
 
 now_utc = datetime.now(pytz.utc)
 today_utc = now_utc.date()
@@ -136,12 +138,12 @@ def check_valid_data(spectrum_data):
 
 
 class DataManager(object):
-    def __init__(self, path_to_repo, verbose=0):
-        self.path_to_repo = path_to_repo
+    def __init__(self, path_to_repo_Irdium_data, verbose=0):
+        self.path_to_repo_Irdium_data = path_to_repo_Irdium_data
         self.verbose = verbose
 
     def generate_pickled_information_name(self, folder):
-        return(self.path_to_repo + '/' + folder + '/information.pkl')
+        return(self.path_to_repo_Irdium_data + '/' + folder + '/information.pkl')
 
     def bundle_data_folder(self, folder):
         # load the pickled information
@@ -153,7 +155,7 @@ class DataManager(object):
 
         # list all files
         all_files = []
-        for crrt_file in os.listdir(self.path_to_repo + '/' + folder):
+        for crrt_file in os.listdir(self.path_to_repo_Irdium_data + '/' + folder):
             if fnmatch.fnmatch(crrt_file, '*.bin'):
                 all_files.append(crrt_file)
 
@@ -193,7 +195,7 @@ class DataManager(object):
         number_associated = len(list_associated)
 
         total_number_files = 0
-        for crrt_file in os.listdir(self.path_to_repo + '/' + folder):
+        for crrt_file in os.listdir(self.path_to_repo_Irdium_data + '/' + folder):
             if fnmatch.fnmatch(crrt_file, '*.bin'):
                 total_number_files += 1
 
@@ -271,6 +273,95 @@ class DataManager(object):
 
         return(keys_to_use)
 
+    # TODO: ongoing work, resume from here
+    def show_directional_spectrum(self, time_start=None, time_end=None, min_delay=None, folder=None, save_fig=False, remove_noise=False, max_number=None, show_all=None):
+        information = self.load_information_folder(folder)
+        associated = information["association_tables"]
+
+        if folder is not None:
+
+            # find list of keys that are valid
+            list_keys = self.associated_to_use(folder, time_start, time_end, min_delay)
+
+            # if too many possible valid keys, only keep the max_number first
+            if max_number is not None:
+                if max_number < len(list_keys):
+                    if self.verbose > 1:
+                        printi("Keep first {} valid keys when showing directional spectrum".format(max_number))
+                    list_keys = list_keys[0: max_number]
+
+            for crrt_key in list_keys:
+
+                if self.verbose > 2:
+                    print("using crrt_key {}".format(crrt_key))
+                    print("value: {}".format(associated[crrt_key]))
+
+                file_to_load = self.path_to_repo_Irdium_data + folder + "/" + associated[crrt_key][1]
+
+                if self.verbose > 0:
+                    print("loading file: {}".format(file_to_load))
+
+                crrt_dict = load_Iridium_wave_data.load_data(file_to_load)
+                (SWH, T_z0, Hs, T_z, freq, fmin, fmax, nfreq, a0_proc, a1_proc, a2_proc, b1_proc, b2_proc, R_proc) = load_Iridium_wave_data.expand_raw_variables(crrt_dict)
+
+                noise = (0.24 * 9.81e-3)**2 * ((2 * np.pi * freq)**(-4))
+                if remove_noise:
+                    a0_proc = remove_noise_PSD(a0_proc, noise)
+
+                SD = DirectionalSpectra(a0=a0_proc, a1=a1_proc, a2=a2_proc, b1=b1_proc, b2=b2_proc, R=R_proc, freqs=freq, ndir=361)
+
+                SD.IMLM()
+                SD.spread()
+                SD.theta()
+                SD.Hm0()
+
+                if remove_noise:
+                    print('Significant waveheight with removed noise = {:.4f} m'.format(SD.Hm0))
+
+                else:
+                    print('Significant waveheight without removed noise = {:.4f} m'.format(SD.Hm0))
+
+                    m0 = np.trapz(SD.a0 - noise, SD.freqs)
+                    print('Significant waveheight minus noise = {:.4f} m'.format(4 * np.sqrt(m0)))
+
+                # plot spreading at max ----------------------------------------
+                fpeak = np.argmax(SD.a0 - noise)
+                print('Peak frequency is {} Hz'.format(SD.freqs[fpeak]))
+
+                if show_all is True and self.verbose > 1:
+                    plt.figure()
+                    plt.plot(SD.freqs, SD.a0, label="a0")
+                    plt.plot(SD.freqs, noise, 'k--', label="noise")
+                    plt.yscale('log')
+                    plt.xlabel("Frequency [Hz]")
+                    plt.legend()
+
+                    # --------------------------------------------------------------
+                    plt.figure()
+                    plt.plot(SD.freqs, SD.theta * 180 / np.pi)
+                    plt.xlabel("Frequency [Hz]")
+                    plt.ylabel("Angular direction [deg]")
+
+                    # --------------------------------------------------------------
+                    plt.figure()
+                    plt.plot(SD.freqs, SD.sigma * 180 / np.pi, label=r'$\sigma$')
+                    plt.plot(SD.freqs, SD.sigma1 * 180 / np.pi, label=r'$\sigma_1$')
+                    plt.plot(SD.freqs, SD.sigma2 * 180 / np.pi, label=r'$\sigma_2$')
+                    plt.xlabel("Frequency [Hz]")
+                    plt.ylabel("Angular spread [deg]")
+                    plt.legend()
+
+                # --------------------------------------------------------------
+                # plt.figure()
+                # plt.plot(SD.dirs * 180 / np.pi, np.real(SD.S[fpeak, :]))
+
+                fig, ax = plt.subplots(subplot_kw=dict(projection='polar'))
+                p1 = ax.contourf(SD.dirs, SD.freqs, SD.S)
+                ax.set_theta_zero_location("N")
+                ax.set_theta_direction(-1)
+                cbar = plt.colorbar(p1, ax=ax)
+                plt.show()
+
     # note: this is an example of how to retrieve some specific spectra, can be used in future works
     def show_spectrum(self, time_start=None, time_end=None, min_delay=None, folder=None, save_fig=False, remove_noise=False):
         information = self.load_information_folder(folder)
@@ -288,7 +379,7 @@ class DataManager(object):
                     print("using crrt_key {}".format(crrt_key))
                     print("value: {}".format(associated[crrt_key]))
 
-                file_to_load = self.path_to_repo + folder + "/" + associated[crrt_key][1]
+                file_to_load = self.path_to_repo_Irdium_data + folder + "/" + associated[crrt_key][1]
 
                 if self.verbose > 0:
                     print("loading file: {}".format(file_to_load))
@@ -316,7 +407,7 @@ class DataManager(object):
             plt.tight_layout()
 
             if save_fig:
-                figure_path = self.path_to_repo + folder + "/Figures/"
+                figure_path = self.path_to_repo_Irdium_data + folder + "/Figures/"
 
                 if not os.path.exists(figure_path):
                     os.makedirs(figure_path)
@@ -354,7 +445,7 @@ class DataManager(object):
                     print("using crrt_key {}".format(crrt_key))
                     print("value: {}".format(associated[crrt_key]))
 
-                file_to_load = self.path_to_repo + folder + "/" + associated[crrt_key][1]
+                file_to_load = self.path_to_repo_Irdium_data + folder + "/" + associated[crrt_key][1]
 
                 if self.verbose > 0:
                     print("loading file: {}".format(file_to_load))
@@ -402,7 +493,7 @@ class DataManager(object):
             plt.tight_layout()
 
             if save_fig:
-                figure_path = self.path_to_repo + folder + "/Figures/"
+                figure_path = self.path_to_repo_Irdium_data + folder + "/Figures/"
 
                 if not os.path.exists(figure_path):
                     os.makedirs(figure_path)
@@ -439,7 +530,7 @@ class DataManager(object):
                     print("using crrt_key {}".format(crrt_key))
                     print("value: {}".format(associated[crrt_key]))
 
-                file_to_load = self.path_to_repo + folder + "/" + associated[crrt_key][0]
+                file_to_load = self.path_to_repo_Irdium_data + folder + "/" + associated[crrt_key][0]
 
                 if self.verbose > 0:
                     print("loading file: {}".format(file_to_load))
@@ -496,7 +587,7 @@ class DataManager(object):
             plt.tight_layout()
 
             if save_fig:
-                figure_path = self.path_to_repo + folder + "/Figures/"
+                figure_path = self.path_to_repo_Irdium_data + folder + "/Figures/"
 
                 if not os.path.exists(figure_path):
                     os.makedirs(figure_path)
@@ -511,4 +602,8 @@ class DataManager(object):
         pass
 
     def show_position(self, time_start=None, time_end=None, folder=None, background_image=None):
+        pass
+
+    # TODO: easy way to retrieve some data
+    def provide_all_data(self, time_start=None, time_end=None):
         pass
