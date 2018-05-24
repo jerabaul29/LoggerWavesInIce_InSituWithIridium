@@ -77,7 +77,7 @@ void IridiumManager::send_receive(void){
             (uint8_t *)buffer_transmit, buffer_transmit_position,
             (uint8_t *)buffer_received, buffer_received_position);
 
-        // TODO: take care of feedback values
+        // TODO: take care of feedback values; this will be needed if should implement 2 ways communication
     #else
         PDEBMSG("Iridium mockup")
     #endif
