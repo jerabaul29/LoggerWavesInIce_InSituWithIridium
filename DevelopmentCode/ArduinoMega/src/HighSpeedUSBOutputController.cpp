@@ -28,34 +28,38 @@ void HighSpeedUSBOutputController::write_to_port(char crrt_char){
 }
 
 bool HighSpeedUSBOutputController::wait_if_needed(void){
-    // if the RPi has something to say, the state may have changed
-    if (this->serial_port->available()){
-        char crrt_char = this->serial_port->read();
+    // if need to wait
+    if (this->need_to_wait){
 
-        // the RPi is full: wait for it to be more ready
-        if (crrt_char == 'F'){
-            this->need_to_wait = true;
-            PDEBMSG("Pi full")
-            return(true);
+        // if received from the RPi...
+        if (this->serial_port->available()){
+            char crrt_char = this->serial_port->read();
+
+            // if Ok to transmit start transmitting again now
+            if (crrt_char == 'O'){
+                this->need_to_wait = false;
+                return(false);
+            }
         }
 
-        // the RPi is empty; can start sending again
-        else if(crrt_char == 'E')
-        {
-            this->need_to_wait = false;
-            PDEBMSG("Pi empty")
-            return(false);
-        }
-
-        // non recognized message
-        else{
-            PDEBMSG("read problematic value")
-            PDEBVAR(crrt_char)
-        }
+        // otherwise need to wait more
+        return(true);
     }
 
-    // if not something from RPi, still in the same state
+    // if does not need to wait, ready to transmit at once, but check if RPi is fed up first
     else{
-        return(this->need_to_wait);
+        // if received from the RPi...
+        if (this->serial_port->available()){
+            char crrt_char = this->serial_port->read();
+
+            // if full need to start waiting now
+            if (crrt_char == 'F'){
+                this->need_to_wait = true;
+                return(true);
+            }
+        }
+
+        // otherwise do not need to wait
+        return(false);
     }
 }

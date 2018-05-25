@@ -5,6 +5,7 @@
 #include "IridiumManager.h"
 #include "BoardManager.h"
 #include "StreamAnalyzer.h"
+#include "HighSpeedUSBOutputController.h"
 
 #ifndef RASPBERRY_MANAGER
 #define RASPBERRY_MANAGER
@@ -42,6 +43,8 @@ class RaspberryManager{
     IridiumManager * iridium_manager;
 
     HardwareSerial * serial_port;
+
+    HighSpeedUSBOutputController controller_to_pi;
 
     const String message_from_raspberry_processing_ok;
 

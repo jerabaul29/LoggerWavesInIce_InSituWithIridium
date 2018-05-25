@@ -10,6 +10,7 @@ RaspberryManager::RaspberryManager(BoardManager * board_manager,
     sd_manager(sd_manager),
     iridium_manager(iridium_manager),
     serial_port(serial_port),
+    controller_to_pi(HighSpeedUSBOutputController(serial_port)),
     message_from_raspberry_processing_ok("PROCESSING_OK"),
     length_message_from_raspberry_processing_ok(message_from_raspberry_processing_ok.length())
     {
@@ -138,11 +139,7 @@ void RaspberryManager::file_content_to_raspberry(void){
     // TODO: improve here...
     while(sd_manager->more_to_read()){
         char crrt_char = sd_manager->read_char();  // TODO: check if no problem with type here
-        // TODO: use a class for the high speed data transfers
-        serial_port->write(crrt_char);
-        delayMicroseconds(100);  // TODO: 100 works, reduced to make data transfer faster
-        
-        wdt_reset();
+        this->controller_to_pi.write_to_port(crrt_char);
     }
     // send the end message
     serial_port->print(F("END_TRANSMIT_FILE"));
