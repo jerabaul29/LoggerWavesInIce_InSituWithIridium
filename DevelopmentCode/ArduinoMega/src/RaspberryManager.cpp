@@ -138,8 +138,10 @@ void RaspberryManager::file_content_to_raspberry(void){
     // TODO: improve here...
     while(sd_manager->more_to_read()){
         char crrt_char = sd_manager->read_char();  // TODO: check if no problem with type here
+        // TODO: use a class for the high speed data transfers
         serial_port->write(crrt_char);
         delayMicroseconds(100);  // TODO: 100 works, reduced to make data transfer faster
+        
         wdt_reset();
     }
     // send the end message
