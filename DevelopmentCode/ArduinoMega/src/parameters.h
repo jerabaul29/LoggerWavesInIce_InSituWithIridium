@@ -25,7 +25,7 @@ SOFTWARE.
 /*
   crucial for good functionning:
     - check DEBUG parameter: should be false for use with RPi, otherwise will not work!!
-    - check USE_IRIDIUM: should be true for use of real iridium and not dummy
+    - check USE_IRIDIUM: should be true for use of real iridium and not dummy; false will be dummy iridium
     - check DURATION_LOGGING_MS
     - check MAX_NBR_SLEEPS_BEFORE_WAKEUP
 */
@@ -53,7 +53,7 @@ SOFTWARE.
 #define MAX_NUMBER_ATTEMPTS_GPRMC 20  // GPS works at 1Hz
 
 // constraints on max number of sleep cycles between wakeups
-#define MAX_NBR_SLEEPS_BEFORE_WAKEUP 18 // 18 should be 6 hours
+#define MAX_NBR_SLEEPS_BEFORE_WAKEUP 18
 // #define MAX_NBR_SLEEPS_BEFORE_WAKEUP 1
 
 // Iridium
@@ -84,7 +84,7 @@ SOFTWARE.
 
 // how long should log
 #define DURATION_LOGGING_MS 1800000UL
-// #define DURATION_LOGGING_MS 300000UL  // for tests
+// #define DURATION_LOGGING_MS 30000UL  // for tests
 
 // LED
 #define PIN_MGA_LED 13
