@@ -28,6 +28,7 @@ void HighSpeedUSBOutputController::write_to_port(char crrt_char){
         this->number_allowed_remaining_to_send = NBR_MAX_ALLOWED_SEND;
 
         // do not overflow the output buffer!
+        // NOTE: actually, this is not needed: the write function is blocking...
         while (this->serial_port->availableForWrite() < NBR_MAX_ALLOWED_SEND){
             // wait
         }
