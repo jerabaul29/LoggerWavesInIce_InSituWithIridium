@@ -83,7 +83,7 @@ SOFTWARE.
 #define PIN_FBK_MGA 48
 
 // how long should log
-#define DURATION_LOGGING_MS 1800000UL
+#define DURATION_LOGGING_MS 1500000UL
 // #define DURATION_LOGGING_MS 30000UL  // for tests
 
 // LED
