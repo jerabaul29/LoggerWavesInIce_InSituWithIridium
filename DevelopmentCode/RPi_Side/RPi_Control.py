@@ -7,6 +7,7 @@ from compute_statistics import WaveStatistics
 from time import sleep
 import os
 from analyze_stream import AnalyzeStream
+from time import time
 
 """
 TODO: add a manager that erases old files, to avoid filling the memory
@@ -138,6 +139,8 @@ class RPi_control(object):
         if self.verbose > 0:
             print("received " + message_start)
 
+        time_start = time()
+
         # receive the data including the end message
         analyze_stream = AnalyzeStream(message_end)
 
@@ -163,6 +166,7 @@ class RPi_control(object):
 
         if self.verbose > 0:
             print("received " + message_end)
+            print("time elapsed (s): {}".format(time() - time_start))
 
         # generate the data, taking away end message
         self.data = ''.join(data_list[:-len(message_end)])
