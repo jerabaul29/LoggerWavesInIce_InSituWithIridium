@@ -1,0 +1,7 @@
+TODO: much more optimal would be to use SPI between Mega and RPi:
+- much faster communication
+- no need of usb interface between the 2
+
+TODO:
+do not use USB / micro USB interface of RPi; do all with header
+use RaspberryPi Zero with soldered header and plug in on a PCB doing the logging.
