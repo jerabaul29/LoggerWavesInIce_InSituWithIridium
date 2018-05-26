@@ -146,6 +146,12 @@ void RaspberryManager::file_content_to_raspberry(void){
 
     // TODO: put some checks here:
     // check that data well receiced, otherwise send again
+
+    // empty buffer (could have some stuff left from the manager on the RPi side)
+    delay(100);
+    while (this->serial_port->available() > 0){
+        this->serial_port->read();
+    }
 }
 
 bool RaspberryManager::detect_message(const String & message){

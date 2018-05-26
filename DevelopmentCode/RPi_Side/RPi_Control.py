@@ -142,10 +142,24 @@ class RPi_control(object):
         analyze_stream = AnalyzeStream(message_end)
 
         while not analyze_stream.has_found_message():
+            """
             if self.serial_port.in_waiting > 0:
                 crrt_char = self.serial_port.read()
                 data_list.append(crrt_char)
                 analyze_stream.read_char(crrt_char)
+            """
+
+            number_bytes_available = self.serial_port.in_waiting
+
+            if number_bytes_available > 0:
+
+                crrt_char = self.serial_port.read()
+                data_list.append(crrt_char)
+                analyze_stream.read_char(crrt_char)
+
+            if number_bytes_available < 32:
+
+                self.serial_port.write("O")
 
         if self.verbose > 0:
             print("received " + message_end)

@@ -26,24 +26,41 @@ void HighSpeedUSBOutputController::write_to_port(char crrt_char){
     // if have sent a whole block, need to flush
     if(this->number_allowed_remaining_to_send == 0){
         this->number_allowed_remaining_to_send = NBR_MAX_ALLOWED_SEND;
-        // wait for finished transmission
-        this->serial_port->flush();
+
+        // do not overflow the output buffer!
+        while (this->serial_port->availableForWrite() < NBR_MAX_ALLOWED_SEND){
+            // wait
+        }
+        
+
+        // wait for RPi to ask for more, to be sure do not overfow it
+        this->need_to_wait = true;
     }
 
     wdt_reset();
 }
 
 bool HighSpeedUSBOutputController::wait_if_needed(void){
+    // return(false);  // never wait
+
     // if need to wait
     if (this->need_to_wait){
 
         // if received from the RPi...
-        if (this->serial_port->available()){
+        while (this->serial_port->available()){
             char crrt_char = this->serial_port->read();
+
+            PDEBVAR(crrt_char)
 
             // if Ok to transmit start transmitting again now
             if (crrt_char == 'O'){
                 this->need_to_wait = false;
+
+                // flush: maybe asked again and again for new data while flushing
+                while (this->serial_port->available() > 0){
+                    this->serial_port->read();
+                }
+
                 return(false);
             }
         }
@@ -55,7 +72,7 @@ bool HighSpeedUSBOutputController::wait_if_needed(void){
     // if does not need to wait, ready to transmit at once, but check if RPi is fed up first
     else{
         // if received from the RPi...
-        if (this->serial_port->available()){
+        while (this->serial_port->available()){
             char crrt_char = this->serial_port->read();
 
             // if full need to start waiting now
