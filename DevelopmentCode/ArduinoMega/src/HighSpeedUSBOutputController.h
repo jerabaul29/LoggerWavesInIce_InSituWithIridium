@@ -3,6 +3,8 @@
 #ifndef HIGH_SPEED_USB_OUT_CONTROLLER
 #define HIGH_SPEED_USB_OUT_CONTROLLER
 
+#define NBR_MAX_ALLOWED_SEND 64
+
 class HighSpeedUSBOutputController
 {
 public:
@@ -19,6 +21,8 @@ public:
    
 private:
     HardwareSerial * serial_port;
+
+    unsigned int number_allowed_remaining_to_send;
 
     bool need_to_wait;
 

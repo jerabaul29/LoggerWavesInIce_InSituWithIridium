@@ -4,6 +4,7 @@
 
 HighSpeedUSBOutputController::HighSpeedUSBOutputController(HardwareSerial * serial_port):
     serial_port(serial_port),
+    number_allowed_remaining_to_send(NBR_MAX_ALLOWED_SEND),
     need_to_wait(false)
     {
         // make sure no trash from RPi: flush input buffer
@@ -20,9 +21,14 @@ void HighSpeedUSBOutputController::write_to_port(char crrt_char){
 
     // transmit
     this->serial_port->write(crrt_char);
+    this->number_allowed_remaining_to_send--;
 
-    // wait for transmission to be ok
-    this->serial_port->flush();
+    // if have sent a whole block, need to flush
+    if(this->number_allowed_remaining_to_send == 0){
+        this->number_allowed_remaining_to_send = NBR_MAX_ALLOWED_SEND;
+        // wait for finished transmission
+        this->serial_port->flush();
+    }
 
     wdt_reset();
 }
@@ -59,7 +65,13 @@ bool HighSpeedUSBOutputController::wait_if_needed(void){
             }
         }
 
-        // otherwise do not need to wait
+        // if done transmitting a block, should wait for acknowledgement from RPi
+        if (this->number_allowed_remaining_to_send == 0){
+            this->need_to_wait = true;
+            return(true);
+        }
+
+        // otherwise do not need to wait: continue transmitting the block
         return(false);
     }
 }
