@@ -828,5 +828,24 @@ S 1050 6900 3250 450
 U 5B0BE2AE
 F0 "RPI_header" 60
 F1 "RPI_header.sch" 60
+F2 "RPI_power_gnd" I R 4300 7250 60 
+F3 "RPI_power_5V" I R 4300 7050 60 
 $EndSheet
+Text Label 4650 7250 0    60   ~ 0
+gnd_mega
+Text Label 8750 3200 0    60   ~ 0
+power_rpi_5V
+Wire Wire Line
+	8600 3400 8450 3400
+Connection ~ 8600 3400
+Wire Wire Line
+	8600 3400 8600 3200
+Wire Wire Line
+	8600 3200 8750 3200
+Text Label 4650 7050 0    60   ~ 0
+power_rpi_5V
+Wire Wire Line
+	4650 7050 4300 7050
+Wire Wire Line
+	4650 7250 4300 7250
 $EndSCHEMATC
