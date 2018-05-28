@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source /home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/PCB_electronics/Logger_and_power_v1/Logger_and_Power.sch)
-    (date "lø. 26. mai 2018 kl. 18.25 +0200")
+    (date "lø. 26. mai 2018 kl. 23.57 +0200")
     (tool "Eeschema 4.0.2+dfsg1-stable")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -118,19 +118,19 @@
     (comp (ref W1)
       (value NET-TIE)
       (footprint Oddities:NetTie-I_Connected)
-      (libsource (lib power_controller-cache) (part NET-TIE))
+      (libsource (lib Logger_and_Power-cache) (part NET-TIE))
       (sheetpath (names /Power_part/) (tstamps /5B0974B7/))
       (tstamp 5B0976EF))
     (comp (ref U1)
       (value IRLB_8721_SOL)
       (footprint TO_SOT_Packages_THT:TO-220_Neutral123_Vertical)
-      (libsource (lib power_controller-cache) (part MOSFET-N))
+      (libsource (lib Logger_and_Power-cache) (part MOSFET-N))
       (sheetpath (names /Power_part/) (tstamps /5B0974B7/))
       (tstamp 5B0976F1))
     (comp (ref U2)
       (value IRLS-8721_MEGA)
       (footprint TO_SOT_Packages_THT:TO-220_Neutral123_Vertical)
-      (libsource (lib power_controller-cache) (part MOSFET-N))
+      (libsource (lib Logger_and_Power-cache) (part MOSFET-N))
       (sheetpath (names /Power_part/) (tstamps /5B0974B7/))
       (tstamp 5B0976F2))
     (comp (ref P1)
@@ -154,7 +154,7 @@
     (comp (ref XA1)
       (value Arduino_Mega2560_Shield)
       (footprint Arduino:Arduino_Mega2560_Shield)
-      (libsource (lib Logger-cache) (part Arduino_Mega2560_Shield))
+      (libsource (lib Logger_and_Power-cache) (part Arduino_Mega2560_Shield))
       (sheetpath (names /Logger_part/) (tstamps /5B0974DF/))
       (tstamp 5B09A20E))
     (comp (ref P5)
@@ -178,7 +178,7 @@
     (comp (ref U4)
       (value FQP27P06)
       (footprint TO_SOT_Packages_THT:TO-220_Neutral123_Vertical)
-      (libsource (lib Logger-cache) (part FQP27P06))
+      (libsource (lib Logger_and_Power-cache) (part FQP27P06))
       (sheetpath (names /Logger_part/) (tstamps /5B0974DF/))
       (tstamp 5B09A212))
     (comp (ref C3)
@@ -331,7 +331,7 @@
         (pin (num 26) (name "(PCINT11/ADC3)PC3") (type BiDi))
         (pin (num 27) (name "(PCINT12/SDA/ADC4)PC4") (type BiDi))
         (pin (num 28) (name "(PCINT13/SCL/ADC5)PC5") (type BiDi))))
-    (libpart (lib Logger-cache) (part Arduino_Mega2560_Shield)
+    (libpart (lib Logger_and_Power-cache) (part Arduino_Mega2560_Shield)
       (footprints
         (fp Arduino_Mega2560_Shield))
       (fields
@@ -565,7 +565,7 @@
       (pins
         (pin (num 1) (name 1) (type passive))
         (pin (num 2) (name 2) (type passive))))
-    (libpart (lib Logger-cache) (part FQP27P06)
+    (libpart (lib Logger_and_Power-cache) (part FQP27P06)
       (fields
         (field (name Reference) U)
         (field (name Value) FQP27P06))
@@ -610,7 +610,7 @@
         (pin (num 14) (name T1OUT) (type output))
         (pin (num 15) (name GND) (type passive))
         (pin (num 16) (name VCC) (type passive))))
-    (libpart (lib power_controller-cache) (part MOSFET-N)
+    (libpart (lib Logger_and_Power-cache) (part MOSFET-N)
       (aliases
         (alias IRLML2803PbF))
       (footprints
@@ -622,7 +622,7 @@
         (pin (num 1) (name ~) (type passive))
         (pin (num 2) (name ~) (type passive))
         (pin (num 3) (name ~) (type passive))))
-    (libpart (lib power_controller-cache) (part NET-TIE)
+    (libpart (lib Logger_and_Power-cache) (part NET-TIE)
       (footprints
         (fp NET-TIE*))
       (fields
@@ -652,10 +652,8 @@
       (uri /usr/share/kicad/library/interface.lib))
     (library (logical atmel)
       (uri /usr/share/kicad/library/atmel.lib))
-    (library (logical power_controller-cache)
-      (uri /home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/PCB_electronics/power_controller_v1/power_controller-cache.lib))
-    (library (logical Logger-cache)
-      (uri /home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/PCB_electronics/Logger_v1/Logger-cache.lib)))
+    (library (logical Logger_and_Power-cache)
+      (uri /home/jrlab/Desktop/Git/LoggerWavesIceSolarIridium/PCB_electronics/Logger_and_power_v1/Logger_and_Power-cache.lib)))
   (nets
     (net (code 1) (name +5V)
       (node (ref IC1) (pin 7))

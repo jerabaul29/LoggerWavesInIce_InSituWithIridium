@@ -756,4 +756,19 @@ Text Label 10100 5150 2    60   ~ 0
 gnd_mega
 Text Label 10100 5050 2    60   ~ 0
 5V_mega
+Text Label 1100 750  2    60   ~ 0
+gnd_mega
+$Comp
+L PWR_FLAG #FLG019
+U 1 1 5B09F8E8
+P 1100 900
+F 0 "#FLG019" H 1100 995 50  0001 C CNN
+F 1 "PWR_FLAG" H 1100 1080 50  0000 C CNN
+F 2 "" H 1100 900 50  0000 C CNN
+F 3 "" H 1100 900 50  0000 C CNN
+	1    1100 900 
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1100 900  1100 750 
 $EndSCHEMATC
