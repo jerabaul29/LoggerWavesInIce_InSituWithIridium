@@ -28,13 +28,14 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:power_controller-cache
-LIBS:Logger-cache
+LIBS:RASPBERRYPI
+LIBS:RASPBERRYPI2
+LIBS:Logger_and_Power-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 3 3
+Sheet 3 4
 Title ""
 Date ""
 Rev ""
@@ -503,6 +504,96 @@ F 3 "" H 10450 5100 50  0000 C CNN
 	1    10450 5100
 	1    0    0    -1  
 $EndComp
+Text HLabel 8100 1000 2    60   Input ~ 0
+Power_mega_plus
+Text HLabel 8100 1100 2    60   Input ~ 0
+Power_mega_gnd
+Text HLabel 8100 1200 2    60   Input ~ 0
+Mega_feedback
+Text HLabel 8100 1950 2    60   Input ~ 0
+Mega_measure_battery
+Text Label 800  3100 3    60   ~ 0
+gnd_mega
+Text Label 1150 1700 1    60   ~ 0
+5V_mega
+Text Label 1150 2500 2    60   ~ 0
+gnd_mega
+Text Label 5350 1450 2    60   ~ 0
+5V_mega
+Text Label 5350 1350 2    60   ~ 0
+gnd_mega
+Text Label 6100 2400 2    60   ~ 0
+gnd_mega
+Text Label 6050 2600 2    60   ~ 0
+5V_mega
+Text Label 6150 3250 2    60   ~ 0
+gnd_mega
+Text Label 6150 3350 2    60   ~ 0
+5V_mega
+Text Label 6150 4000 2    60   ~ 0
+gnd_mega
+Text Label 6150 4100 2    60   ~ 0
+5V_mega
+Text Label 8100 5350 0    60   ~ 0
+gnd_mega
+Text Label 8400 6200 2    60   ~ 0
+5V_mega
+Text Label 4900 6450 2    60   ~ 0
+5V_mega
+Text Label 8100 4750 0    60   ~ 0
+5V_mega
+Text Label 8000 1000 2    60   ~ 0
+5V_mega
+Text Label 7950 1100 2    60   ~ 0
+gnd_mega
+Text Label 8050 2550 2    60   ~ 0
+5V_mega
+Text Label 8700 4100 2    60   ~ 0
+gnd_mega
+Text Label 10100 5150 2    60   ~ 0
+gnd_mega
+Text Label 10100 5050 2    60   ~ 0
+5V_mega
+Text Label 1100 750  2    60   ~ 0
+gnd_mega
+$Comp
+L PWR_FLAG #FLG019
+U 1 1 5B09F8E8
+P 1100 900
+F 0 "#FLG019" H 1100 995 50  0001 C CNN
+F 1 "PWR_FLAG" H 1100 1080 50  0000 C CNN
+F 2 "" H 1100 900 50  0000 C CNN
+F 3 "" H 1100 900 50  0000 C CNN
+	1    1100 900 
+	-1   0    0    1   
+$EndComp
+$Comp
+L CONN_01X06 P?
+U 1 1 5B0BCC6F
+P 4600 2850
+F 0 "P?" H 4600 3200 50  0000 C CNN
+F 1 "Iridium_header_high" V 4700 2850 50  0000 C CNN
+F 2 "" H 4600 2850 50  0000 C CNN
+F 3 "" H 4600 2850 50  0000 C CNN
+	1    4600 2850
+	-1   0    0    1   
+$EndComp
+$Comp
+L CONN_01X08 P?
+U 1 1 5B0BD29B
+P 4600 3800
+F 0 "P?" H 4600 4250 50  0000 C CNN
+F 1 "Iridium_header_low" V 4700 3800 50  0000 C CNN
+F 2 "" H 4600 3800 50  0000 C CNN
+F 3 "" H 4600 3800 50  0000 C CNN
+	1    4600 3800
+	-1   0    0    1   
+$EndComp
+Text Label 4900 4150 0    60   ~ 0
+gnd_mega
+NoConn ~ 4800 4050
+Text Label 4900 3950 0    60   ~ 0
+IRD_ON_OFF
 Wire Wire Line
 	7400 1450 8100 1450
 Wire Wire Line
@@ -580,7 +671,7 @@ Wire Wire Line
 Wire Wire Line
 	6150 1150 5350 1150
 Wire Wire Line
-	5650 2400 6150 2400
+	6100 2400 6150 2400
 Wire Wire Line
 	5650 2300 6150 2300
 Wire Wire Line
@@ -702,73 +793,40 @@ Wire Wire Line
 	4900 6450 4900 6150
 Connection ~ 4900 6150
 Connection ~ 8400 6050
-Text HLabel 8100 1000 2    60   Input ~ 0
-Power_mega_plus
-Text HLabel 8100 1100 2    60   Input ~ 0
-Power_mega_gnd
-Text HLabel 8100 1200 2    60   Input ~ 0
-Mega_feedback
-Text HLabel 8100 1950 2    60   Input ~ 0
-Mega_measure_battery
-Text Label 800  3100 3    60   ~ 0
-gnd_mega
-Text Label 1150 1700 1    60   ~ 0
-5V_mega
-Text Label 1150 2500 2    60   ~ 0
-gnd_mega
-Text Label 5350 1450 2    60   ~ 0
-5V_mega
-Text Label 5350 1350 2    60   ~ 0
-gnd_mega
-Text Label 5650 2400 2    60   ~ 0
-gnd_mega
-Text Label 5650 2600 2    60   ~ 0
-5V_mega
 Wire Wire Line
-	5650 2600 6150 2600
-Text Label 6150 3250 2    60   ~ 0
-gnd_mega
-Text Label 6150 3350 2    60   ~ 0
-5V_mega
-Text Label 6150 4000 2    60   ~ 0
-gnd_mega
-Text Label 6150 4100 2    60   ~ 0
-5V_mega
-Text Label 8100 5350 0    60   ~ 0
-gnd_mega
-Text Label 8400 6200 2    60   ~ 0
-5V_mega
-Text Label 4900 6450 2    60   ~ 0
-5V_mega
-Text Label 8100 4750 0    60   ~ 0
-5V_mega
-Text Label 8000 1000 2    60   ~ 0
-5V_mega
-Text Label 7950 1100 2    60   ~ 0
-gnd_mega
+	6050 2600 6150 2600
 Wire Wire Line
 	7950 1100 8100 1100
-Text Label 8050 2550 2    60   ~ 0
-5V_mega
-Text Label 8700 4100 2    60   ~ 0
-gnd_mega
-Text Label 10100 5150 2    60   ~ 0
-gnd_mega
-Text Label 10100 5050 2    60   ~ 0
-5V_mega
-Text Label 1100 750  2    60   ~ 0
-gnd_mega
-$Comp
-L PWR_FLAG #FLG019
-U 1 1 5B09F8E8
-P 1100 900
-F 0 "#FLG019" H 1100 995 50  0001 C CNN
-F 1 "PWR_FLAG" H 1100 1080 50  0000 C CNN
-F 2 "" H 1100 900 50  0000 C CNN
-F 3 "" H 1100 900 50  0000 C CNN
-	1    1100 900 
-	-1   0    0    1   
-$EndComp
 Wire Wire Line
 	1100 900  1100 750 
+Wire Wire Line
+	4900 4150 4800 4150
+Wire Wire Line
+	4800 3950 4900 3950
+NoConn ~ 4800 3850
+NoConn ~ 4800 3750
+NoConn ~ 4800 3650
+Text Label 4900 3550 0    60   ~ 0
+5V_mega
+Wire Wire Line
+	4900 3550 4800 3550
+NoConn ~ 4800 3450
+NoConn ~ 4800 3100
+NoConn ~ 4800 3000
+NoConn ~ 4800 2900
+NoConn ~ 4800 2600
+Text Label 4900 2700 0    60   ~ 0
+IRD_RXC
+Text Label 4900 2800 0    60   ~ 0
+IRD_TXD
+Wire Wire Line
+	4900 2800 4800 2800
+Wire Wire Line
+	4900 2700 4800 2700
+$Sheet
+S 1050 6900 3250 450 
+U 5B0BE2AE
+F0 "RPI_header" 60
+F1 "RPI_header.sch" 60
+$EndSheet
 $EndSCHEMATC

@@ -1,0 +1,8 @@
+pins for serial Arduino to RPI:
+need to use a level shifter.
+Connections (for MAX3323):
+- as usual
+- Ard TX -> 10
+- Ard Rx -> 9 
+- RPi TXD -> 8
+- RPi RXD -> 7

@@ -28,13 +28,14 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:power_controller-cache
-LIBS:Logger-cache
+LIBS:RASPBERRYPI
+LIBS:RASPBERRYPI2
+LIBS:Logger_and_Power-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 2 3
+Sheet 2 4
 Title "Power controller WIL"
 Date "2017-11-28"
 Rev "1.0"

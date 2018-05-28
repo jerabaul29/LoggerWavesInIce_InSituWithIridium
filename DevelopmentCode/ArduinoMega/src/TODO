@@ -1,6 +1,7 @@
 TODO: much more optimal would be to use SPI between Mega and RPi:
 - much faster communication
 - no need of usb interface between the 2
+- need a level shifter chip
 
 TODO:
 do not use USB / micro USB interface of RPi; do all with header

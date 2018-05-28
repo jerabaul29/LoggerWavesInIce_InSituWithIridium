@@ -1,4 +1,4 @@
-update=lø. 26. mai 2018 kl. 16.52 +0200
+update=ma. 28. mai 2018 kl. 11.45 +0200
 version=1
 last_client=kicad
 [pcbnew]
@@ -23,6 +23,8 @@ ModuleOutlineThickness=0.150000000000
 [cvpcb]
 version=1
 NetIExt=net
+[general]
+version=1
 [eeschema]
 version=1
 LibDir=
@@ -56,5 +58,5 @@ LibName26=opto
 LibName27=atmel
 LibName28=contrib
 LibName29=valves
-[general]
-version=1
+LibName30=/home/jrlab/Desktop/Git/kicad-library/libs/RASPBERRYPI
+LibName31=/home/jrlab/Desktop/Git/kicad-library/libs/RASPBERRYPI2
