@@ -138,7 +138,7 @@ void RaspberryManager::file_content_to_raspberry(void){
     // send the whole content
     // TODO: improve here...
     while(sd_manager->more_to_read()){
-        char crrt_char = sd_manager->read_char();  // TODO: check if no problem with type here
+        char crrt_char = sd_manager->read_char();  // TODO: check if no problem with type here; TODO: buffer here (read for example 512 bytes at once)
         this->controller_to_pi.write_to_port(crrt_char);
     }
     // send the end message

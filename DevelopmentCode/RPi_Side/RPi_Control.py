@@ -63,7 +63,7 @@ class RPi_control(object):
 
     def receive_from_Arduino(self):
 
-        self.list_of_commands = []
+        self.list_of_commands = ['DEFAULT']
         self.filename = ""
         self.data = ""
 
@@ -72,7 +72,7 @@ class RPi_control(object):
             printi("Receive commands")
 
         wait_for_commands = True
-        current_command = ['DEFAULT']
+        current_command = []
 
         while wait_for_commands:
             if self.serial_port.in_waiting > 0:
