@@ -21,7 +21,7 @@ public:
 
     void send_receive_iridium_vital_information(void);
 
-    // TODO: make the following public to allow filling with the Iridum message;
+    // TODO: make the following public to allow filling with the Iridium message;
     // this is not too good a solution
     unsigned char buffer_received[IRIDIUM_RECEIVED_PACKET_SIZE];
     unsigned char buffer_transmit[IRIDIUM_TRANSMIT_PACKET_SIZE];
