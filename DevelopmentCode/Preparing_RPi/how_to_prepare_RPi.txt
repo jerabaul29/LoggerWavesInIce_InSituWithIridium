@@ -1,0 +1,34 @@
+- possibility 1: if there is already the right iso image for the kind of RPi that is being used:
+
+-- insert SD card
+-- re-format
+-- find it:
+    sudo fdisk -l
+-- unmount it (for example, if /dev/mmcblk0 is the SD card):
+    sudo umount /dev/mmcblk0
+-- copy the right image
+note: this works:
+    sudo dd if=/media/jrlab/SAMSUNG/Images_RPi/img_0208_Rpi_2Bv11.img dd of=/dev/mmcblk0 bs=4M
+note: seems that this works
+    sudo dd if=/media/jrlab/SAMSUNG/Images_RPi/img_0208_Rpi_2Bv11.img | pv | sudo dd of=/dev/mmcblk0 bs=4M
+note: seems to work and be relatively fast
+    sudo dd if=/media/jrlab/SAMSUNG/Images_RPi/img_0208_Rpi_2Bv11.img bs=16M | pv | sudo dd of=/dev/mmcblk0 bs=16M
+    
+--------------------------------------------------------------------------------
+- possibility 2: if no right image for the kind of RPi yet:
+
+-- format SD card
+-- Download Raspbian version lite
+-- create a SD bootable card using startup disk creator
+-- use the RPi with a screen and english keyboard etc to do the setup
+-- change password
+-- sudo apt-get update
+-- sudo apt-get upgrade
+
+-- sudo apt-get install vim
+-- sudo apt-get install python-pip
+-- all packages from here...
+
+--------------------------------------------------------------------------------
+change password
+azerty5+@RPi)
