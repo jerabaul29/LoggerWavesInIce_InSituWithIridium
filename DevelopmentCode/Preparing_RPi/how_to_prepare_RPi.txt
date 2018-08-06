@@ -27,7 +27,30 @@ note: seems to work and be relatively fast
 
 -- sudo apt-get install vim
 -- sudo apt-get install python-pip
--- all packages from here...
+
+// NOTE: DO NOT use pip, too slow:
+
+// -- sudo pip --no-cache-dir install numpy printind scipy matplotlib binascii fnmatch crcmod pyserial
+
+use sudo:
+
+sudo apt-get install python-numpy python-scipy python-matplotlib
+sudo pip --no-cache-dir install printind crcmod pyserial
+
+-- set the crontab:
+    crontab -e
+and then add:
+    @reboot sh /home/pi/Logger/Code/script_RPi.sh
+(note: located at rootfs/var/spool/cron/crontabs)
+
+once seems to work:
+
+apply the booting time optimization (suppress output, suppress network, etc)
+that are described here:
+
+https://folk.uio.no/jeanra/Informatics/GettingStartedRaspberryPi.html
+
+NOTE: on the RPI 1 B, seems need a reboot to see the Arduino
 
 --------------------------------------------------------------------------------
 change password

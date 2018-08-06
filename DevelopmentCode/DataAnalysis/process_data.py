@@ -374,7 +374,7 @@ class DataManager(object):
 
                     plt.savefig(figure_path + fig_name, format="pdf")
 
-                plt.show()
+                # plt.show()
 
     # note: this is an example of how to retrieve some specific spectra, can be used in future works
     def show_spectrum(self, time_start=None, time_end=None, min_delay=None, folder=None, save_fig=False, remove_noise=False):
@@ -417,7 +417,7 @@ class DataManager(object):
             # plt.yscale('log')
             plt.yscale('linear')
             plt.xlim([fmin, fmax])
-            plt.ylim([0, MAX_VALUE_SPECTRUM_REAL])
+            # plt.ylim([0, MAX_VALUE_SPECTRUM_REAL])
             plt.tight_layout()
 
             if save_fig:
@@ -433,7 +433,7 @@ class DataManager(object):
 
                 plt.savefig(figure_path + fig_name, format="pdf")
 
-            plt.show()
+            # plt.show()
 
         else:
             print("plot for all folders simultaneously not yet implemented")
@@ -519,7 +519,7 @@ class DataManager(object):
 
                 plt.savefig(figure_path + fig_name, format="pdf")
 
-            plt.show()
+            # plt.show()
 
         else:
             print("plot for all folders simultaneously not yet implemented")
@@ -609,7 +609,7 @@ class DataManager(object):
                 fig_name = "battery_" + str(time_start) + "_" + str(time_end) + ".pdf"
                 plt.savefig(figure_path + fig_name, format="pdf")
 
-            plt.show()
+            # plt.show()
 
         else:
             print("plot for all folders simultaneously not yet implemented")
