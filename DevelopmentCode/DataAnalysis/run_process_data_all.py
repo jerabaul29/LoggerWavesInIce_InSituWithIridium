@@ -18,8 +18,8 @@ list_folders = ["300234066587240",
                 "300234066885440",
                 "300234066885480"]
 
-time_start = datetime(year=2018, month=8, day=1, hour=23, tzinfo=None)
-time_end = datetime(year=2018, month=8, day=11, hour=23, tzinfo=None)
+time_start = datetime(year=2018, month=9, day=1, hour=23, tzinfo=None)
+time_end = datetime(year=2018, month=10, day=1, hour=23, tzinfo=None)
 min_delay = timedelta(hours=0, minutes=20)
 max_number_directional_spectra = 1
 

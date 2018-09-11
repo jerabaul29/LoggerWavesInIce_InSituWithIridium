@@ -616,6 +616,7 @@ class DataManager(object):
         pass
 
     def show_position(self, time_start=None, time_end=None, folder=None, background_image=None):
+        # TODO: implement; output in a csv-like format, appending the file.
         pass
 
     # TODO: easy way to retrieve some data
