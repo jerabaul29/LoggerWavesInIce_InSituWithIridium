@@ -12,8 +12,8 @@ path_to_repo_Irdium_data =
 # YOU SHOULD USE YOUR OWN GOOGLE ACCOUNT FORWARDING HERE, NOT MINE!!!
 # username = "iridium.uio.math.mech"
 # password = "hJ742@))+=h"
-username = ""
-password = ""
+username = "universityosloiridiumdatacopy"
+password = "gJJ75@))1"
 
 iridium_reader = interact_with_gmail.IridiumEmailReader(username, password, path_to_repo_Irdium_data, verbose=1)
 iridium_reader.automatic_interaction()
