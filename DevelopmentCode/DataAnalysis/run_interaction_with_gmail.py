@@ -10,5 +10,5 @@ path_to_repo_Irdium_data = '/home/jrlab/Desktop/Git/IridiumData_Svalbard2018/'
 username = "iridium.uio.math.mech"
 password = "hJ742@))+=h"
 
-iridium_reader = interact_with_gmail.IridiumEmailReader(username, password, path_to_repo_Irdium_data, verbose=1)
+iridium_reader = interact_with_gmail.IridiumEmailReader(username, password, path_to_repo_Irdium_data, verbose=5)
 iridium_reader.automatic_interaction()

@@ -18,9 +18,9 @@ list_folders = ["300234066587240",
                 "300234066885440",
                 "300234066885480"]
 
-time_start = datetime(year=2018, month=9, day=1, hour=23, tzinfo=None)
-time_end = datetime(year=2018, month=10, day=1, hour=23, tzinfo=None)
-min_delay = timedelta(hours=0, minutes=20)
+time_start = datetime(year=2018, month=9, day=24, hour=23, tzinfo=None)
+time_end = datetime(year=2018, month=9, day=29, hour=23, tzinfo=None)
+min_delay = timedelta(hours=0, minutes=1)
 max_number_directional_spectra = 1
 
 for crrt_folder in list_folders:
@@ -53,6 +53,7 @@ for crrt_folder in list_folders:
                                remove_noise=False)
 
     # an example of how to show data as a spectrogram
+    """
     data_manager.show_spectrogram(folder=crrt_folder,
                                   time_start=time_start,
                                   time_end=time_end,
@@ -60,5 +61,6 @@ for crrt_folder in list_folders:
                                   noise_normalize=False,
                                   remove_noise=False
                                   )
+    """
 
     plt.show()

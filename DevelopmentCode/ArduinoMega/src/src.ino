@@ -1,3 +1,5 @@
+// TODO: add possibility of a small LCD screen
+
 // TODO: find a solution to the slow data transfer arduino / RPi.
 //       try to do by chunks of 256 bytes of data (if arduino tx is 512)
 // TODO: use better methodology with the SD card: writing by chunks of data (see post google "fast sd card author")

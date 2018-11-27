@@ -70,27 +70,32 @@ class IridiumEmailReader(object):
 
         for crrt_message in self.messages:
 
-            crrt_message_index += 1
-            if self.verbose > 2:
-                print("generate data for message number {}".format(crrt_message_index))
+            try:
 
-            parsed_message = parse_message(crrt_message)
-            self.parsed_messages.append(parsed_message)
-            (information_from, information_date) = extract_infos_message(parsed_message)
-            iridium_id = information_from.rsplit(' ', 1)[0]
-            message_name = information_date.replace(" ", "_").replace(",", "")
-            attachment_string = download_message_attachment(parsed_message)
+                crrt_message_index += 1
+                if self.verbose > 2:
+                    print("generate data for message number {}".format(crrt_message_index))
 
-            path_data = self.path_repo + '/' + iridium_id + '/'
+                parsed_message = parse_message(crrt_message)
+                self.parsed_messages.append(parsed_message)
+                (information_from, information_date) = extract_infos_message(parsed_message)
+                iridium_id = information_from.rsplit(' ', 1)[0]
+                message_name = information_date.replace(" ", "_").replace(",", "")
+                attachment_string = download_message_attachment(parsed_message)
 
-            if not os.path.exists(path_data):
-                os.makedirs(path_data)
+                path_data = self.path_repo + '/' + iridium_id + '/'
 
-            if self.verbose > 2:
-                print("save data for message number {}".format(crrt_message_index))
+                if not os.path.exists(path_data):
+                    os.makedirs(path_data)
 
-            with open(path_data + message_name + '.bin', 'wb') as crrt_file:
-                crrt_file.write(attachment_string)
+                if self.verbose > 2:
+                    print("save data for message number {}".format(crrt_message_index))
+
+                with open(path_data + message_name + '.bin', 'wb') as crrt_file:
+                    crrt_file.write(attachment_string)
+
+            except:
+                print("Problem loading message: {}".format)
 
     def pull_data(self):
         if self.verbose > 0:
