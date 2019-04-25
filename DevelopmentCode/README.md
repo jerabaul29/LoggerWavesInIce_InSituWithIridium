@@ -4,6 +4,18 @@ Development code for all the modules of the logger, including processing on the 
 
 Each folder contains one component.
 
+The Arduino stuff was developped in Visual Studio Code with the PlatformIO IDE; this may explain for some specificities in the folder structures.
+
+- **ArduinoMega**: the code on the Arduino Mega on the center PCB; effectively, the logger and interface to all other components.
+
+- **PowerControl**: the power controller, ie controlling the solar panel, battery, and wakeup planning.
+
+- **RPI_side**: the stuff on the RPI.
+
+- The rest is tests, help, etc.
+
+# Old ------------
+
 ## To build a logger:
 
 - upload the power controller and put it on the PCB.
