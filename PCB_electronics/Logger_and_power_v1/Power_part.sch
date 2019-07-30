@@ -680,4 +680,101 @@ F 3 "" H 750 1250 50  0000 C CNN
 	1    750  1250
 	-1   0    0    1   
 $EndComp
+NoConn ~ 10200 3750
+$Comp
+L CONN_01X05 P19
+U 1 1 5D40578E
+P 8150 950
+F 0 "P19" H 8150 1250 50  0000 C CNN
+F 1 "header_pololu_in" V 8250 950 50  0000 C CNN
+F 2 "" H 8150 950 50  0000 C CNN
+F 3 "" H 8150 950 50  0000 C CNN
+	1    8150 950 
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_01X04 P20
+U 1 1 5D405903
+P 8750 900
+F 0 "P20" H 8750 1150 50  0000 C CNN
+F 1 "header_pololu_out" V 8850 900 50  0000 C CNN
+F 2 "" H 8750 900 50  0000 C CNN
+F 3 "" H 8750 900 50  0000 C CNN
+	1    8750 900 
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	8950 950  9200 950 
+Wire Wire Line
+	9200 950  9200 1050
+Wire Wire Line
+	9200 1050 8950 1050
+Wire Wire Line
+	9200 850  8950 850 
+Wire Wire Line
+	9200 750  9200 850 
+Wire Wire Line
+	9200 750  8950 750 
+Connection ~ 9200 800 
+Wire Wire Line
+	9200 1000 9900 1000
+Connection ~ 9200 1000
+$Comp
+L GND #PWR019
+U 1 1 5D405E2B
+P 9600 700
+F 0 "#PWR019" H 9600 450 50  0001 C CNN
+F 1 "GND" H 9600 550 50  0000 C CNN
+F 2 "" H 9600 700 50  0000 C CNN
+F 3 "" H 9600 700 50  0000 C CNN
+	1    9600 700 
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9200 800  9350 800 
+Wire Wire Line
+	9350 800  9350 700 
+Wire Wire Line
+	9350 700  9600 700 
+$Comp
+L +5V #PWR020
+U 1 1 5D406012
+P 9900 1000
+F 0 "#PWR020" H 9900 850 50  0001 C CNN
+F 1 "+5V" H 9900 1140 50  0000 C CNN
+F 2 "" H 9900 1000 50  0000 C CNN
+F 3 "" H 9900 1000 50  0000 C CNN
+	1    9900 1000
+	1    0    0    -1  
+$EndComp
+NoConn ~ 7950 750 
+Text Label 7950 750  2    60   ~ 0
+enable_default_on
+Wire Wire Line
+	7550 850  7950 850 
+Wire Wire Line
+	7750 850  7750 950 
+Wire Wire Line
+	7750 950  7950 950 
+Wire Wire Line
+	7950 1050 7750 1050
+Wire Wire Line
+	7750 1050 7750 1150
+Wire Wire Line
+	7350 1150 7950 1150
+Connection ~ 7750 850 
+$Comp
+L GND #PWR021
+U 1 1 5D406578
+P 7550 850
+F 0 "#PWR021" H 7550 600 50  0001 C CNN
+F 1 "GND" H 7550 700 50  0000 C CNN
+F 2 "" H 7550 850 50  0000 C CNN
+F 3 "" H 7550 850 50  0000 C CNN
+	1    7550 850 
+	1    0    0    -1  
+$EndComp
+Connection ~ 7750 1150
+Text Label 7350 1150 2    60   ~ 0
+COMMON_BAT+_SOL+
 $EndSCHEMATC
