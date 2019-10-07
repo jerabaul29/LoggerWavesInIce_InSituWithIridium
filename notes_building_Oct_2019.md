@@ -83,3 +83,18 @@ Binary output 1:
 # Raspberry Pi
 
 This is to setup the RPi SD card.
+
+Use the Raspberry Pi image (for example, tested and verified with **img_0208_Rpi_2Bv11.img**). Then:
+
+- Format SD card
+-- find it:
+    sudo fdisk -l
+-- unmount it (for example, if /dev/mmcblk0 is the SD card):
+    sudo umount /dev/mmcblk0
+-- copy the right image
+note: this works:
+    sudo dd if=/media/jrlab/SAMSUNG/Images_RPi/img_0208_Rpi_2Bv11.img dd of=/dev/mmcblk0 bs=4M
+note: seems that this works
+    sudo dd if=/media/jrlab/SAMSUNG/Images_RPi/img_0208_Rpi_2Bv11.img | pv | sudo dd of=/dev/mmcblk0 bs=4M
+note: seems to work and be relatively fast
+    sudo dd if=/media/jrlab/SAMSUNG/Images_RPi/img_0208_Rpi_2Bv11.img bs=16M | pv | sudo dd of=/dev/mmcblk0 bs=16M
