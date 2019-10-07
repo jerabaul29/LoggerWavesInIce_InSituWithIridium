@@ -1,14 +1,17 @@
-## build the PCB 'as usual'. Fixes:
+# build the PCB 'as usual'. Fixes:
 
 - 3.9k -> 39k
 - 5.6k -> 56k
 - 1.0 uF -> 0.1 uF
 - 32k, 46k, 50k -> 47k
 
+# programming procedure
+
 ## code for the Arduino barebone
 
-- power controller: using commit **b76f6a5** (current master IS BROKEN), upload the code in the **PowerControl** folder.
-- go back to master
+- power controller: using commit **b76f6a5** (current master IS BROKEN), upload the code in the **PowerControl** folder on the barebone Arduino (for example, using an Arduino Uno to program the chip).
+
+- go back to master in the code
 
 ## code for the Arduino Mega logger
 
@@ -24,10 +27,6 @@ PROGRAM: [=         ]  10.9% (used 27732 bytes from 253952 bytes)
 ```
 
 I use the platformio plugin on Visual Studio Code to compile / upload.
-
-- Set up the EEPROM of the Arduino Mega:
-
-
 
 ## VN100 setup
 
@@ -80,3 +79,7 @@ Binary output 1:
  - disconnect from the sensor
  ---------------------------------------------------------------
  ```
+
+# Raspberry Pi
+
+This is to setup the RPi SD card.
