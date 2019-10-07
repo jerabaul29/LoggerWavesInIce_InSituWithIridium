@@ -7,12 +7,16 @@
 
 ## code for the Arduino barebone
 
-- power controller: using commit **b76f6a5** (current master IS BROKEN).
+- power controller: using commit **b76f6a5** (current master IS BROKEN), upload the code in the **PowerControl** folder.
+- go back to master
 
 ## code for the Arduino Mega logger
 
 - take away the Arduino from logger shield
-- upload the code (location master, current commit **39c30775849a**). Make sure that you well use the extended buffer compilation flags (see the platformio.ini parameters folder). The sizes of the data and program should read something in this kind:
+
+- Initialize the EEPROM (run **InitializeEEPROM** on the Mega).
+
+- upload the code (from **ArduinoMega**, current master, for example using commit **39c30775849a**). Make sure that you well use the extended buffer compilation flags (see the platformio.ini parameters folder). The sizes of the data and program should read something in this kind:
 
 ```
 DATA:    [========  ]  81.5% (used 6673 bytes from 8192 bytes)
@@ -20,6 +24,10 @@ PROGRAM: [=         ]  10.9% (used 27732 bytes from 253952 bytes)
 ```
 
 I use the platformio plugin on Visual Studio Code to compile / upload.
+
+- Set up the EEPROM of the Arduino Mega:
+
+
 
 ## VN100 setup
 
