@@ -104,3 +104,9 @@ Use the Raspberry Pi image (for example, tested and verified with **img_0208_Rpi
 
 3. note: seems to work and be relatively fast
     ```sudo dd if=/media/jrlab/SAMSUNG/Images_RPi/img_0208_Rpi_2Bv11.img bs=16M | pv | sudo dd of=/dev/mmcblk0 bs=16M```
+
+# Buying Iridium credits
+
+- Go to https://rockblock.rock7.com
+
+- Buy the amount of credits and line rental you want.
