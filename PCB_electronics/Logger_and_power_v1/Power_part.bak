@@ -687,7 +687,7 @@ U 1 1 5D40578E
 P 8150 950
 F 0 "P19" H 8150 1250 50  0000 C CNN
 F 1 "header_pololu_in" V 8250 950 50  0000 C CNN
-F 2 "" H 8150 950 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x05" H 8150 950 50  0001 C CNN
 F 3 "" H 8150 950 50  0000 C CNN
 	1    8150 950 
 	1    0    0    -1  
@@ -698,7 +698,7 @@ U 1 1 5D405903
 P 8750 900
 F 0 "P20" H 8750 1150 50  0000 C CNN
 F 1 "header_pololu_out" V 8850 900 50  0000 C CNN
-F 2 "" H 8750 900 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" H 8750 900 50  0001 C CNN
 F 3 "" H 8750 900 50  0000 C CNN
 	1    8750 900 
 	-1   0    0    1   
