@@ -7,6 +7,8 @@
 
 # programming procedure
 
+NOTE: all the following is tested on Ubuntu.
+
 ## code for the Arduino barebone
 
 - power controller: using commit **b76f6a5** (current master IS BROKEN), upload the code in the **PowerControl** folder on the barebone Arduino (for example, using an Arduino Uno to program the chip).
@@ -86,15 +88,19 @@ This is to setup the RPi SD card.
 
 Use the Raspberry Pi image (for example, tested and verified with **img_0208_Rpi_2Bv11.img**). Then:
 
-- Format SD card
--- find it:
-    sudo fdisk -l
--- unmount it (for example, if /dev/mmcblk0 is the SD card):
-    sudo umount /dev/mmcblk0
--- copy the right image
-note: this works:
-    sudo dd if=/media/jrlab/SAMSUNG/Images_RPi/img_0208_Rpi_2Bv11.img dd of=/dev/mmcblk0 bs=4M
-note: seems that this works
-    sudo dd if=/media/jrlab/SAMSUNG/Images_RPi/img_0208_Rpi_2Bv11.img | pv | sudo dd of=/dev/mmcblk0 bs=4M
-note: seems to work and be relatively fast
-    sudo dd if=/media/jrlab/SAMSUNG/Images_RPi/img_0208_Rpi_2Bv11.img bs=16M | pv | sudo dd of=/dev/mmcblk0 bs=16M
+- Format SD card (exFAT)
+
+- Find it the name of the SD card: ```sudo fdisk -l```
+
+- Unmount it (for example, if /dev/mmcblk0 is the SD card): ```sudo umount /dev/mmcblk0```
+
+- Copy the right image using dd. Be careful, this is a 'dangerous' command.
+
+1. note: this works:
+    ```sudo dd if=/media/jrlab/SAMSUNG/Images_RPi/img_0208_Rpi_2Bv11.img dd of=/dev/mmcblk0 bs=4M```
+
+2. note: seems that this works
+    ```sudo dd if=/media/jrlab/SAMSUNG/Images_RPi/img_0208_Rpi_2Bv11.img | pv | sudo dd of=/dev/mmcblk0 bs=4M```
+
+3. note: seems to work and be relatively fast
+    ```sudo dd if=/media/jrlab/SAMSUNG/Images_RPi/img_0208_Rpi_2Bv11.img bs=16M | pv | sudo dd of=/dev/mmcblk0 bs=16M```
