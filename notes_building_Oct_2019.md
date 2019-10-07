@@ -7,4 +7,4 @@
 
 ## code for the Arduino barebone
 
-- 
+- power controller: using commit **b76f6a5** (current master IS BROKEN).
