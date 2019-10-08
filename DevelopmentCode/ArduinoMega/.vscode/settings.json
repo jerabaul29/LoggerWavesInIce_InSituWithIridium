@@ -1,7 +1,8 @@
 {
     "terminal.integrated.env.linux": {
-        "PATH": "/home/jrlab/.platformio/penv/bin:/home/jrlab/.platformio/penv:/home/jrlab/Desktop/VirtualEnv/VE_P2/bin:/home/jrlab/bin:/home/jrlab/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+        "PATH": "/home/jrlab/.platformio/penv/bin:/home/jrlab/.platformio/penv:/usr/local/go/bin:/home/jrlab/Desktop/VirtualEnv/VE_P2/bin:/home/jrlab/bin:/home/jrlab/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/jrlab/go/bin",
         "PLATFORMIO_CALLER": "vscode"
     },
-    "todo-tree.flat": true
+    "todo-tree.flat": true,
+    "todo-tree.tree.flat": true
 }
