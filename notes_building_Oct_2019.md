@@ -86,7 +86,13 @@ Binary output 1:
 
 This is to setup the RPi SD card.
 
+Can either use the code in the DevelopmentCode / RPi_Side and the tips on my website post: https://folk.uio.no/jeanra/Informatics/GettingStartedRaspberryPi.html .
+
+or
+
 Use the Raspberry Pi image (for example, tested and verified with **img_0208_Rpi_2Bv11.img**). Then:
+
+TODO: find the image from the HDD and upload.
 
 - Format SD card (exFAT)
 
