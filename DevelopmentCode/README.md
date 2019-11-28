@@ -10,7 +10,7 @@ The Arduino stuff was developped in Visual Studio Code with the PlatformIO IDE; 
 
 - **PowerControl**: the power controller, ie controlling the solar panel, battery, and wakeup planning.
 
-- **RPI_side**: the stuff on the RPI.
+- **RPI_side**: the stuff on the RPI. An image of the RPi image ready for use is available here: https://folk.uio.no/jeanra/Research/Research/img_0208_Rpi_2Bv11.img .
 
 - The rest is tests, help, etc.
 
