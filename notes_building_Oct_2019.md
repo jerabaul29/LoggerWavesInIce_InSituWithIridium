@@ -11,7 +11,7 @@ NOTE: all the following is tested on Ubuntu.
 
 ## code for the Arduino barebone
 
-- power controller: using commit **b76f6a5** (current master IS BROKEN), upload the code in the **PowerControl** folder on the barebone Arduino (for example, using an Arduino Uno to program the chip). Check the **parameters** and that you are ready for deployment, not test.
+- power controller: using commit **b76f6a5** (current master IS BROKEN), upload the code in the **PowerControl** folder on the barebone Arduino (for example, using an Arduino Uno to program the chip). Check the **parameters** and that you are ready for deployment, not test. This can be done either by using ```git checkout``` or by using the folder in **DevelopmentCode/PowerController_commitb76f6a5**.
 
 - go back to master in the code
 
