@@ -1,5 +1,5 @@
-#include <HighSpeedUSBOutputController.h>
-#include <DebugMacros.h>
+#include "HighSpeedUSBOutputController.h"
+#include "DebugMacros.h"
 #include <avr/wdt.h>
 
 HighSpeedUSBOutputController::HighSpeedUSBOutputController(HardwareSerial * serial_port):
