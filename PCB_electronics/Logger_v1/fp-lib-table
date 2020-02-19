@@ -1,3 +1,0 @@
-(fp_lib_table
-  (lib (name ArduinoShield)(type KiCad)(uri "$(KIPRJMOD)\\Arduino.pretty")(options "")(descr ""))
-)
