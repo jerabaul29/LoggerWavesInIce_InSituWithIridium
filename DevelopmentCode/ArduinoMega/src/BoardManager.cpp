@@ -118,6 +118,14 @@ void BoardManager::check_sleep_status(void)
 }
 
 float BoardManager::measure_battery_level(void){
+
+    // an attempted fix to possible battery value read problem.
+    delay(5);
+    analogRead(PIN_MSR_BATTERY);
+    delay(5);
+    analogRead(PIN_MSR_BATTERY);
+    delay(5);
+    
     battery_level_V =  float(analogRead(PIN_MSR_BATTERY)) * 5.0 / 1024.0;
     PDEBVAR(battery_level_V)
     return(battery_level_V);
