@@ -84,6 +84,8 @@ Binary output 1:
 
 # Raspberry Pi
 
+NOTE: use RPi Pi 2 Model B v1.2, NOT RPi Pi model B+ v1.2.
+
 This is to setup the RPi SD card.
 
 Can either use the code in the DevelopmentCode / RPi_Side and the tips on my website post: https://folk.uio.no/jeanra/Informatics/GettingStartedRaspberryPi.html .
