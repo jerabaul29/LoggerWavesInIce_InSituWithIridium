@@ -70,7 +70,7 @@ The instrument has a few main components:
   \item Inertial Motion Unit (IMU, possibly hidden at the bottom of the box depending on the assembly).
 \end{itemize}
 
-All the components are visible on following pictures \ref{FromOutside} and \ref{FromInside}.
+All the components are visible on the figures \ref{FromOutside} and \ref{FromInside}.
 
   \begin{figure}
   \begin{center}
@@ -94,7 +94,7 @@ Any instrument shipped has been fully tested at UiO and should work "out of the 
 To deploy:
 
 \begin{itemize}
-  \item Open the instrument. Remember that electronics are very sensitive to static electricity discharges / sparks, so try to touch the PCBs / electronics as little as possible, and try to "dischare yourself" by touching a large metallic mass before opening the instrument. Try to only open the instrument either inside a vehicle, or outside when the conditions are good, so that no snow / water is introduced. Some dessicant bags are hidden at the bottom of the instrument, so it should be fairly resistant to a bit of humidity.
+  \item Open the instrument. Remember that electronics are very sensitive to static electricity discharges / sparks, so try to touch the PCBs / electronics as little as possible, and try to "discharge yourself" by touching a large metallic mass before opening the instrument. Try to only open the instrument either inside a vehicle, or outside when the conditions are good, so that no snow / water is introduced. Some desiccant bags are hidden at the bottom of the instrument, so it should be fairly resistant to a bit of humidity.
   \item Take a short visual inspection to make sure that the instrument was not damaged during transport: check visually that all cables are in place, and nothing looks broken (SD card inserted, USB cable in place, GPS antenna cable in place).
   \item Find the main power connectors. These should be the only 2 loose connectors present in the box. They may be taped inside the box to make sure that they do not "move around" during transport.
   \item Connect the 2 main power connectors. Make sure that you engage them fully all the way.
@@ -122,9 +122,9 @@ A few points about the instruments deployment:
 Try to not start / stop the instruments: just let them on for the full duration of the deployment if no problem is encountered. Do not try to disconnect any cables / remove SD cards or other. All relevant data are transmitted through Iridium anyways. If necessary, to stop the instruments:
 
 \begin{itemize}
-  \item Cover the solar panel with a dark, mate, opaque cover, and keey them covered the whole time of the procedure. If not, the solar panels will continue providing enough energy to keep the instruments on.
+  \item Cover the solar panel with a dark, mate, opaque cover, and keep it covered the whole time of the procedure. If not, the solar panel will continue providing enough energy to keep the instrument on.
   \item Disconnect the main power connector. Secure both ends with a bit of tape.
-  \item To make sure that all capacitors are emptied, and that all electronics is shut off rather than in compromized browned-out mode, use the provided cable to short the 2 "supercaps" pads, as visible in Fig. \ref{shorting}.
+  \item To make sure that all capacitors are emptied, and that all electronics is shut off rather than in compromised browned-out mode, use the provided cable to short the 2 "supercaps" pads, as visible in Fig. \ref{shorting}. Make sure that you perform the shorting AFTER the main power connector has been disconnected, otherwise, you are attempting to short the battery.
 \end{itemize}
 
   \begin{figure}
@@ -138,11 +138,11 @@ Try to not start / stop the instruments: just let them on for the full duration 
 
 The design has been tested and operated without problems in several campaigns, both in the Arctic and the Antarctic.
 
-The main possible sources of troubles include: 1) the instruments being covered by snow 2) the instruments being destroyed by polar bears 2) the instruments falling in the water / being crushed following ice breakup.
+The main possible sources of troubles include: 1) the instruments being covered by snow 2) the instruments being destroyed by polar bears 2) the instruments falling in the water / being crushed following ice breakup. If possible, try to mitigate these hazards by choosing a relevant deployment location. These are conflicting trade-offs (for example, for polar bear resistance we chose to design the instruments to have a low profile and no mast, while this also means that the instruments are more likely to get covered by snow).
 
 The instruments should have enough power through the solar panel to sustain continuous operation with around 8 to 10 hours of sun per day. The batteries included should allow operation without any solar input for at least 1 to 2 months depending on the frequency of data transmission.
 
-The only issue encountered so far was failure to start up due to browned-out state of the electronics. This can happen if the instruments are switched on but not shorted, and / or (note: uncertain) if the instruments are let in the sun before turning on, in which case they may be started by the solar panel alone even without power from the battery.
+The only issue encountered so far in deployments was failure to start up due to browned-out state of the electronics. This can happen if the instruments are switched off but not shorted, and / or (note: uncertain) if the instruments are let in the sun before turning on, in which case they may be started by the solar panel alone even without power from the battery.
 
 To reset the instrument and start them in this case, 1) disconnect the main connector, 2) cover the solar panel with something opaque, 3) short the supercaps pads with the provided cable, 4) start the instruments by connecting the main connector.
 

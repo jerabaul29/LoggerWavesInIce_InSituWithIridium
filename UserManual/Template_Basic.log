@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.8.9)  17 JUN 2020 15:28
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.8.9)  17 JUN 2020 15:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1424,11 +1424,11 @@ Package pdftex.def Info: Figures/shorting.jpg  used on input line 132.
  [5 <./Figures/shorting.jpg>] [6]
 (./Template_Basic.aux) ) 
 Here is how much of TeX's memory you used:
- 20385 strings out of 492982
- 369337 string characters out of 6134897
+ 20389 strings out of 492982
+ 369377 string characters out of 6134897
  533025 words of memory out of 5000000
  23589 multiletter control sequences out of 15000+600000
- 583082 words of font info for 107 fonts, out of 8000000 for 9000
+ 583264 words of font info for 109 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  54i,10n,56p,10389b,458s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}{/usr/sh
@@ -1436,7 +1436,7 @@ are/texmf/fonts/enc/dvips/lm/lm-ts1.enc}</usr/share/texmf/fonts/type1/public/lm
 /lmr10.pfb></usr/share/texmf/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf/
 fonts/type1/public/lm/lmr17.pfb></usr/share/texmf/fonts/type1/public/lm/lmssbx1
 0.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt12.pfb>
-Output written on Template_Basic.pdf (6 pages, 3331684 bytes).
+Output written on Template_Basic.pdf (6 pages, 3332317 bytes).
 PDF statistics:
  51 PDF objects out of 1000 (max. 8388607)
  33 compressed objects within 1 object stream
