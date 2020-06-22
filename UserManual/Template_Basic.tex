@@ -134,6 +134,25 @@ Try to not start / stop the instruments: just let them on for the full duration 
   \end{center}
   \end{figure}
 
+\section{Extraction of raw data}
+
+\textbf{Warning: make sure to be very careful when extracting / inserting SD cards on the main PCB}.
+
+Data of interest (i.e., GPS position, significant wave height, peak period, binned spectra) are transmitted through Iridium. However, the Iridium data do not include the full raw signal.
+
+In order to extract the raw wave data:
+
+\begin{itemize}
+  \item Extract the SD card visible on the main PCB. This is a press in / press out mechanism: press and release to eject.
+  \item Copy all files on the SD card back to your computer. Do not change anything to the formatting of the SD card or the files contained.
+  \item Insert back the SD cad: press and release to insert.
+\end{itemize}
+
+I would advise to perform this operation when the logger is sleeping and not active (i.e., no blinking LEDs on the SD and GPS shields), and to not switch on / off the logger for performing this operation. It should take only a few seconds to copy the data, and the probability that the logger wakes up then is quite little. \\~\\
+
+If you perform data extraction from several instruments, \textbf{make sure that each instrument gets back its initial SD card}, i.e. \textbf{do not permutate SD cards between instruments}.
+
+
 \section{Troubleshooting}
 
 The design has been tested and operated without problems in several campaigns, both in the Arctic and the Antarctic.
