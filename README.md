@@ -1,3 +1,5 @@
+### NOTE - the content of this repository is kept available for archive, but we have a better instrument design released in 2021, see: https://github.com/jerabaul29/OpenMetBuoy-v2021a .
+
 # Logger waves in ice with solar panel and Iridium communications
 
 This is the repository for the 'waves in ice' instrument developed in this work:
